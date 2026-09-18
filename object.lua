@@ -5,6 +5,7 @@ local sb_layer  = require 'layer'
 local sb_log    = require 'log'
 local sb_com    = require 'commands'
 local sb_ir     = require 'ir'
+local sb_eval   = require 'eval'
 
 local object = {}
 object.__index = object
@@ -142,7 +143,7 @@ function object:getAnchorPosition(x,y)
 	return anc(x,y,w,h)
 end
 
-function object:out(commands)
+function object:output(commands)
 	local header = self:getObjectType()
 
 	if header=="Sample" then
@@ -157,13 +158,40 @@ function object:out(commands)
 			 self.frame_count, self.frame_delay, self.loop_type)
 	end
 
+	local evaluated = {}
 	for i,com in ipairs(commands or {}) do
+		local eval_result = {sb_eval(com)}
+		for i,v in ipairs(eval_result) do
+			table.insert(evaluated,v)
+		end
+	end
+
+	for i,com in ipairs(evaluated) do
+		local com_def = sb_com[com[1]]
+		if com_def.args and not com["start_x"] then
+			com["start_x"] = self.x or 320 end
+		if com_def.args and not com["start_y"] then
+			com["start_y"] = self.y or 240 end
+
 		local com_ir  = sb_com:out(com)
 		local com_str = com_ir:out()
 		header=header.."\n"..com_str
 	end
 
 	return header
+end
+
+-- the same as object:output, but wraps all commands inside a __root__ beforehand
+-- if there isnt one.
+function object:out(commands)
+	commands = commands or {}
+
+	if not sb_com:equal(commands[1], "root") then
+		return self:output{
+			"root", table.unpack(commands) }
+	else
+		return self:output(commands)
+	end
 end
 
 return object

@@ -18,6 +18,7 @@
 -- storyboard.
 
 local sb_log = require 'log'
+local sb_config = require 'config'
 
 local time = {}
 local time_mt = {}
@@ -78,7 +79,7 @@ function time.convert(x)
 		"suppress warning with -ignore-large-time-points if this makes sense."
 
 	if type(x)=="number" then
-		if x > 5400000 and not sb_log.ignore_large_time_points then
+		if x > 5400000 and not sb_config["ignore-large-time-points"] then
 			sb_log:warn(string.format(large_number_warning,tostring(x)))
 		end
 		return x
@@ -96,7 +97,7 @@ function time.convert(x)
 				return sb_log:error(string.format("'%s' is a malformed millisecond time point.", x))
 			end
 
-			if result > 5400000 and not sb_log.ignore_large_time_points then
+			if result > 5400000 and not sb_config["ignore-large-time-points"] then
 				sb_log:warn(string.format(large_number_warning,tostring(x)))
 			end
 			return result
@@ -113,6 +114,9 @@ function time.convert(x)
 			tonumber(Ms),
 			tonumber(Ss),
 			tonumber(MSs)
+
+		-- if M is -0 instead of 0, the time point should still be negated
+		local negate = false
 
 		--ms
 		sb_log:assert(MS,string.format("'%s' is a malformed mm:ss:mms time point. (%s)", x, MSs))
@@ -132,6 +136,10 @@ function time.convert(x)
 		sb_log:assert(M,string.format("'%s' is a malformed mm:ss:mms time point. (%s)", x, Ms))
 		sb_log:assert(math.type(M)=="integer",
 			string.format("'%s' is a malformed mm:ss:mms time point. (%s minutes is not an integer)", x, Ms))
+		if M==0 and Ms:byte(1) == string.byte('-') then
+			negate = true
+		end
+
 		--
 		--
 		-- count leading zeros in the millisecond string,
@@ -155,23 +163,25 @@ function time.convert(x)
 					leading2=leading2*10
 				end
 
-				if sb_log["-allow-no-leading-zeros"] then
-					sb_log:warn (string.format("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds", x, leading1, leading2))
+				if sb_config["allow-no-leading-zeros"] then
+					sb_log:warn (string.format("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds",
+						x, leading1, leading2))
 				else
-					sb_log:error(string.format("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds", x, leading1, leading2))
+					sb_log:error(string.format("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds", x,
+						leading1, leading2))
 				end
 			end
 		end
 		--
 
 		local result
-		if M < 0 then
+		if M < 0 or negate then
 			result = -(MS + S*1000 + M*-60000)
 		else
 			result = MS + S*1000 + M*60000
 		end
 
-		if result > 5400000 and not sb_log.ignore_large_time_points then
+		if result > 5400000 and not sb_config["ignore-large-time-points"] then
 			sb_log:warn(string.format(large_number_warning,tostring(x)))
 		end
 
@@ -196,7 +206,7 @@ function time.convert(x)
 		local interval = 60000.0 / metronome[1]
 		local result = interval*beat + metronome[2]
 		
-		if result > 5400000 and not log.ignore_large_time_points then
+		if result > 5400000 and not sb_config["ignore-large-time-points"] then
 			sb_log:warn(string.format(large_number_warning,tostring(result)))
 		end
 

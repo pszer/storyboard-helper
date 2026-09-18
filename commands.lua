@@ -30,6 +30,8 @@
 --                   for the command (see ir.lua).
 -- overlapping    - (this is a boolean for if this command is allowed to overlap with commands of the same type, used
 --                   for things like relative transformations which can have their transformations combined in the overlap.)
+-- absolute_equal - (this is a string specifying the name for the command which is the absolute (non-relative) version
+--                   of this command if this is a relative command with the 'overlapping' flag on)
 --
 
 local sb_log  = require 'log'
@@ -68,7 +70,7 @@ function command:parseCommand(com, target)
 	local time
 	local args
 	local varargs
-	local vec1,vec2
+	local vec1,vec2 
 
 	if step_easing and com_def.easing then
 		step()
@@ -187,32 +189,41 @@ command.___lock_out = false
 function command:addDefinition(def, ...)
 	sb_log:assert(def, "command.addDefinition(): missing command definition.")
 	local keys = {...}
-	sb_log:assert(#keys > 0, "command.addDefinition(): missing key names to assign to this command.")
+	sb_log:assert(#keys > 0, "command.addDefinition(): missing key names to assign to this command")
 
-	sb_log:assert(type(def.easing)=="boolean", "command.addDefinition(): malformed easing definition.")
+	local definition_str = " for \'"..keys[1].."\'"
+
+	sb_log:assert(type(def.easing)=="boolean", "command.addDefinition(): malformed easing definition"..definition_str)
 	sb_log:assert(type(def.time_points)=="number"
 	              and math.type(def.time_points)=="integer"
-								and def.time_points >= 0, "command.addDefinition(): malformed time points definition.")
+								and def.time_points >= 0, "command.addDefinition(): malformed time points definition"..definition_str)
 	sb_log:assert(type(def.dimension)=="number"
 	              and math.type(def.dimension)=="integer"
-								and def.time_points >= 0, "command.addDefinition(): malformed dimension(s) definition.")
+								and def.time_points >= 0, "command.addDefinition(): malformed dimension(s) definition"..definition_str)
 
 	sb_log:assert(type(def.args)=="table" or type(def.args)=="nil",
-								"command.addDefinition(): malformed arg(s) table definition.")
+								"command.addDefinition(): malformed arg(s) table definition"..definition_str)
 	for i,v in ipairs(def.args or {}) do
-		sb_log:assert(type(v)=="string", "command.addDefinition(): malformed arg(s) table definition.")
+		sb_log:assert(type(v)=="string", "command.addDefinition(): malformed arg(s) table definition"..definition_str)
 	end
 
 	sb_log:assert(type(def.args_valid)=="table" or type(def.args_valid)=="nil",
-								"command.addDefinition(): malformed arg(s) valid functions table definition.")
+								"command.addDefinition(): malformed arg(s) valid functions table definition"..definition_str)
 	for i,v in pairs(def.args_valid or {}) do
-		sb_log:assert(type(v)=="function" or type(v)=="nil", "command.addDefinition(): malformed arg(s) valod functions table definition.")
+		sb_log:assert(type(v)=="function" or type(v)=="nil", "command.addDefinition(): malformed arg(s) valod functions table definition"..definition_str)
 	end
-	sb_log:assert(type(def.varargs)=="boolean", "command.addDefinition(): malformed variable args definition.")
+	sb_log:assert(type(def.varargs)=="boolean", "command.addDefinition(): malformed variable args definition"..definition_str)
 	sb_log:assert(not (type(def.out)=="function" and command.___lock_out),
 		"command.addDefinition(): the out function are fixed for primitives only.")
 
-	sb_log:assert(type(def.eval)=="function" or type(def.eval)=="nil", "command.addDefinition(): malformed eval defintion.")
+
+	sb_log:assert(type(def.overlapping)=="boolean" or def.overlapping==nil, "command.addDefinition(): malformed overlapping flag definition"..definition_str)
+	def.overlapping = def.overlapping==true
+	if def.overlapping then
+		sb_log:assert(type(def.absolute_equal)=="string", "command.addDefinition(): malformed absolute_equal specifier definition"..definition_str)
+	end
+
+	sb_log:assert(type(def.eval)=="function" or type(def.eval)=="nil", "command.addDefinition(): malformed eval defintion"..definition_str)
 
 	for i,v in ipairs(keys) do
 		local str = v
@@ -235,9 +246,15 @@ command:addDefinition(require 'commands.vector'     , 'v', 'vector', 'vectorscal
 command:addDefinition(require 'commands.parameter'  , 'p', 'parameter', 'param')
 command:addDefinition(require 'commands.colour'     , 'c', 'col', 'color', 'colour')
 command:addDefinition(require 'commands.originscale', 'originscale', 'os', 'origin_scale')
+command:addDefinition(require 'commands.moverel'  , 'mr', 'mover', 'moverel', 'moverelative', 'm_r', 'move_r', 'move_rel', 'move_relative')
+command:addDefinition(require 'commands.rotaterel', 'rr', 'rotr', 'rotrel', 'rotrelative', 'r_r', 'rot_r', 'rot_rel', 'rot_relative',
+                                                    'rotater', 'rotaterel', 'rotaterelative', 'rotate_r', 'rotate_rel',
+																										'rotate_relative')
+command:addDefinition(require 'commands.scalerel' , 'sr', 'scaler', 'scalerel', 'scalerelative', 's_r', 'scale_r', 'scale_rel','scale_relative')
+command:addDefinition(require 'commands.vectorrel', 'vr', 'vectorr', 'vectorrel', 'vectorrelative', 'v_r', 'vector_r', 'vector_rel',
+                                                    'vector_relative')
 
 command.___lock_out = true -- prevent future command definitions with an 'out' function
-command:addDefinition(require 'commands.moverel'  , 'mr', 'mover', 'moverel', 'moverelative', 'm_r', 'move_r', 'move_rel', 'move_relative')
 
 function command:type(c)
 	sb_log:assert(c, "command.type(): no argument")
@@ -262,6 +279,29 @@ function command:equal(com, ...)
 	return false
 end
 
+function command:isRelative(com)
+	sb_log:assert(com, "command.isRelative(): no argument")
+	local com_type = com[1]
+	sb_log:assert(com_type, "command.isRelative(): malformed command, missing type?")
+	return command[com_type].overlapping==true
+end
+function command:isAbsolute(com)
+	sb_log:assert(com, "command.isAbsolute(): no argument")
+	local com_type = com[1]
+	sb_log:assert(com_type, "command.isAbsolute(): malformed command, missing type?")
+	return command[com_type].overlapping~=true
+end
+function command:getAbsoluteVersion(com)
+	if type(com) == "string" then
+		return command[com].absolute_equal
+	end
+
+	if command:isRelative(com) then
+		return command[com[1]].absolute_equal
+	end
+		return com[1]
+end
+
 function command:isRoot(com)
 	sb_log:assert(com, "command.isRoot(): no argument")
 	local com_type = com[1]
@@ -279,13 +319,85 @@ function command:out(com)
 
 	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
 
-	return out_func(time, easing, vec1, vec2, args, varargs )
+	return out_func(time, easing, vec1, vec2, args, varargs)
+end
+
+-- creates a command based on the type.
+-- this function does not support the normal shorthands for time and vectors since its
+-- for internal logic use only.
+function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
+	local com_def = command[com_type]
+	sb_log:assert(com_def, string.format("command.createCommand(): unknown command '%s'.", tostring(com_type)))
+
+	local result = {com_type}
+	if com_def.easing then
+		local c_easing = sb_easing[easing]
+		sb_log:assert(c_easing, string.format("command.createCommand(): command '%s' expects an easing, got '%s'.",
+			com_type, tostring(c_easing)))
+		table.insert(result, c_easing)
+	end
+
+	if com_def.time_points > 0 then
+		local c_time, err = sb_time(table.unpack(time))
+		sb_log:assert(not err, string.format("command.createCommand(): command '%s' expects time, got an error: %s.",
+			com_type, err))
+		table.insert(result, time)
+	end
+
+	if com_def.dimension > 0 then
+		sb_log:assert(vec1 and vec2, string.format("command.createCommand(): command '%s' expects two vectors, got a '%s' and '%s'",
+			com_type, type(vec1), type(vec2)))
+		sb_log:assert(#vec1 == com_def.dimension, string.format("command.createCommand(): command '%s' expects vector of dimension %d, "..
+			"start vector is dimension %d.",
+			com_type, com_def.dimension, #vec1))
+		sb_log:assert(#vec2 == com_def.dimension, string.format("command.createCommand(): command '%s' expects vector of dimension %d, "..
+			"end vector is dimension %d.",
+			com_type, com_def.dimension, #vec2))
+		table.insert(result, vec1)
+		table.insert(result, vec2)
+	end
+
+	if com_def.varargs then
+		for i,v in {...} do
+			table.insert(result, v)
+		end
+	end
+
+	if com_def.args then
+		args = args or {}
+		local valids = com_def.args_valid
+
+		for i,v in ipairs(com_def.args) do
+			local valid_func = valids[i] or function(x) return x end
+			local value, err = valid_func(args[v])
+			sb_log:assert(not err, string.format("command.createCommand(): command '%s' got malformed argument for '%s': %s",
+				com_type, tostring(v), tostring(err)))
+			result[v] = value
+		end
+	end
+
+	return result
+end
+
+function command:scaleToVector(com)
+	if command:equal(com, 's') then
+		local easing,time,vec1,vec2 = command:parseCommand(com)
+		return command:createCommand('v', easing, time, {vec1[1],vec[1]}, {vec2[1],vec2[1]})
+	end
+	if command:equal(com, 'sr') then
+		local easing,time,vec1,vec2 = command:parseCommand(com)
+		return command:createCommand('vr', easing, time, {vec1[1],vec[1]}, {vec2[1],vec2[1]})
+	end
 end
 
 -- 
 -- not serialised (doesn't seriaise args or varargs), only for debugging purposes
 --
 function command:toString(com)
+	if type(com)~="table" then
+		return tostring(com)
+	end
+
 	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
 	local result = "{"..com[1]
 
@@ -314,7 +426,16 @@ function command:toString(com)
 		end
 		result=result..","..vec2s.."}"
 	end
-	if args or varargs then
+	if args then
+		result=result.."{"
+
+		for i,v in pairs(args) do
+			result=result..string.format("%s=%s",tostring(i),tostring(v))
+			result=result..","
+		end
+		result=result.."}"
+	end
+	if varargs then
 		result=result..", ... " end
 	result = result.."}"
 	return result

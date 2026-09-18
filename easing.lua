@@ -11,6 +11,18 @@ local sb_log = require 'log'
 
 local easing = {}
 easing.funcs = {}
+easing.names = {
+"linear","out","in","quadin","quadout","quadinout"
+,"cubicin","cubicout","cubicinout"
+,"quartin","quartout","quartinout"
+,"quintin","quintout","quintinout"
+,"sinein","sineout","sineinout"
+,"expoin","expoout","expoinout"
+,"circin","circout","circinout"
+,"elasticin","elasticout","elastichalfout","elasticquarterout","elasticinout"
+,"backin","backout","backinout"
+,"bouncein","bounceout","bounceinout"
+}
 
 local easing_mt = {}
 easing_mt.__index = function(table,key)
@@ -190,6 +202,11 @@ end
 easing["bounceinout"] =34
 easing.funcs[34]=function(x)
 	return x < 0.5 and (1 - easeOutBounce(1 - 2 * x)) / 2 or (1 + easeOutBounce(2 * x - 1)) / 2;
+end
+
+for i,v in ipairs(easing.names) do
+	local num = easing[v]
+	easing.funcs[v] = easing.funcs[num]
 end
 
 return easing

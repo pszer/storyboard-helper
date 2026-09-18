@@ -138,13 +138,13 @@ local function eval(t)
 	return table.unpack(eval_result)
 end
 
-local test = {eval{
-
-	"__root__",
-	{"move"  , 0, {10,50}, {50,50}, {250,250}},
-	{"rotate", 0, {10,50}, 0, 3.14},
-	function(out) out{"rotate", 0, {10,50}, 0, 3.14} end
-
-}}
+--local test = {eval{
+--
+--	"__root__",
+--	{"move"  , 0, {10,50}, {50,50}, {250,250}},
+--	{"rotate", 0, {10,50}, 0, 3.14},
+--	function(out) out{"rotate", 0, {10,50}, 0, 3.14} end
+--
+--}}
 
 return eval

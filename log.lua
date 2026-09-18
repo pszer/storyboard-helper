@@ -8,6 +8,7 @@ local log = {
 
 	["-ignore-large-time-points"] = false,
 	["-allow-no-leading-zeroes"] = false,
+	["-allow-non-linear-easing-overlaps"] = false,
 }
 log.__index = {}
 
@@ -26,7 +27,8 @@ function log:warn(...)
 
 	table.insert(log.history,str)
 
-	if not self.__silent and self.__out then
+	local sb_config = require 'config'
+	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')
 	end
@@ -41,7 +43,8 @@ function log:error(...)
 
 	table.insert(log.history,str)
 
-	if not self.__silent and self.__out then
+	local sb_config = require 'config'
+	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')
 		error("Aborting.")
@@ -61,7 +64,8 @@ function log:assert(a, ...)
 
 	table.insert(log.history,str)
 
-	if not self.__silent and self.__out then
+	local sb_config = require 'config'
+	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')
 		error("Aborting.")
