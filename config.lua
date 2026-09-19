@@ -7,9 +7,13 @@ local config = {
 	["allow-non-linear-easing-overlaps"] = false,
 	["no-overlap-checks"] = false,
 	["ignore-version"] = false,
+
 	["disable-easing-keyframing"] = false,
 	["default-easing-keyframing-epsilon"] = 2.0,
 	["default-easing-keyframing-interval"] = 1,
+
+	["default-epsilon"] = 2.0,
+
 	["project-folder"] = "."..package.config:sub(1,1),
 }
 

@@ -80,7 +80,7 @@ function time.convert(x)
 
 	if type(x)=="number" then
 		if x > 5400000 and not sb_config["ignore-large-time-points"] then
-			sb_log:warn(large_number_warning,tostring(x))
+			sb_log:warn(large_number_warning,x)
 		end
 		return x
 	end
@@ -98,7 +98,7 @@ function time.convert(x)
 			end
 
 			if result > 5400000 and not sb_config["ignore-large-time-points"] then
-				sb_log:warn(large_number_warning,tostring(x))
+				sb_log:warn(large_number_warning,x)
 			end
 			return result
 		end
@@ -182,7 +182,7 @@ function time.convert(x)
 		end
 
 		if result > 5400000 and not sb_config["ignore-large-time-points"] then
-			sb_log:warn(large_number_warning,tostring(x))
+			sb_log:warn(large_number_warning,x)
 		end
 
 		return result
@@ -207,13 +207,13 @@ function time.convert(x)
 		local result = interval*beat + metronome[2]
 		
 		if result > 5400000 and not sb_config["ignore-large-time-points"] then
-			sb_log:warn(large_number_warning,tostring(result))
+			sb_log:warn(large_number_warning,result)
 		end
 
 		return result
 	end
 
-	sb_log:error("Unknown time point '%s' of type '%s'",tostring(x),type(x))
+	sb_log:error("Unknown time point '%s' of type '%s'",x,type(x))
 end
 
 return time

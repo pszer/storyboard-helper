@@ -33,8 +33,8 @@ function object:new(file,layer,...)
 	}
 	setmetatable(t, object)
 
-	sb_log:assert(t.file, "object:new(): bad file '%s'.", tostring(file))
-	sb_log:assert(t.layer, "object:new(): bad layer '%s'.", tostring(layer))
+	sb_log:assert(t.file, "object:new(): bad file '%s'.", file)
+	sb_log:assert(t.layer, "object:new(): bad layer '%s'.", layer)
 	t.file_type   = t.file:getFilenameType()
 	t.object_type = t:getObjectType()
 
@@ -55,13 +55,13 @@ function object:new(file,layer,...)
 	if t.file_type == "image" then
 		sb_log:assert(arg[1], "object:new(): no anchor.")
 		t.anchor = sb_anchor:correctInput(arg[1])
-		sb_log:assert(t.anchor, "object:new(): bad anchor '%s'.", tostring(arg[1]))
+		sb_log:assert(t.anchor, "object:new(): bad anchor '%s'.", arg[1])
 
 		sb_log:assert(type(arg[2])=="number",
-			"object:new(): expected number for x position, got '%s'",tostring(arg[2]))
+			"object:new(): expected number for x position, got '%s'",arg[2])
 		t.x = tonumber(arg[2]) or 320
 		sb_log:assert(type(arg[3])=="number",
-			"object:new(): expected number for y position, got '%s'",tostring(arg[2]))
+			"object:new(): expected number for y position, got '%s'",arg[2])
 		t.y = tonumber(arg[3]) or 240
 
 		if t.object_type == "Animation" then
@@ -69,13 +69,13 @@ function object:new(file,layer,...)
 			t.frame_count = math.floor(tonumber(arg[4]))
 			sb_log:assert(t.frame_count>=1,
 				"object:new(): Animation object frame count should be 1 or higher, got '%s'.",
-				tostring(arg[4]))
+				arg[4])
 
 			sb_log:assert(arg[5], "object:new(): Animation object expects a frame delay.")
 			t.frame_delay = math.floor(tonumber(arg[5]))
 			sb_log:assert(t.frame_delay >= 1,
 				"object:new(): Animation frame delay should be 1 or higher, got '%s'.",
-				tostring(arg[5]))
+				arg[5])
 
 			sb_log:assert(arg[6]:lower()=="looponce" or arg[6]:lower()=="loopforever",
 				"object:new(): Animation object expects a loop_type of LoopOnce or LoopForever")

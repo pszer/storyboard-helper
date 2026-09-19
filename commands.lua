@@ -173,7 +173,7 @@ function command:parseCommand(com, target)
 			if valid_func then
 				A,err = valid_func(A)
 
-				sb_log:assert(err==nil,"invalid value for argument '%s' in command '%s', '%s'", arg_name, com_type, tostring(err))
+				sb_log:assert(err==nil,"invalid value for argument '%s' in command '%s', '%s'", arg_name, com_type, err)
 			end
 			
 			args[arg_name] = A
@@ -328,13 +328,13 @@ end
 -- for internal logic use only.
 function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
 	local com_def = command[com_type]
-	sb_log:assert(com_def, "command.createCommand(): unknown command '%s'.", tostring(com_type))
+	sb_log:assert(com_def, "command.createCommand(): unknown command '%s'.", (com_type))
 
 	local result = {com_type}
 	if com_def.easing then
 		local c_easing = sb_easing[easing]
 		sb_log:assert(c_easing, "command.createCommand(): command '%s' expects an easing, got '%s'.",
-			com_type, tostring(c_easing))
+			com_type, (c_easing))
 		table.insert(result, c_easing)
 	end
 
@@ -371,7 +371,7 @@ function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
 		for i,v in ipairs(com_def.args) do
 			local valid_func = valids[i] or function(x) return x end
 			local value, err = valid_func(args[v])
-			sb_log:assert(not err, "command.createCommand(): command '%s' got malformed argument for '%s': %s", com_type, tostring(v), tostring(err))
+			sb_log:assert(not err, "command.createCommand(): command '%s' got malformed argument for '%s': %s", com_type, v, err)
 			result[v] = value
 		end
 	end
@@ -419,6 +419,9 @@ function command:createCommandAddition(c1,c2)
 
 	local c = command:createCommand(type1, easing, time1, new_vec1, new_vec2)
 	return c
+end
+
+function command:getTimeSpan(...)
 end
 
 -- 
@@ -476,7 +479,7 @@ local command_mt={}
 function command_mt.__index(table,key)
 	if type(key)=="string" then
 		local r = rawget(table,key:lower())
-		sb_log:assert(r, "command[]: unknown command '%s'",tostring(key))
+		sb_log:assert(r, "command[]: unknown command '%s'",key)
 		return r
 	end
 end

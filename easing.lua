@@ -31,7 +31,7 @@ easing_mt.__index = function(table,key)
 	end
 	if type(key)=="string" then
 		local r = rawget(table,key:lower())
-		sb_log:assert(r, "easing[]: unknown easing '%s'",tostring(key))
+		sb_log:assert(r, "easing[]: unknown easing '%s'",key)
 		return r
 	end
 end

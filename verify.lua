@@ -362,24 +362,6 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		local easing, time, vec1, vec2 = sb_com:parseCommand(curr.command)
 		local easing_func = sb_easing.funcs[easing]
 
-		local keyframe_easing = false
-
-		if easing~= 0 then
-
-			--[[
-			if not sb_config["allow-non-linear-easing-overlaps"] then
-			sb_log:warn(
-				"verify:resolveTransformOverlaps(): overlap resolution with non-linear easings may result in "
-			.."unexpected visuals, got '%s'. 'linear'/0 is recommended.", tostring(easing))
-			end--]]
-
-			--
-			--
-			-- TODO create keyframes to emulate easing motion.
-			--
-			--
-		end
-
 		-- in case there is a custom relative transformation command that makes use of the
 		-- multiple time points feature, how motion is to be resolved
 		-- cannot be deduced, using the minimum and maximum as time points
