@@ -1,4 +1,5 @@
 require 'math'
+
 local sb_log = require 'log'
 
 local keyframe = {}
@@ -41,7 +42,8 @@ function keyframe:simplify(input, parameters)
 	if input[1] == nil then
 		return {}
 	else
-		local vec = in_func(input[1])
+		local vec = input[1]
+		if in_func then vec = in_func(vec) end
 		t_dimension = #vec
 		dimension = t_dimension - 1
 	end
@@ -73,8 +75,8 @@ function keyframe:simplify(input, parameters)
 			p[i-1]=v3[i]-v1[i]
 		end
 		local dd = dd or dot(d,d) -- precalculated d*d
-		local pp = dot(p,d)
-		if dd==0 then math.pow(p,1/dimension) -- if v1 and v2 are the same point, just use point to point dist
+		local pd = dot(p,d)
+		if dd==0 then math.pow(dot(p,p),1/dimension) -- if v1 and v2 are the same point, just use point to point dist
 			return
 		end
 		return math.sqrt(dot(p,p) - (pd*pd)/dd)
@@ -88,11 +90,12 @@ function keyframe:simplify(input, parameters)
 		local max_dist = -1/0
 		local max_i = nil
 
+		-- precalculate d and dd
 		local d = {}
 		for i=2,t_dimension do
 			d[i-1]=points[J][i] - points[I][i]
 		end
-		local dd = dot(d)
+		local dd = dot(d,d)
 
 		for i = I+1, J-1 do
 			local dist_i = perp_dist(points[J],points[I], points[i], d, dd)
@@ -103,8 +106,8 @@ function keyframe:simplify(input, parameters)
 		end
 
 		if max_dist > epsilon then
-			r_results1 = RDP(points,I,max_i)
-			r_results2 = RDP(points,max_i,J)
+			local r_results1 = RDP(points,I,max_i)
+			local r_results2 = RDP(points,max_i,J)
 
 			for i=1,#r_results1-1 do
 				table.insert(result,r_results1[i])
@@ -137,17 +140,6 @@ function keyframe:simplify(input, parameters)
 	end
 
 	return result
-end
-
-local test_v = {}
-for i=1,360 do
-	local x = -math.sin(math.pi*i/180) + i/10.0
-	local y = math.cos(math.pi*i/180) + i
-	test_v[i] = {i*2-2,x,y}
-end
-
-for i,v in ipairs(test_v) do
-	print('{',v[1],v[2],v[3],'}')
 end
 
 return keyframe

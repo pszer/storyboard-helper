@@ -2,9 +2,9 @@ require 'io'
 
 package.path = "./imgsize/?.lua;" .. package.path
 local imgsize = require 'imagesize'
+local sb_config  = require 'config'
 
 local file = {
-	project_folder="."..package.config:sub(1,1)
 }
 file.__index = file
 
@@ -24,7 +24,7 @@ file.userskin_filenames = {
 
 function file:setProjectFolder(f)
 	if type(f)~="string" then sb_log:error("file:setProjectFolder(): string required") end
-	self.project_folder = f
+	sb_config["project-folder"] = f
 end
 
 -- animated_file -- boolean if animated file (eg if img.png, then img0.png is tested
@@ -45,10 +45,10 @@ function file:new(filename, animated_file)
 		_absfpath=nil
 	}
 
-	local absfpath = self.project_folder..filename
+	local absfpath = sb_config["project-folder"]..filename
 	if animated_file then
 		local period_i = filename:find("%.[^%.]*$")
-		absfpath = self.project_folder..filename:sub(1,period_i-1).."0"..filename:sub(period_i,-1)
+		absfpath = sb_config["project-folder"]..filename:sub(1,period_i-1).."0"..filename:sub(period_i,-1)
 		t._absfpath=absfpath
 	end
 

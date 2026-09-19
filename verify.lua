@@ -8,6 +8,7 @@ local sb_config    = require 'config'
 local sb_transform = require 'transform'
 local sb_time      = require 'time'
 local sb_log       = require 'log'
+local sb_keyframe  = require 'keyframe'
 
 local verify = {}
 verify.__index = verify
@@ -213,11 +214,11 @@ end
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type)
 
-	print()
+	--[[print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
 	end
-	print()
+	print()--]]
 
 	local dimensions=0
 	if times[1] then
@@ -234,12 +235,13 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 	local abs_type = sb_com:getAbsoluteVersion(com_type)
 	local curr = times[1]
 
+	local linear_easing = sb_easing["linear"]
 
 	-- {command, easing_func, time, vec1, vec2} are popped
 	-- on and off here lasting from their start to end time
 	local easing_stack = {}
-	local function add_to_easing_stack(command, easing_func, time, vec1, vec2)
-		table.insert(easing_stack, {command, easing_func, time, vec1, vec2})
+	local function add_to_easing_stack(command, easing_func, time, vec1, vec2, easing)
+		table.insert(easing_stack, {command, easing_func, time, vec1, vec2, easing})
 	end
 	local function remove_from_easing_stack(command)
 		for i=#easing_stack,1,-1 do
@@ -249,7 +251,6 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 			end
 		end
 	end
-
 
 	--
 	-- when commands evaluate to cases like
@@ -284,7 +285,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		end
 	end
 
-	function get_from_stack(time)
+	local function get_from_stack(time)
 		local result = {}
 		for i=1,dimension do result[i]=total_offset[i] end
 
@@ -309,18 +310,68 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		return result
 	end
 
+	local function is_stack_overlapping()
+		return #easing_stack > 1
+	end
+
+	local function is_stack_linear()
+		for i,v in ipairs(easing_stack) do
+			local easing = v[6]
+			if easing ~= linear_easing then return false end
+		end
+		return true
+	end
+
+	local function get_keyframes_from_stack(time1, time2, interval)
+		if interval==0 then sb_log:error("keyframe:simplify(): error in get_keyframes_from_stack, time step interval is 0.") end
+
+		local result = {}
+
+		local add_time2 = true
+		for t=time1,time2,interval do
+			if t==time2 then add_time2 = false end
+
+			local vec = get_from_stack(t)
+			local V = {t}
+			for i=1,dimension do
+				V[i+1] = vec[i]
+			end
+			table.insert(result, V)
+		end
+
+		-- in case step interval doesnt cleanly divide the given time interval.
+		if add_time2 then
+			local vec = get_from_stack(time2)
+			local V = {time2}
+			for i=1,dimension do
+				V[i+1] = vec[i]
+			end
+			table.insert(result, V)
+		end
+
+		return result
+	end
+
+	-- converts keyframes to the final commands
+	local function keyframes_to_command(keyframes)
+	end
+
 	while curr do
 		local com_type = curr.command[1]
 
 		local easing, time, vec1, vec2 = sb_com:parseCommand(curr.command)
-
 		local easing_func = sb_easing.funcs[easing]
+
+		local keyframe_easing = false
+
 		if easing~= 0 then
+
+			--[[
 			if not sb_config["allow-non-linear-easing-overlaps"] then
 			sb_log:warn(string.format(
 				"verify:resolveTransformOverlaps(): overlap resolution with non-linear easings may result in "
 			.."unexpected visuals, got '%s'. 'linear'/0 is recommended.", tostring(easing)))
-			end
+			end--]]
 
 			--
 			--
@@ -340,7 +391,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		local is_abs = sb_com:isAbsolute(curr.command)
 
 		if curr[2]=="min" then
-			add_to_easing_stack(curr.command, easing_func, time, vec1, vec2)
+			add_to_easing_stack(curr.command, easing_func, time, vec1, vec2, easing)
 
 			if is_abs then
 				for i=1,dimension do
@@ -356,38 +407,72 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		--
 		local skip = false
 		if curr.prev then
-			if curr.prev[1] == curr[1] and curr.prev[2]=="max" and curr[2]=="max" then
+			if curr.prev[1] == curr[1] then
 				skip = true
 			end
+		elseif curr[2] ~= "point" then
+			skip = true
 		end
 
 		if curr[2]=="point" then
 			if not is_abs then
-				add_to_easing_stack(curr.command, easing_func, time, vec1, vec2)
+				add_to_easing_stack(curr.command, easing_func, time, vec1, vec2, easing)
 				add_to_total_offset(curr.command)
 				remove_from_easing_stack(curr.command)
 			else
 				for i=1,dimension do
 					total_offset[i]=vec2[i]
 				end
-				--add_to_total_offset_abs_command(vec1, vec2)
 			end
-
-			last_point_time = time[2]
-
 			table.insert(final, sb_com:createCommand(abs_type, 0, {curr[1], curr[1]},
 				get_from_stack(curr[1]), get_from_stack(curr[1]), nil, nil))
+
+			last_point_time = time[2]
 				
 		elseif curr.prev and not skip then
 
 			-- if previous point-like command can be removed, then remove it
-			print("umm",last_point_time,curr[1])
 			if last_point_time == curr[1] then
-				print("die")
 				table.remove(final, #final)
 			else
-				table.insert(final, sb_com:createCommand(abs_type, 0, {curr.prev[1], curr[1]},
-					get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
+
+				--
+				-- if stack only has linear easings, the final result can be linear too.
+				--
+				-- if stack has no overlaps, then the current commands easing can be used without extra steps.
+				--
+				-- if stack has overlaps and non-linear easings, the easings must be sampled and keyframed to
+				-- create the desired visual result.
+				--
+
+				if (not is_stack_overlapping() or is_stack_linear())
+					and not (easing ~= linear_easing and curr.prev.command ~= curr.command) then 
+					table.insert(final, sb_com:createCommand(abs_type, easing, {curr.prev[1], curr[1]},
+						get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
+				elseif sb_config["disable-easing-keyframing"] then
+
+					sb_log:warn(
+						"verify:resolveTransformOverlaps(): overlap resolution with non-linear easings will result in "
+					.."unexpected visuals. -disable-easing-keyframing has been set to true, so "
+					.."'linear'/0 is recommended.")
+					table.insert(final, sb_com:createCommand(abs_type, easing, {curr.prev[1], curr[1]},
+						get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
+				else
+
+					local frames = get_keyframes_from_stack(curr.prev[1], curr[1], sb_config["default-easing-keyframing-interval"])
+					frames = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon"]})
+					
+					for i=1,#frames-1 do
+						local vec1,vec2 = {},{}
+						for j=1,dimension do
+							vec1[j]=frames[i][j+1]
+							vec2[j]=frames[i+1][j+1]
+						end
+
+						table.insert(final, sb_com:createCommand(abs_type, linear_easing, {frames[i][1], frames[i+1][1]},
+							vec1, vec2, nil, nil))
+					end
+				end
 			end
 		end
 
@@ -445,31 +530,5 @@ function verify:resolve(commands_list)
 		local param_overlaps      = verify:sortedTimes(param_overlaps)
 	end
 end
-
---[[local test, dim = verify:sortedTimes(
-	{
-		{"mover", 0, {"-00:01:000","00:09:000"}, {0,0}, {10000,10000}},
-		{"mover", 0, {"-00:00:200","00:00:000"}, {0,0}, {-20,-20}},
-		{"mover", 0, {"00:00:000","00:00:000"}, {0,0}, {10,10}},
-		{"mover", 0, {"00:00:000","00:05:000"}, {0,0}, {1000,1000}},
-		{"mover", 0, {"00:01:000","00:05:000"}, {0,0}, {1000,1000}},
-		{"mover", 0, {"00:02:000","00:05:000"}, {0,0}, {1000,1000}},
-		{"mover", 0, {"00:07:000","00:07:000"}, {0,0}, {1000,1000}},
-		--{"move", 0, {"00:06:000","00:07:100"}, {0,0}, {1000, 1000}},
-		--{"move", 0, {"00:02:000","00:04:000"}, {0,0}, {10, 10}},
-	}
-)--]]
-
---[[for i,v in ipairs(test) do
-	print(table.unpack(v))
-end
-print()
-
---local overlaps = verify:testSortedTimes(test)
-local resolved = verify:resolveTransformOverlaps(test, dim)
-
-for i,v in ipairs(resolved) do
-	print(sb_com:toString(v))
-end--]]
 
 return verify
