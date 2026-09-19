@@ -5,7 +5,6 @@
 local sb_com       = require 'commands'
 local sb_easing    = require 'easing'
 local sb_config    = require 'config'
-local sb_transform = require 'transform'
 local sb_time      = require 'time'
 local sb_log       = require 'log'
 local sb_keyframe  = require 'keyframe'
@@ -48,8 +47,8 @@ function verify:sortedTimes(commands, types)
 		dimensions = sb_com[types[1]].dimension
 		for i,v in ipairs(types) do
 			if dimensions ~= sb_com[v].dimension then
-				sb:warning(string.format("verify:sortedTimes(): types specified do not have matching dimensions (%s / %s, %d / %d).",
-					types[1], v, dimensions, sb_com[v].dimension))
+				sb:warning("verify:sortedTimes(): types specified do not have matching dimensions (%s / %s, %d / %d).",
+					types[1], v, dimensions, sb_com[v].dimension)
 			end
 		end
 
@@ -73,29 +72,28 @@ function verify:sortedTimes(commands, types)
 
 		local i,j,m = 1, nil, times_c
 
+		local skip = false
+
 		while m >= i do
 			j=math.floor((i+m)*0.5)
 			local j_t = times[j][1]
 
 			if j_t == entry_t then
-				if test_order(times[j][2], entry[2]) then
-					--i=j+1
+
+				-- if entries share time, and are both of type "point", then
+				-- their two commands are to be combined to simplify processing.
+				if times[j][2] == "point" and entry[2] == "point" then
+
+					times[j].command = sb_com:createCommandAddition(times[j].command, entry.command)
+					skip = true
+					break
+					
+				elseif test_order(times[j][2], entry[2]) then
 					m=j-1
 				else
-					--m=j-1
 					i=j+1
 				end
 
-				--[[if entry[2] == "max" and times[j][2]=="min"then
-					i=j
-					m=j-1
-				elseif entry[2] == "min" and times[j][2]=="max" then
-					i=j+1
-					m=j
-				else
-					i=j
-					m=j-1
-				end--]]
 			elseif j_t < entry_t then
 				i=j+1
 			else
@@ -103,8 +101,10 @@ function verify:sortedTimes(commands, types)
 			end
 		end
 
-		table.insert(times, i, entry)
-		times_c = times_c + 1
+		if not skip then
+			table.insert(times, i, entry)
+			times_c = times_c + 1
+		end
 	end
 
 	for i,v in ipairs(commands) do
@@ -368,9 +368,9 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 
 			--[[
 			if not sb_config["allow-non-linear-easing-overlaps"] then
-			sb_log:warn(string.format(
+			sb_log:warn(
 				"verify:resolveTransformOverlaps(): overlap resolution with non-linear easings may result in "
-			.."unexpected visuals, got '%s'. 'linear'/0 is recommended.", tostring(easing)))
+			.."unexpected visuals, got '%s'. 'linear'/0 is recommended.", tostring(easing))
 			end--]]
 
 			--

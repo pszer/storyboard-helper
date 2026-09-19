@@ -18,15 +18,15 @@ function version:verify(ver)
 
 	for i,v in ipairs(ver) do
 		if v<version[i] then
-			sb_log:warn(string.format("This storyboard script is written for an older version of Storyboard Helper %s, your version is %s.",
-				str(ver), str(version)))
+			sb_log:warn("This storyboard script is written for an older version of Storyboard Helper %s, your version is %s.",
+				str(ver), str(version))
 			return false
 		end
 
 		if v>version[i] and not sb_config["ignore-version"] then
-			sb_log:error(string.format("This storyboard script is written for a newer version of Storyboard Helper %s, your version is %s. "..
+			sb_log:error("This storyboard script is written for a newer version of Storyboard Helper %s, your version is %s. "..
 			"Enable -ignore-version to run anyway.",
-				str(ver), str(version)))
+				str(ver), str(version))
 		elseif v>version[i] then
 			return false
 		end

@@ -28,7 +28,7 @@ local keyframe = {}
 
 function keyframe:simplify(input, parameters)
 	sb_log:assert(input, "keyframe.simplify(): missing argument.")	
-	sb_log:assert(type(input)=="table", string.format("keyframe.simplify(): expected table. got '%s'.", type(input)))	
+	sb_log:assert(type(input)=="table", "keyframe.simplify(): expected table. got '%s'.", type(input))
 
 	parameters = parameters or {}
 	local in_func  = parameters.in_func 

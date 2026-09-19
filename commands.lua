@@ -47,7 +47,8 @@ local command = {
 function command:parseCommand(com, target)
 	local clone = require 'clone'
 	local step_easing, step_time, step_vec, step_args, step_varargs = false,false,false,false,false
-	local target_easing, target_time, target_vec1, target_vec2, target_args, target_varargs = false,false,false,false,false,false
+	local target_easing, target_time, target_vec1, target_vec2, target_vec, target_args, target_varargs =
+		false,false,false,false,false,false,false
 
 	if target then
 		local step_easing, step_time, step_vec, step_args, step_varargs = true,true,true,true,true
@@ -57,6 +58,7 @@ function command:parseCommand(com, target)
 		if target=="varargs" then step_varargs=false target_varargs = true end
 		if target=="vec1" then step_vec=false target_vec1 = true end
 		if target=="vec2" then step_vec=false target_vec2 = true end
+		if target=="vec" then step_vec=false target_vec = true end
 	end
 
 	local com_type = com[1]
@@ -76,7 +78,7 @@ function command:parseCommand(com, target)
 		step()
 	elseif com_def.easing then
 		ease = sb_easing[com[i]]
-		sb_log:assert(ease and type(ease)=="number", string.format("command '%s' expects an easing, got '%s'.", com_type, type(ease)))
+		sb_log:assert(ease and type(ease)=="number", "command '%s' expects an easing, got '%s'.", com_type, type(ease))
 
 		step()
 	end
@@ -90,14 +92,14 @@ function command:parseCommand(com, target)
 		local count, err_str = sb_time:verify(time)
 
 		if err_str then
-			sb_log:error(string.format("command '%s' got a malformed time argument: %s", com_type, err_str))
+			sb_log:error("command '%s' got a malformed time argument: %s", com_type, err_str)
 		end
 
 		sb_log:assert(count > 0,
-			string.format("command '%s' expects '%d' time point(s), got 0.", com_type, com_def.time_points))
+			"command '%s' expects '%d' time point(s), got 0.", com_type, com_def.time_points)
 
 		if count > com_def.time_points then
-			sb_log:warn(string.format("command '%s' expects '%d' time point(s), got '%d'.", com_type, com_def.time_points, count))
+			sb_log:warn("command '%s' expects '%d' time point(s), got '%d'.", com_type, com_def.time_points, count)
 		end
 
 		local time_c = {}
@@ -120,11 +122,10 @@ function command:parseCommand(com, target)
 		vec1 = com[i]
 		-- can be a table, or just a single number if dimension is 1
 		sb_log:assert(vec1 and (type(vec1)=="table" or (type(vec1)=="number" and com_def.dimension==1)),
-			string.format("command '%s' expects a vector, argument is a '%s'.", com_type, type(vec1)))
+			"command '%s' expects a vector, argument is a '%s'.", com_type, type(vec1))
 		if type(vec1) == "number" then vec1 = {vec1} end
 
-		sb_log:assert(#vec1==com_def.dimension, string.format("command '%s' expects a %dD vector, argument is %d.",
-			com_type, com_def.dimension, #vec1))
+		sb_log:assert(#vec1==com_def.dimension, "command '%s' expects a %dD vector, argument is %d.", com_type, com_def.dimension, #vec1)
 		vec1 = clone(vec1)
 
 		step()
@@ -138,15 +139,16 @@ function command:parseCommand(com, target)
 		else
 			-- can be a table, or just a single number if dimension is 1
 			sb_log:assert(vec2 and (type(vec2)=="table" or (type(vec2)=="number" and com_def.dimension==1)),
-				string.format("command '%s' expects two vectors, second argument is a '%s'.", com_type, type(vec2)))
+				"command '%s' expects two vectors, second argument is a '%s'.", com_type, type(vec2))
 			if type(vec2) == "number" then vec2 = {vec2} end
-			sb_log:assert(#vec2==com_def.dimension, string.format("command '%s' expects a %dD vector, argument is %d.",
-				com_type, com_def.dimension, #vec2))
+			sb_log:assert(#vec2==com_def.dimension, "command '%s' expects a %dD vector, argument is %d.", com_type, com_def.dimension, #vec2)
 			vec2 = clone(vec2)
 		end
 
 		step()
 	end
+
+	if target_vec then return vec1, vec2 end
 	if target_vec1 then return vec1 end
 	if target_vec2 then return vec2 end
 
@@ -171,8 +173,7 @@ function command:parseCommand(com, target)
 			if valid_func then
 				A,err = valid_func(A)
 
-				sb_log:assert(err==nil,string.format("invalid value for argument '%s' in command '%s', '%s'",
-					arg_name, com_type, tostring(err)))
+				sb_log:assert(err==nil,"invalid value for argument '%s' in command '%s', '%s'", arg_name, com_type, tostring(err))
 			end
 			
 			args[arg_name] = A
@@ -228,9 +229,9 @@ function command:addDefinition(def, ...)
 	for i,v in ipairs(keys) do
 		local str = v
 		sb_log:assert(type(str)=="string",
-			string.format("command.addDefinition(): only strings are allowed to be used as keys for commands, got a '%s'.", type(str)))
+			"command.addDefinition(): only strings are allowed to be used as keys for commands, got a '%s'.", type(str))
 		str = str:lower()
-		sb_log:assert(command[str]==nil, string.format("command.addDefinition(): key [\"%s\"] is already in use.", str))
+		sb_log:assert(command[str]==nil, "command.addDefinition(): key [\"%s\"] is already in use.", str)
 		command[str] = def
 	end
 end
@@ -271,7 +272,7 @@ function command:equal(com, ...)
 	local args = {...}
 	for _,v in ipairs(args) do
 		local C = command[v]
-		sb_log:assert(C, string.format("command:equal(): no such command '%s'", v))
+		sb_log:assert(C, "command:equal(): no such command '%s'", v)
 		if C == com_command then
 			return true
 		end
@@ -315,7 +316,7 @@ function command:out(com)
 	sb_log:assert(com_type, "command.out(): malformed command, missing type?")
 	local out_func = command[com_type].out
 	sb_log:assert(out_func,
-		string.format("command.out(): '%s' is not a primitive command, and cannot be outputted in a .osb format.", com_type))
+		"command.out(): '%s' is not a primitive command, and cannot be outputted in a .osb format.", com_type)
 
 	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
 
@@ -327,32 +328,32 @@ end
 -- for internal logic use only.
 function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
 	local com_def = command[com_type]
-	sb_log:assert(com_def, string.format("command.createCommand(): unknown command '%s'.", tostring(com_type)))
+	sb_log:assert(com_def, "command.createCommand(): unknown command '%s'.", tostring(com_type))
 
 	local result = {com_type}
 	if com_def.easing then
 		local c_easing = sb_easing[easing]
-		sb_log:assert(c_easing, string.format("command.createCommand(): command '%s' expects an easing, got '%s'.",
-			com_type, tostring(c_easing)))
+		sb_log:assert(c_easing, "command.createCommand(): command '%s' expects an easing, got '%s'.",
+			com_type, tostring(c_easing))
 		table.insert(result, c_easing)
 	end
 
 	if com_def.time_points > 0 then
 		local c_time, err = sb_time(table.unpack(time))
-		sb_log:assert(not err, string.format("command.createCommand(): command '%s' expects time, got an error: %s.",
-			com_type, err))
+		sb_log:assert(not err, "command.createCommand(): command '%s' expects time, got an error: %s.",
+			com_type, err)
 		table.insert(result, time)
 	end
 
 	if com_def.dimension > 0 then
-		sb_log:assert(vec1 and vec2, string.format("command.createCommand(): command '%s' expects two vectors, got a '%s' and '%s'",
-			com_type, type(vec1), type(vec2)))
-		sb_log:assert(#vec1 == com_def.dimension, string.format("command.createCommand(): command '%s' expects vector of dimension %d, "..
+		sb_log:assert(vec1 and vec2, "command.createCommand(): command '%s' expects two vectors, got a '%s' and '%s'",
+			com_type, type(vec1), type(vec2))
+		sb_log:assert(#vec1 == com_def.dimension, "command.createCommand(): command '%s' expects vector of dimension %d, "..
 			"start vector is dimension %d.",
-			com_type, com_def.dimension, #vec1))
-		sb_log:assert(#vec2 == com_def.dimension, string.format("command.createCommand(): command '%s' expects vector of dimension %d, "..
+			com_type, com_def.dimension, #vec1)
+		sb_log:assert(#vec2 == com_def.dimension, "command.createCommand(): command '%s' expects vector of dimension %d, "..
 			"end vector is dimension %d.",
-			com_type, com_def.dimension, #vec2))
+			com_type, com_def.dimension, #vec2)
 		table.insert(result, vec1)
 		table.insert(result, vec2)
 	end
@@ -370,8 +371,7 @@ function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
 		for i,v in ipairs(com_def.args) do
 			local valid_func = valids[i] or function(x) return x end
 			local value, err = valid_func(args[v])
-			sb_log:assert(not err, string.format("command.createCommand(): command '%s' got malformed argument for '%s': %s",
-				com_type, tostring(v), tostring(err)))
+			sb_log:assert(not err, "command.createCommand(): command '%s' got malformed argument for '%s': %s", com_type, tostring(v), tostring(err))
 			result[v] = value
 		end
 	end
@@ -388,6 +388,37 @@ function command:scaleToVector(com)
 		local easing,time,vec1,vec2 = command:parseCommand(com)
 		return command:createCommand('vr', easing, time, {vec1[1],vec[1]}, {vec2[1],vec2[1]})
 	end
+end
+
+-- if two commands share the same type and timepoint,
+-- this will create their combined result
+--
+-- this is only useful for relative commands
+function command:createCommandAddition(c1,c2)
+	local type1,type2 = c1[1],c2[1]
+	sb_log:assert(type1==type2, "command:createCommandAddition(): expected same command types, got '%s' and '%s'", type1,type2)
+
+	sb_log:assert(command[type1].overlapping, "command:createCommandAddition(): command '%s' doesn't support overlaps/addition.", type1)
+
+	local time1 = command:parseCommand(c1, "time")
+	local time2 = command:parseCommand(c2, "time")
+	for i,v in ipairs(time1) do
+		sb_log:assert(time1[i]==time2[i], "command:createCommandAddition(): expected same time points, got '%s' and '%s'", time1[i], time2[i])
+	end
+
+	local vec1_1,vec1_2 = command:parseCommand(c1, "vec")
+	local vec2_1,vec2_2 = command:parseCommand(c2, "vec")
+
+	local new_vec1, new_vec2 = {},{}
+	for i = 1, #vec1_1 do
+		new_vec1[i] = vec1_1[i] + vec2_1[i]
+		new_vec2[i] = vec1_2[i] + vec2_2[i]
+	end
+
+	local easing = command:parseCommand(c1, "easing")
+
+	local c = command:createCommand(type1, easing, time1, new_vec1, new_vec2)
+	return c
 end
 
 -- 
@@ -445,7 +476,7 @@ local command_mt={}
 function command_mt.__index(table,key)
 	if type(key)=="string" then
 		local r = rawget(table,key:lower())
-		sb_log:assert(r, string.format("command[]: unknown command '%s'",tostring(key)))
+		sb_log:assert(r, "command[]: unknown command '%s'",tostring(key))
 		return r
 	end
 end

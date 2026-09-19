@@ -80,7 +80,7 @@ function time.convert(x)
 
 	if type(x)=="number" then
 		if x > 5400000 and not sb_config["ignore-large-time-points"] then
-			sb_log:warn(string.format(large_number_warning,tostring(x)))
+			sb_log:warn(large_number_warning,tostring(x))
 		end
 		return x
 	end
@@ -94,11 +94,11 @@ function time.convert(x)
 		if not first_colon_i then
 			local result = tonumber(x)
 			if not result then
-				return sb_log:error(string.format("'%s' is a malformed millisecond time point.", x))
+				return sb_log:error("'%s' is a malformed millisecond time point.", x)
 			end
 
 			if result > 5400000 and not sb_config["ignore-large-time-points"] then
-				sb_log:warn(string.format(large_number_warning,tostring(x)))
+				sb_log:warn(large_number_warning,tostring(x))
 			end
 			return result
 		end
@@ -119,23 +119,23 @@ function time.convert(x)
 		local negate = false
 
 		--ms
-		sb_log:assert(MS,string.format("'%s' is a malformed mm:ss:mms time point. (%s)", x, MSs))
+		sb_log:assert(MS,"'%s' is a malformed mm:ss:mms time point. (%s)", x, MSs)
 		sb_log:assert(MS>=0 and MS<=999,
-			string.format("'%s' is a malformed mm:ss:mms time point. (%s milliseconds is outside bound [0,999])", x, MSs))
+			"'%s' is a malformed mm:ss:mms time point. (%s milliseconds is outside bound [0,999])", x, MSs)
 		--
 
 		--s
-		sb_log:assert(S,string.format("'%s' is a malformed mm:ss:mms time point. (%s)", x, Ss))
+		sb_log:assert(S,"'%s' is a malformed mm:ss:mms time point. (%s)", x, Ss)
 		sb_log:assert(S>=0 and S<=59,
-			string.format("'%s' is a malformed mm:ss:mms time point. (%s seconds is outside bound [0,59])", x, Ss))
+			"'%s' is a malformed mm:ss:mms time point. (%s seconds is outside bound [0,59])", x, Ss)
 		sb_log:assert(math.type(S)=="integer",
-			string.format("'%s' is a malformed mm:ss:mms time point. (%s seconds is not an integer)", x, Ss))
+			"'%s' is a malformed mm:ss:mms time point. (%s seconds is not an integer)", x, Ss)
 		--
 
 		--m
-		sb_log:assert(M,string.format("'%s' is a malformed mm:ss:mms time point. (%s)", x, Ms))
+		sb_log:assert(M,"'%s' is a malformed mm:ss:mms time point. (%s)", x, Ms)
 		sb_log:assert(math.type(M)=="integer",
-			string.format("'%s' is a malformed mm:ss:mms time point. (%s minutes is not an integer)", x, Ms))
+			"'%s' is a malformed mm:ss:mms time point. (%s minutes is not an integer)", x, Ms)
 		if M==0 and Ms:byte(1) == string.byte('-') then
 			negate = true
 		end
@@ -164,11 +164,11 @@ function time.convert(x)
 				end
 
 				if sb_config["allow-no-leading-zeros"] then
-					sb_log:warn (string.format("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds",
-						x, leading1, leading2))
+					sb_log:warn ("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds",
+						x, leading1, leading2)
 				else
-					sb_log:error(string.format("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds", x,
-						leading1, leading2))
+					sb_log:error("'%s' is missing leading zeros, clarify if this is %s or %g milliseconds",
+						x, leading1, leading2)
 				end
 			end
 		end
@@ -182,7 +182,7 @@ function time.convert(x)
 		end
 
 		if result > 5400000 and not sb_config["ignore-large-time-points"] then
-			sb_log:warn(string.format(large_number_warning,tostring(x)))
+			sb_log:warn(large_number_warning,tostring(x))
 		end
 
 		return result
@@ -194,12 +194,12 @@ function time.convert(x)
 
 		sb_log:assert(metronome, "{metronome,beat} time point is missing the metronome argument.")
 		sb_log:assert(type(metronome)=="table",
-			string.format("{metronome,beat} time point expected {BPM, offset} table for metronome argument, got %s.",type(metronome)))
+			"{metronome,beat} time point expected {BPM, offset} table for metronome argument, got %s.",type(metronome))
 		sb_log:assert(type(metronome[1])=="number",
-			string.format("{metronome,beat} time point expected number for metronome BPM, got %s.",type(metronome[1])))
+			"{metronome,beat} time point expected number for metronome BPM, got %s.",type(metronome[1]))
 		sb_log:assert(metronome[1]~=0,"time(metronome,beat) 0 BPM is not allowed")
 		sb_log:assert(type(metronome[2])=="number",
-			string.format("{metronome,beat} time point expected number for metronome offset, got %s.",type(metronome[2])))
+			"{metronome,beat} time point expected number for metronome offset, got %s.",type(metronome[2]))
 
 		sb_log:assert(beat, "{metronome,beat} time point is missing the beat argument.")
 
@@ -207,13 +207,13 @@ function time.convert(x)
 		local result = interval*beat + metronome[2]
 		
 		if result > 5400000 and not sb_config["ignore-large-time-points"] then
-			sb_log:warn(string.format(large_number_warning,tostring(result)))
+			sb_log:warn(large_number_warning,tostring(result))
 		end
 
 		return result
 	end
 
-	sb_log:error(string.format("Unknown time point '%s' of type '%s'",tostring(x),type(x)))
+	sb_log:error("Unknown time point '%s' of type '%s'",tostring(x),type(x))
 end
 
 return time

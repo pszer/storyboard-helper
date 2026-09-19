@@ -10,7 +10,7 @@ return {
 			local x=X:upper()
 			if x=="A"or x=="H"or x=="H"
 				then return x end
-			sb_log:error(string.format("Invalid ['value'] for Parameter command '%s'.",X))
+			sb_log:error("Invalid ['value'] for Parameter command '%s'.",X)
 			return nil
 		end
 	},

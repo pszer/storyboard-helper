@@ -18,11 +18,11 @@ function log:silent(b)
 	self.__silent = (b~=nil)
 end
 
-function log:warn(...)
-	local arg = {...}
+function log:warn(fstr, ...)
 	local str = "//[warning] "
-	for i,v in ipairs(arg) do
-		str=str..tostring(v)
+
+	if fstr then
+		str=str..string.format(fstr,...)
 	end
 
 	table.insert(log.history,str)
@@ -34,11 +34,11 @@ function log:warn(...)
 	end
 end
 
-function log:error(...)
-	local arg = {...}
+function log:error(fstr, ...)
 	local str = "//[error] "
-	for i,v in ipairs(arg) do
-		str=str..tostring(v)
+
+	if fstr then
+		str=str..string.format(fstr,...)
 	end
 
 	table.insert(log.history,str)
@@ -53,13 +53,13 @@ function log:error(...)
 	end
 end
 
-function log:assert(a, ...)
+function log:assert(a, fstr, ...)
 	if a then return end
 
-	local arg = {...}
 	local str = "//[error] "
-	for i,v in ipairs(arg) do
-		str=str..tostring(v)
+
+	if fstr then
+		str=str..string.format(fstr,...)
 	end
 
 	table.insert(log.history,str)

@@ -20,22 +20,22 @@ function config:readFromArgs(...)
 	while args[i] do
 		local v = args[i]
 
-		sb_log:assert(type(v)=="string", string.format("config:readFromArgs(): expected string, got '%s'", type(v)))
+		sb_log:assert(type(v)=="string", "config:readFromArgs(): expected string, got '%s'", type(v))
 		v = v:lower()
 		if v:byte(1)==v:byte('-') then
 			v=v:sub(2)
 		end
 
 		local exists = rawget(config, v)~=nil
-		sb_log:assert("config:readFromArgs(): unknown variable '%s'", v)
+		sb_log:assert(exists, "config:readFromArgs(): unknown variable '%s'", v)
 
 		local typeofv = type(rawget(config, v))
 
 		if typeofv~="boolean" then
 			i=i+1
 			local w = args[i]
-			sb_log:assert(w, string.format("config:readFromArgs(): expected argument for '%s'", v))
-			sb_log:assert(type(w)==typeofv, string.format("config:readFromArgs(): expected '%s' for '%s', got '%s'", typeofv, v, type(w)))
+			sb_log:assert(w, "config:readFromArgs(): expected argument for '%s'", v)
+			sb_log:assert(type(w)==typeofv, "config:readFromArgs(): expected '%s' for '%s', got '%s'", typeofv, v, type(w))
 			rawset(config, v, w)
 		else
 			rawset(config, v, true)
@@ -55,10 +55,10 @@ config_mt.__index = function(t, key)
 		if key_f ~= key then
 			key_f = key_f.."' '("..key..")"
 		end
-		sb_log:error(string.format("config[]: unknown config variable '%s'", key_f))
+		sb_log:error("config[]: unknown config variable '%s'", key_f)
 	end
 
-	sb_log:error(string.format("config[]: expected string, got '%s'", type(key)))
+	sb_log:error("config[]: expected string, got '%s'", type(key))
 end
 
 return config
