@@ -25,6 +25,9 @@ easing.names = {
 ,"backin","backout","backinout"
 ,"bouncein","bounceout","bounceinout"
 }
+for i=0,#easing.names do
+	easing.names[i]=easing.names[i+1]
+end
 
 local easing_mt = {}
 easing_mt.__index = function(table,key)
@@ -86,7 +89,7 @@ easing.funcs[9]=function(x)
 end	
 easing["quartout"]=10
 easing.funcs[10]=function(x)
-		return (1 - x)^4
+		return 1 - (1 - x)^4
 end	
 easing["quartinout"] =11
 easing.funcs[11]=function(x)
@@ -98,11 +101,11 @@ easing.funcs[12]=function(x)
 end	
 easing["quintout"] =13
 easing.funcs[13]=function(x)
-		return (1 - x)^5
+		return 1 - (1 - x)^5
 end	
 easing["quintinout"]=14
 easing.funcs[14]=function(x)
-	return x < 0.5 and 16 * x * x * x * x or 1 - (-2 * x + 2)^8 / 2
+	return x < 0.5 and 16 * x * x * x * x * x or 1 - (-2 * x + 2)^5 / 2
 end
 easing["sinein"]=15
 easing.funcs[15]=function(x)
@@ -126,7 +129,7 @@ easing.funcs[19]=function(x)
 end
 easing["expoinout"] =20
 easing.funcs[20]=function(x)
-	return x == 0 and 0 or x == 1 and 1 or x < 0.5 and 2 ^ (20 * x - 10) / 2 or (2 - 2 ^ (-20 * x + 10)) / 2
+	return x == 0 and 0 or x == 1 and 1 or x < 0.5 and (2 ^ (20 * x - 10) / 2) or ((2 - 2 ^ (-20 * x + 10)) / 2)
 end
 easing["circin"]=21
 easing.funcs[21]=function(x)
@@ -153,14 +156,14 @@ end
 
 easing["elastichalfout"]=26
 easing.funcs[26]=function(x)
-	return 1 - 0.5 * pow(2, -10 * t) *
-		math.sin((t - 0.075) * (2 * math.pi) / 0.3)
+	return 1 - 0.5 * pow(2, -10 * x) *
+		math.sin((x - 0.075) * (2 * math.pi) / 0.3)
 end
 
 easing["elasticquarterout"]=27
 easing.funcs[27]=function(x)
-	return 1 - 0.5 * pow(2, -10 * t) *
-		math.sin((t - 0.075) * (2 * math.pi) / 0.15)
+	return 1 - 0.5 * pow(2, -10 * x) *
+		math.sin((x - 0.075) * (2 * math.pi) / 0.15)
 end
 
 easing["elasticinout"]=28

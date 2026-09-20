@@ -123,6 +123,8 @@ local function eval(t)
 		return t
 	end
 
+	sb_log:addToStack(t)
+
 	local ease, time, vec1, vec2, args, varargs = sb_command:parseCommand(t)
 	local eval_pass = { sb_command[com_type].eval(time, ease, vec1, vec2, args, varargs) }
 	local eval_result = {}
@@ -133,6 +135,8 @@ local function eval(t)
 			table.insert(eval_result, w)
 		end
 	end
+
+	sb_log:popStack(t)
 
 	return table.unpack(eval_result)
 end

@@ -8,6 +8,8 @@ local config = {
 	["no-overlap-checks"] = false,
 	["ignore-version"] = false,
 
+	["forbid-unsupported-negative-scale-easing"] = false,
+
 	["disable-easing-keyframing"] = false,
 	["default-easing-keyframing-epsilon"]        = 2.4,
 	["default-easing-keyframing-epsilon-scale"]  = 0.001,

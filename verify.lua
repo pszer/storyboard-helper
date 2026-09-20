@@ -2,12 +2,13 @@
 --
 --
 
-local sb_com       = require 'commands'
-local sb_easing    = require 'easing'
-local sb_config    = require 'config'
-local sb_time      = require 'time'
-local sb_log       = require 'log'
-local sb_keyframe  = require 'keyframe'
+local sb_com        = require 'commands'
+local sb_easing     = require 'easing'
+local sb_easingroot = require 'easingroot'
+local sb_config     = require 'config'
+local sb_time       = require 'time'
+local sb_log        = require 'log'
+local sb_keyframe   = require 'keyframe'
 
 local verify = {}
 verify.__index = verify
@@ -539,6 +540,48 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	end
 
 	return table.unpack(final)
+end
+
+-- expects non-overlapping vector commands
+function verify:resolveNegativeScales(coms)
+	--
+	local converted = {}
+	for i,v in ipairs(coms) do
+		table.insert(converted, sb_com:scaleToVector( v ))
+		table.sort(converted, function(a,b)
+			local time1 = sb_com:parseCommand(a, "time")
+			local time2 = sb_com:parseCommand(b, "time")
+			return time1[1] < time2[1]
+		end)
+	end
+
+	local result = {}
+
+	local negative_x_start = nil
+	local negative_y_start = nil
+
+	local function pos(x) return x>0 end
+	local function neg(x) return x<0 end
+
+	local function root_linear(t1,t2,a,b)
+		return t1 - (a/(b-a)) * (t2 - t1)
+	end
+	local function root_easing(easing,t1,t2,a,b)
+		local root_f = require 'root'
+	end
+
+	for i,v in ipairs(converted) do
+		local time = sb_com:parseCommand(v, "time")
+		local vec1, vec2 = sb_com:parseCommand(v, "vec")
+
+		-- if nothing needs to be done
+		if pos(vec1[1]) and pos(vec1[2]) and pos(vec2[1]) and pos(vec2[2]) then
+			table.insert(result, v)
+		end
+
+		if pos(vec1[1]) and neg(vec2[1]) then
+		end
+	end
 end
 
 --[[function verify:checkTimeOverlaps(commands_list)
