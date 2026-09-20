@@ -52,15 +52,22 @@ function sb_ir:out()
 	for i,v in ipairs(self) do
 		local x = v
 
+		local skip_comma = false
 		if time_shortcut and i==4 then x="" end
-		if vec1_shortcut and i==6 then x="" end
-		if vec2_shortcut and i>=7 and i<=8 then x=""end
-		if vec3_shortcut and i>=8 and i<=10 then x=""end
+
+		if vec1_shortcut and i==6 then x="" skip_comma = true end
+		if vec1_shortcut and i==5 then skip_comma = true end
+
+		if vec2_shortcut and i>=7 and i<=8 then x="" skip_comma = true end
+		if vec2_shortcut and i==6 then skip_comma = true end
+
+		if vec3_shortcut and i>=8 and i<=10 then x="" skip_comma = true end
+		if vec3_shortcut and i==7 then skip_comma = true end
 
 		if type(x)=="number" then x=string.format("%g",x) end
 
 		result=result..x
-		if i<c then
+		if i<c and not skip_comma then
 			result=result..","
 		end
 	end

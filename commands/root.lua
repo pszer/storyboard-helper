@@ -34,8 +34,18 @@ return {
 	eval = function(t, easing, vector_a, vector_b, args, varargs)
 		local sb_verify = require 'verify'
 		--return table.unpack(varargs)
-		--
-		local time, dim = sb_verify:sortedTimes(varargs)
+
+		local eval = require 'eval'
+
+		local evals = {}
+		for i,v in ipairs(varargs) do
+			local R = {eval(v)}
+			for _,w in ipairs(R) do
+				table.insert(evals, w)
+			end
+		end
+		
+		local time, dim = sb_verify:sortedTimes(evals)
 		local movers = sb_verify:resolveTransformOverlaps(time, dim, "moverel")
 
 		return table.unpack(movers)

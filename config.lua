@@ -9,7 +9,7 @@ local config = {
 	["ignore-version"] = false,
 
 	["disable-easing-keyframing"] = false,
-	["default-easing-keyframing-epsilon"] = 2.0,
+	["default-easing-keyframing-epsilon"] = 1.8,
 	["default-easing-keyframing-interval"] = 1,
 
 	["default-epsilon"] = 2.0,

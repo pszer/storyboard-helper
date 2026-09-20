@@ -27,6 +27,7 @@ local keyframe = {}
 --
 
 function keyframe:simplify(input, parameters)
+
 	sb_log:assert(input, "keyframe.simplify(): missing argument.")	
 	sb_log:assert(type(input)=="table", "keyframe.simplify(): expected table. got '%s'.", type(input))
 
@@ -48,15 +49,6 @@ function keyframe:simplify(input, parameters)
 		dimension = t_dimension - 1
 	end
 
-	-- dist
-	local function dist(V)
-		local sum = 0
-		for i=2,t_dimension do
-			sum = sum + V[i]
-		end
-		return math.pow(sum, 1.0 / dimension) + 0.01
-	end
-
 	local function dot(a, b)
 		local sum = 0
 		for i = 1,#a do
@@ -66,6 +58,7 @@ function keyframe:simplify(input, parameters)
 	end
 
 	-- shortest distance of v3 from line v1, v2
+	--[[
 	local function perp_dist(v1, v2, v3, d, dd)
 
 		local d = d or {}
@@ -80,11 +73,13 @@ function keyframe:simplify(input, parameters)
 			return
 		end
 		return math.sqrt(dot(p,p) - (pd*pd)/dd)
-	end
+	end-]]
 
 	-- Ramer–Douglas–Peucker algorithm
+	--
 	local RDP
-	RDP = function(points, I, J)
+	-- purely spatial
+	--[[RDP = function(points, I, J)
 		local result = {}
 
 		local max_dist = -1/0
@@ -120,8 +115,75 @@ function keyframe:simplify(input, parameters)
 		end
 
 		return result
+	end--]]
+
+	local function time_dist(v1, v2, v3, d)
+
+		-- calculate D once 
+		if not d[1] then
+			d = {}
+			for i=2,t_dimension do
+				d[i-1]=v2[i]-v1[i]
+			end
+		end
+
+		local U = (v3[1]-v1[1]) / (v2[1]-v1[1])
+
+		local p_linear = {}
+		for i=1,dimension do
+			p_linear[i] = (U * d[i]) + v1[i+1]
+			p_linear[i] = p_linear[i] - v3[i+1]
+		end
+
+		local dist = 0
+		for i=1,dimension do
+			dist = dist + p_linear[i]*p_linear[i]
+		end
+
+		--print("dist", dist)
+
+		return dist ^ 0.5
 	end
 
+	-- 
+	-- use time interpolation
+	--
+	RDP = function(points, I, J)
+		local result = {}
+
+		local max_dist = -1/0
+		local max_i = nil
+
+		local d = {}
+		for i = I+1, J-1 do
+			local dist_i = time_dist(points[I],points[J], points[i], d)
+
+			if dist_i > max_dist then
+				max_dist = dist_i
+				max_i = i
+			end
+		end
+
+		if max_dist > epsilon then
+			local r_results1 = RDP(points,I,max_i)
+			local r_results2 = RDP(points,max_i,J)
+
+			for i=1,#r_results1-1 do
+				table.insert(result,r_results1[i])
+			end
+			for i=1,#r_results2 do
+				table.insert(result,r_results2[i])
+			end
+		else
+			result = {points[I],points[J]}
+		end
+
+		return result
+	end
+
+	--
+	--
+	--
 	local points
 	if in_func then
 		for i,v in ipairs(input) do

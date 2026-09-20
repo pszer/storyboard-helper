@@ -187,8 +187,8 @@ function object:out(commands)
 	commands = commands or {}
 
 	if not sb_com:equal(commands[1], "root") then
-		return self:output{
-			"root", table.unpack(commands) }
+		return self:output{{
+			"__root__", table.unpack(commands) }}
 	else
 		return self:output(commands)
 	end

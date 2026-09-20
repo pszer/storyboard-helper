@@ -213,7 +213,6 @@ end
 --
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type)
-
 	--[[print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
@@ -274,16 +273,16 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		for i=#easing_stack,1,-1 do
 			if command == easing_stack[i][1] then
 				for j=1,dimension do
-					total_offset[j] = total_offset[j] + easing_stack[i][5][j]
+					total_offset[j] = total_offset[j] + easing_stack[i][5][j] - easing_stack[i][4][j]
 				end
 			end
 		end
 	end
-	local function add_to_total_offset_abs_command(vec1, vec2)
-		for i=1,dimension do
-			total_offset[i] = total_offset[i] + vec2[i] - vec1[i]
-		end
-	end
+	--local function add_to_total_offset_abs_command(vec1, vec2)
+	--	for i=1,dimension do
+	--		total_offset[i] = total_offset[i] + vec2[i] - vec1[i]
+	--	end
+	--end
 
 	local function get_from_stack(time)
 		local result = {}
@@ -302,7 +301,8 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 				end
 				for i=1,dimension do
 					local D = v[5][i] - v[4][i]
-					result[i] = result[i] + v[4][i] + (v[2](tau) * D)
+					--result[i] = result[i] + v[4][i] + (v[2](tau) * D)
+					result[i] = result[i] + (v[2](tau) * D)
 				end
 			end
 		end
@@ -323,6 +323,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 	end
 
 	local function get_keyframes_from_stack(time1, time2, interval)
+
 		if interval==0 then sb_log:error("keyframe:simplify(): error in get_keyframes_from_stack, time step interval is 0.") end
 
 		local result = {}
@@ -374,21 +375,14 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 
 		if curr[2]=="min" then
 			add_to_easing_stack(curr.command, easing_func, time, vec1, vec2, easing)
-
-			if is_abs then
-				for i=1,dimension do
-					total_offset[i]=0
-				end
-			end
 		end
 
 		--
-		-- if two commands have the same end points, there is no need
-		-- to create point-like commands at the end of these time intervals.
-		-- ignore.
 		--
 		local skip = false
-		if curr.prev then
+		if curr[2]=="min" and not is_stack_overlapping() then
+			skip = true
+		elseif curr.prev then
 			if curr.prev[1] == curr[1] then
 				skip = true
 			end
@@ -442,16 +436,16 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 				else
 
 					local frames = get_keyframes_from_stack(curr.prev[1], curr[1], sb_config["default-easing-keyframing-interval"])
-					frames = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon"]})
+					local s_frames = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon"]})
 					
-					for i=1,#frames-1 do
+					for i=1,#s_frames-1 do
 						local vec1,vec2 = {},{}
 						for j=1,dimension do
-							vec1[j]=frames[i][j+1]
-							vec2[j]=frames[i+1][j+1]
+							vec1[j]=s_frames[i][j+1]
+							vec2[j]=s_frames[i+1][j+1]
 						end
 
-						table.insert(final, sb_com:createCommand(abs_type, linear_easing, {frames[i][1], frames[i+1][1]},
+						table.insert(final, sb_com:createCommand(abs_type, linear_easing, {s_frames[i][1], s_frames[i+1][1]},
 							vec1, vec2, nil, nil))
 					end
 				end
@@ -462,12 +456,26 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 			last_point_time = nil
 		end
 
-		if curr[2]=="max" then
-			if not is_abs then
-				add_to_total_offset(curr.command)
-			else
-				add_to_total_offset_abs_command(vec1, vec2)
+		if curr[2]=="min" then
+			if is_abs then
+				local current_p = get_from_stack(curr[1])
+				local fix_p = {}
+
+				for i = 1,dimension do
+					fix_p[i] = current_p[i] - total_offset[i]
+				end
+				for i=1,dimension do
+					total_offset[i] = vec1[i] - fix_p[i]
+				end
 			end
+		end
+
+		if curr[2]=="max" then
+			--if not is_abs then
+				add_to_total_offset(curr.command)
+			--else
+			--	add_to_total_offset_abs_command(vec1, vec2)
+			--end
 			remove_from_easing_stack(curr.command)
 		end
 

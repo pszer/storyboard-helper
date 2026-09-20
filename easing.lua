@@ -9,6 +9,8 @@
 require 'math'
 local sb_log = require 'log'
 
+local function pow(a,b) return a^b end
+
 local easing = {}
 easing.funcs = {}
 easing.names = {
@@ -151,13 +153,13 @@ end
 
 easing["elastichalfout"]=26
 easing.funcs[26]=function(x)
-	return 1 - 0.5 * math.pow(2, -10 * t) *
+	return 1 - 0.5 * pow(2, -10 * t) *
 		math.sin((t - 0.075) * (2 * math.pi) / 0.3)
 end
 
 easing["elasticquarterout"]=27
 easing.funcs[27]=function(x)
-	return 1 - 0.5 * math.pow(2, -10 * t) *
+	return 1 - 0.5 * pow(2, -10 * t) *
 		math.sin((t - 0.075) * (2 * math.pi) / 0.15)
 end
 
@@ -172,7 +174,7 @@ easing.funcs[29]=function(x)
 end
 easing["backout"]=30
 easing.funcs[30]=function(x)
-local c1 = 1.70158 local c3 = c1 + 1 return 1 + c3 * math.pow(x - 1, 3) + c1 * math.pow(x - 1, 2) end
+local c1 = 1.70158 local c3 = c1 + 1 return 1 + c3 * pow(x - 1, 3) + c1 * pow(x - 1, 2) end
 easing["backinout"]=31
 
 local function bout(x)
