@@ -111,21 +111,22 @@ local function eval(t)
 				table.insert(eval_result, w)
 			end
 		end
-
 		return table.unpack(eval_result)
 	end
 	--
 	
 	-- evaluate commands
 	local com_type = t and t[1]
-	sb_log:assert(com_type, "eval(): malformed command, missing type?")
+	sb_log:assert(com_type, "eval(): malformed command, missing type? t[1] got %s", t[1])
 
 	if not sb_command[com_type].eval then
 		return t
 	end
 
+	print(com_type)
+
 	local ease, time, vec1, vec2, args, varargs = sb_command:parseCommand(t)
-	local eval_pass = {sb_command[com_type].eval(time, ease, vec1, vec2, args, varargs)}
+	local eval_pass = { sb_command[com_type].eval(time, ease, vec1, vec2, args, varargs) }
 	local eval_result = {}
 
 	for i,v in ipairs(eval_pass) do

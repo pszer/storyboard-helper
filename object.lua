@@ -30,6 +30,8 @@ function object:new(file,layer,...)
 		loop_type=nil,--animation
 		time=nil,--sample
 		volume=nil,--sample
+
+		commands=nil
 	}
 	setmetatable(t, object)
 
@@ -143,7 +145,10 @@ function object:getAnchorPosition(x,y)
 	return anc(x,y,w,h)
 end
 
-function object:output(commands)
+function object:add(commands)
+end
+
+function object:out(...)
 	local header = self:getObjectType()
 
 	if header=="Sample" then
@@ -158,13 +163,18 @@ function object:output(commands)
 			 self.frame_count, self.frame_delay, self.loop_type)
 	end
 
-	local evaluated = {}
-	for i,com in ipairs(commands or {}) do
-		local eval_result = {sb_eval(com)}
-		for i,v in ipairs(eval_result) do
-			table.insert(evaluated,v)
-		end
-	end
+	local evaluated = {
+		sb_com:evalTop({
+			start_x     = self.x,
+			start_y     = self.y,
+			start_sx    = self.sx or 1,
+			start_sy    = self.sy or 1,
+			start_r     = self.r or 0,
+			start_col_r = self.col_r or 255,
+			start_col_g = self.col_g or 255,
+			start_col_b = self.col_b or 255},
+			...)
+	}
 
 	for i,com in ipairs(evaluated) do
 		local com_def = sb_com[com[1]]
@@ -179,19 +189,6 @@ function object:output(commands)
 	end
 
 	return header
-end
-
--- the same as object:output, but wraps all commands inside a __root__ beforehand
--- if there isnt one.
-function object:out(commands)
-	commands = commands or {}
-
-	if not sb_com:equal(commands[1], "root") then
-		return self:output{{
-			"__root__", table.unpack(commands) }}
-	else
-		return self:output(commands)
-	end
 end
 
 return object

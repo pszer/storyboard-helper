@@ -75,48 +75,6 @@ function keyframe:simplify(input, parameters)
 		return math.sqrt(dot(p,p) - (pd*pd)/dd)
 	end-]]
 
-	-- Ramer–Douglas–Peucker algorithm
-	--
-	local RDP
-	-- purely spatial
-	--[[RDP = function(points, I, J)
-		local result = {}
-
-		local max_dist = -1/0
-		local max_i = nil
-
-		-- precalculate d and dd
-		local d = {}
-		for i=2,t_dimension do
-			d[i-1]=points[J][i] - points[I][i]
-		end
-		local dd = dot(d,d)
-
-		for i = I+1, J-1 do
-			local dist_i = perp_dist(points[J],points[I], points[i], d, dd)
-			if dist_i > max_dist then
-				max_dist = dist_i
-				max_i = i
-			end
-		end
-
-		if max_dist > epsilon then
-			local r_results1 = RDP(points,I,max_i)
-			local r_results2 = RDP(points,max_i,J)
-
-			for i=1,#r_results1-1 do
-				table.insert(result,r_results1[i])
-			end
-			for i=1,#r_results2 do
-				table.insert(result,r_results2[i])
-			end
-		else
-			result = {points[I],points[J]}
-		end
-
-		return result
-	end--]]
-
 	local function time_dist(v1, v2, v3, d)
 
 		-- calculate D once 
@@ -145,8 +103,11 @@ function keyframe:simplify(input, parameters)
 		return dist ^ 0.5
 	end
 
+	-- Ramer–Douglas–Peucker algorithm
+	--
+	local RDP
 	-- 
-	-- use time interpolation
+	-- uses time interpolation
 	--
 	RDP = function(points, I, J)
 		local result = {}

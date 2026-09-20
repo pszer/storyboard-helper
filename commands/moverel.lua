@@ -10,7 +10,8 @@ return {
 	varargs = false,
 	eval = nil,
 	overlapping=true,
-	absolute_equal="move",
+	overlap_operator='+',
+	absolute_equal='move',
 	out = function(t, easing, vector_a, vector_b, args, varargs)
 		local sb_log = require 'log'
 		local sb_ir  = require 'ir'

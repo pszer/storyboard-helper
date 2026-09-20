@@ -11,6 +11,9 @@ return {
 	},
 	varargs = false,
 	eval = function(t, easing, vector_a, vector_b, args, varargs)
+		local sb_com = require 'commands'
+
+		local coms = sb_com:eval(varargs)
 		-- TODO
 		return table.unpack(varargs)
 	end,

@@ -11,6 +11,7 @@ return {
 	eval = nil,
 	overlapping=true,
 	absolute_equal="vector",
+	overlap_operator='*',
 	out = function(t, easing, vector_a, vector_b, args, varargs)
 		local sb_log = require 'log'
 		local sb_ir  = require 'ir'

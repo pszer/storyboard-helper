@@ -17,7 +17,10 @@ local function do_the_wiggly_worm_lol (t,dur,period)
 end
 
 print(
- object:new("slidez.png", "Background", "TopLeft", 320, 240):out{
+ object:new("slidez.png", "Background", "TopLeft", 320, 240):out(
+
+	 --{"moverel", "linear", {'-0:00:500', '-0:00:250'}, {0,0}, {50,50}},
+
 	 {"move" , "linear"     , {0, 5000}, {100,100}, {200,300}},
 	 {"moverel", "elasticout" , {1000, 2000}, {0,0}, {100,-10}},
 	 {"moverel", "elasticout" , {3000, 4000}, {0,0}, {100,-10}},
@@ -25,28 +28,9 @@ print(
 
 	 {"moverel", "elasticout" , {7000,8400}, {0,0}, {-50,5}},
 	 {"moverel", "elasticout" , {7900,9000}, {0,0}, {-30,-10}},
-	 {"moverel" , "linear"     , {8900, 10000}, {400,240}, {100,240}},
-	 {"move" , "linear"     , {10000, 11000}, {100,240}, {300,40}},
-
-	 do_the_wiggly_worm_lol(8900, 11000, 200)
-})
-
---[[
-local roottest = {
- 'root', memo=false,
-
-	 {"move" , "linear"     , {0, 5000}, {100,100}, {200,300}},
-	 {"mover", "elasticout" , {1000, 2000}, {0,0}, {100,-10}},
-	 {"mover", "elasticout" , {3000, 4000}, {0,0}, {100,-10}},
-	 {"mover", "backout"    , {5000, 6000}, {0,0}, {0,-200}},
-
-	 {"mover", "elasticout" , {7000,8400}, {0,0}, {-50,5}},
-	 {"mover", "elasticout" , {7900,9000}, {0,0}, {-30,-10}},
 	 {"move" , "linear"     , {8900, 10000}, {400,240}, {100,240}},
 	 {"move" , "linear"     , {10000, 11000}, {100,240}, {300,40}},
 
 	 do_the_wiggly_worm_lol(8900, 11000, 200)
+ ))
 
-}--]]
-
---print(testobj:out{roottest})

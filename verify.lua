@@ -30,6 +30,10 @@ local function filter(t, predicate)
 	return result
 end
 
+function verify:filterToCommand(commands, types)
+	return filter(commands, function(x) return sb_com:equal(x, table.unpack(types)) end)
+end
+
 --
 -- returns a doubly linked list table (and dimensions).
 -- each entry is
@@ -55,6 +59,8 @@ function verify:sortedTimes(commands, types)
 		commands = filter(commands, function(x) return sb_com:equal(x, table.unpack(types)) end)
 	elseif commands[1] then
 		dimensions = sb_com[commands[1][1]].dimension
+	else
+		return {}, 0
 	end
 
 	local times_c = 0
@@ -211,8 +217,10 @@ end
 -- absolute transformation commands like 'move' should not be resolved this way,
 -- any time overlap is undefined behaviour error.
 --
+-- if rel_type is non-nil, then any of the relative commands are collapsed into
+-- their absolute versions
 --
-function verify:resolveTransformOverlaps(times, dimension, rel_type)
+function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	--[[print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
@@ -223,15 +231,21 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 	if times[1] then
 		dimensions = sb_com[times[1].command[1]].dimension
 	end
-
 	if not times or #times==0 then
 		return {}
 	end
+	start_vec = start_vec or {}
 
 	local clone = require 'clone'
 	local final = {}
-	local com_type = rel_type
-	local abs_type = sb_com:getAbsoluteVersion(com_type)
+
+	local com_type = rel_type or times[1].command[1]
+	local abs_type
+	local out_type
+	if com_type then
+		abs_type = sb_com:getAbsoluteVersion(com_type)
+		if abs_type then out_type = abs_type end
+	end
 	local curr = times[1]
 
 	local linear_easing = sb_easing["linear"]
@@ -268,7 +282,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 	local last_point_time = nil
 
 	local total_offset = {}
-	for i=1,dimension do total_offset[i]=0 end
+	for i=1,dimension do total_offset[i]=start_vec[i] or 0 end
 	local function add_to_total_offset(command)
 		for i=#easing_stack,1,-1 do
 			if command == easing_stack[i][1] then
@@ -482,7 +496,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type)
 		curr = curr.next
 	end
 
-	return final
+	return table.unpack(final)
 end
 
 --[[function verify:checkTimeOverlaps(commands_list)

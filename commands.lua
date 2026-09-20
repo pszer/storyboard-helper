@@ -26,12 +26,17 @@
 -- eval           - (the function that evalutes the command, primitive commands have no eval function as they are
 --                   the final step when evaluating a tree of compound commands.)
 --
+-- overlapping      - (this is a boolean for if this command is allowed to overlap with commands of the same type, used
+--                     for things like relative transformations which can have their transformations combined in the overlap.)
+-- absolute_equal   - (this is a string specifying the name for the command which is the absolute (non-relative) version
+--                     of this command if this is a relative command with the 'overlapping' flag on)
+-- overlap_operator - (for relative commands either '*' or '+', nil for everything else. determines whether the transformation
+--                     should be treated as additive or multiplicative, for example 'moveRel' and 'rotateRel' are additive, but
+--                     the scaling commands 'scaleRel' and 'vectorRel' are multiplicative.)
+--
+--
 -- out            - (this is for the primitive commands only. function that outputs the intermediate representation form
 --                   for the command (see ir.lua).
--- overlapping    - (this is a boolean for if this command is allowed to overlap with commands of the same type, used
---                   for things like relative transformations which can have their transformations combined in the overlap.)
--- absolute_equal - (this is a string specifying the name for the command which is the absolute (non-relative) version
---                   of this command if this is a relative command with the 'overlapping' flag on)
 --
 
 local sb_log  = require 'log'
@@ -236,7 +241,7 @@ function command:addDefinition(def, ...)
 	end
 end
 
-command:addDefinition(require 'commands.root'       , '__root__', 'root')
+command:addDefinition(require 'commands.root'       , '__root__', 'root','eval')
 command:addDefinition(require 'commands.move'       , 'm', 'move')
 command:addDefinition(require 'commands.movex'      , 'mx', 'movex', 'move_x', 'm_x')
 command:addDefinition(require 'commands.movey'      , 'my', 'movey', 'move_y', 'm_y')
@@ -246,7 +251,6 @@ command:addDefinition(require 'commands.scale'      , 's', 'scale')
 command:addDefinition(require 'commands.vector'     , 'v', 'vector', 'vectorscale', 'vector_scale')
 command:addDefinition(require 'commands.parameter'  , 'p', 'parameter', 'param')
 command:addDefinition(require 'commands.colour'     , 'c', 'col', 'color', 'colour')
-command:addDefinition(require 'commands.originscale', 'originscale', 'os', 'origin_scale')
 command:addDefinition(require 'commands.moverel'  , 'mr', 'mover', 'moverel', 'moverelative', 'm_r', 'move_r', 'move_rel', 'move_relative')
 command:addDefinition(require 'commands.rotaterel', 'rr', 'rotr', 'rotrel', 'rotrelative', 'r_r', 'rot_r', 'rot_rel', 'rot_relative',
                                                     'rotater', 'rotaterel', 'rotaterelative', 'rotate_r', 'rotate_rel',
@@ -254,8 +258,9 @@ command:addDefinition(require 'commands.rotaterel', 'rr', 'rotr', 'rotrel', 'rot
 command:addDefinition(require 'commands.scalerel' , 'sr', 'scaler', 'scalerel', 'scalerelative', 's_r', 'scale_r', 'scale_rel','scale_relative')
 command:addDefinition(require 'commands.vectorrel', 'vr', 'vectorr', 'vectorrel', 'vectorrelative', 'v_r', 'vector_r', 'vector_rel',
                                                     'vector_relative')
-
 command.___lock_out = true -- prevent future command definitions with an 'out' function
+
+command:addDefinition(require 'commands.originscale', 'originscale', 'os', 'origin_scale')
 
 function command:type(c)
 	sb_log:assert(c, "command.type(): no argument")
@@ -379,6 +384,8 @@ function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
 	return result
 end
 
+-- converts a scale command to the more generalised vector command
+-- also works on scalerel
 function command:scaleToVector(com)
 	if command:equal(com, 's') then
 		local easing,time,vec1,vec2 = command:parseCommand(com)
@@ -388,6 +395,12 @@ function command:scaleToVector(com)
 		local easing,time,vec1,vec2 = command:parseCommand(com)
 		return command:createCommand('vr', easing, time, {vec1[1],vec[1]}, {vec2[1],vec2[1]})
 	end
+	if command:equal(com, 'v','vr') then
+		return com
+	end
+	local t
+	if type(com) ~= "table" then t = type(t) end
+	sb_log:error("command.scaleToVector(): expected scale/vector command argument. got '%s'", t or com[1])
 end
 
 -- if two commands share the same type and timepoint,
@@ -473,6 +486,35 @@ function command:toString(com)
 		result=result..", ... " end
 	result = result.."}"
 	return result
+end
+
+-- called at the top levels, fills out starting states like
+-- start_x, start_y, etc...
+function command:evalTop(params, ...)
+	local root = {"root", ...}
+	for i,v in pairs(params) do
+		root[i]=v
+	end
+	return command:eval(root)
+end
+
+function command:eval(...)
+	local args = {...}
+
+	local c1 = args[1]
+	if not c1 then return {} end
+
+	-- if table is passed instead of lua varargs
+	if type(c1[1])~="string" then
+		command:eval(table.unpack(args[1]))
+	end
+
+	local eval = require 'eval'
+	if command:equal(c1, 'root') then
+		return eval(c1)
+	else
+		return eval{'root', memo=false, ...}
+	end
 end
 
 local command_mt={}
