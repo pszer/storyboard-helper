@@ -32,7 +32,7 @@ layer.dict = {
 function layer:correctInput(str)
 	if type(str)=="number" then
 		if str < 0 then return 0 end
-		if str > 3 then return 3 end
+		if str > 4 then return 4 end
 		return math.floor(str)
 	end
 

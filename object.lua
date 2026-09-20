@@ -145,7 +145,16 @@ function object:getAnchorPosition(x,y)
 	return anc(x,y,w,h)
 end
 
-function object:add(commands)
+function object:add(...)
+	local commands = {...}
+
+	if commands[1] and not self.commands then self.commands = {} end
+
+	for i,v in ipairs(commands) do
+		table.insert(self.commands,v)
+	end
+
+	return self
 end
 
 function object:out(...)
@@ -163,29 +172,46 @@ function object:out(...)
 			 self.frame_count, self.frame_delay, self.loop_type)
 	end
 
-	local evaluated = {
-		sb_com:evalTop({
-			start_x     = self.x,
-			start_y     = self.y,
-			start_sx    = self.sx or 1,
-			start_sy    = self.sy or 1,
-			start_r     = self.r or 0,
-			start_col_r = self.col_r or 255,
-			start_col_g = self.col_g or 255,
-			start_col_b = self.col_b or 255},
-			...)
-	}
+	if self.commands then
+		local evaluated = {
+			sb_com:evalTop({
+				start_x     = self.x,
+				start_y     = self.y,
+				start_sx    = self.sx or 1,
+				start_sy    = self.sy or 1,
+				start_r     = self.r or 0,
+				start_col_r = self.col_r or 255,
+				start_col_g = self.col_g or 255,
+				start_col_b = self.col_b or 255},
+				table.unpack(self.commands))
+		}
 
-	for i,com in ipairs(evaluated) do
-		local com_def = sb_com[com[1]]
-		if com_def.args and not com["start_x"] then
-			com["start_x"] = self.x or 320 end
-		if com_def.args and not com["start_y"] then
-			com["start_y"] = self.y or 240 end
+		for i,com in ipairs(evaluated) do
+			local com_ir  = sb_com:out(com)
+			local com_str = com_ir:out()
+			header=header.."\n"..com_str
+		end
+	end
 
-		local com_ir  = sb_com:out(com)
-		local com_str = com_ir:out()
-		header=header.."\n"..com_str
+	if ... then
+		local evaluated = {
+			sb_com:evalTop({
+				start_x     = self.x,
+				start_y     = self.y,
+				start_sx    = self.sx or 1,
+				start_sy    = self.sy or 1,
+				start_r     = self.r or 0,
+				start_col_r = self.col_r or 255,
+				start_col_g = self.col_g or 255,
+				start_col_b = self.col_b or 255},
+				...)
+		}
+
+		for i,com in ipairs(evaluated) do
+			local com_ir  = sb_com:out(com)
+			local com_str = com_ir:out()
+			header=header.."\n"..com_str
+		end
 	end
 
 	return header
