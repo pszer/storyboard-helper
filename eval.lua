@@ -123,8 +123,6 @@ local function eval(t)
 		return t
 	end
 
-	print(com_type)
-
 	local ease, time, vec1, vec2, args, varargs = sb_command:parseCommand(t)
 	local eval_pass = { sb_command[com_type].eval(time, ease, vec1, vec2, args, varargs) }
 	local eval_result = {}

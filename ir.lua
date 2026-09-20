@@ -35,7 +35,7 @@ function sb_ir:out()
 	local vec1_shortcut=false
 	local vec2_shortcut=false
 	local vec3_shortcut=false
-	for i,v in ipairs{"F","S","V","MX","MY","R"} do
+	for i,v in ipairs{"F","S","MX","MY","R"} do
 		if v==self[1] then vec1_shortcut=true break end end
 	for i,v in ipairs{"M","V"} do
 		if v==self[1] then vec2_shortcut=true break end end

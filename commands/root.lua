@@ -34,9 +34,9 @@ return {
 		local sb_com = require 'commands'
 		local eval = require 'eval'
 
-		for i,v in pairs(varargs) do
+		--for i,v in pairs(varargs) do
 		--	print(i,table.unpack(v))
-		end
+		--end
 
 		local evals = {}
 		for i,v in ipairs(varargs) do
@@ -46,38 +46,53 @@ return {
 			end
 		end
 
+		local start_pos   = {args.start_x, args.start_y}
+		if not start_pos[1] then start_pos = nil end
+
+		local start_rot   = {args.start_rot}
+		if not start_rot[1] then start_rot = nil end
+
+		local start_scale = {args.start_sx, args.start_sy}
+		if not start_scale[1] then start_scale = nil end
+
+		local start_col = {args.start_col_r, args.start_col_g, args.start_col_b}
+		if not start_col[1] then start_col = nil end
+
 		-- scale and vector have undefined .osb behaviour when used
 		-- at the same time, even if they do behave correctly a percentage
 		-- of the time. for now all scale commands are converted to vector.
 		local function simplify_scale_vector()
-			local scales = sb_verify:filterToCommand(evals, 'scale')
-			local vector = sb_verify:filterToCommand(evals, 'vector')
+			local scales = sb_verify:filterToCommand(evals, 'scale', 'scalerel')
+			local vector = sb_verify:filterToCommand(evals, 'vector', 'vectorrel')
+
+			if #vector == 0 and (start_scale and start_scale[1] == start_scale[2]) then
+				return scales, 'scalerel'
+			end
 
 			for i,s in ipairs(scales) do
-				local V = sb_com:scaleToVector(V)
+				local V = sb_com:scaleToVector(s)
 				table.insert(vector, V)
 			end
 
-			return vector
+			return vector, 'vectorrel'
 		end
 
-		local function resolve(rel_type, ...)
+		local function resolve(rel_type, start_vec, ...)
 			local time, dim = sb_verify:sortedTimes(evals, {rel_type, ...})
-			return {sb_verify:resolveTransformOverlaps(time, dim, rel_type)}
+			return {sb_verify:resolveTransformOverlaps(time, dim, rel_type, start_vec)}
 		end
-		
-		local m = resolve('moverel', 'move')
-		local r = resolve('rotrel', 'rot')
 
-		--local s = resolve('scalerel', 'scale')
-		--local v = resolve('vectorrel', 'vector')
-		local time, dim = sb_verify:sortedTimes(simplify_scale_vector())
-		local s_v = {sb_verify:resolveTransformOverlaps(time, dim, rel_type)}
+		local m = resolve('moverel', start_pos, 'move')
+		local r = resolve('rotrel', start_rot, 'rot')
+
+		local s_v_commands, s_v_rel_type, s_v_type = simplify_scale_vector()
+		local s_time, s_dim = sb_verify:sortedTimes(s_v_commands)
+		local s_v = {sb_verify:resolveTransformOverlaps(s_time, s_dim, s_v_rel_type, start_scale)}
 
 		local concat = {}
 		for _,v in ipairs(m) do concat[#concat+1] = v end
-		--for _,v in ipairs(r) do concat[#concat+1] = v end
-		--for _,v in ipairs(s_v) do concat[#concat+1] = v end
+		for _,v in ipairs(r) do concat[#concat+1] = v end
+		for _,v in ipairs(s_v) do concat[#concat+1] = v end
 
 		return table.unpack(concat)
 	end,

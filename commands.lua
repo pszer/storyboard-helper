@@ -251,6 +251,10 @@ command:addDefinition(require 'commands.scale'      , 's', 'scale')
 command:addDefinition(require 'commands.vector'     , 'v', 'vector', 'vectorscale', 'vector_scale')
 command:addDefinition(require 'commands.parameter'  , 'p', 'parameter', 'param')
 command:addDefinition(require 'commands.colour'     , 'c', 'col', 'color', 'colour')
+command:addDefinition(require 'commands.colouradd'  , 'ca', 'cadd','coladd', 'coloradd', 'colouradd', 'c_add','col_add',
+                                                      'color_add', 'colour_add')
+command:addDefinition(require 'commands.colourmul'  , 'cm', 'cmul','colmul', 'colormul', 'colourmul', 'c_mul','col_mul',
+                                                      'color_mul', 'colour_mul')
 command:addDefinition(require 'commands.moverel'  , 'mr', 'mover', 'moverel', 'moverelative', 'm_r', 'move_r', 'move_rel', 'move_relative')
 command:addDefinition(require 'commands.rotaterel', 'rr', 'rotr', 'rotrel', 'rotrelative', 'r_r', 'rot_r', 'rot_rel', 'rot_relative',
                                                     'rotater', 'rotaterel', 'rotaterelative', 'rotate_r', 'rotate_rel',
@@ -273,6 +277,8 @@ end
 -- can be used as an argument.
 -- if multiple arguments are given, it checks if it is any one of the types
 function command:equal(com, ...)
+	sb_log:assert(com, "command.equal(): got nil.")
+
 	local com_command = command[com[1]]
 	local args = {...}
 	for _,v in ipairs(args) do
@@ -389,11 +395,11 @@ end
 function command:scaleToVector(com)
 	if command:equal(com, 's') then
 		local easing,time,vec1,vec2 = command:parseCommand(com)
-		return command:createCommand('v', easing, time, {vec1[1],vec[1]}, {vec2[1],vec2[1]})
+		return command:createCommand('v', easing, time, {vec1[1],vec1[1]}, {vec2[1],vec2[1]})
 	end
 	if command:equal(com, 'sr') then
 		local easing,time,vec1,vec2 = command:parseCommand(com)
-		return command:createCommand('vr', easing, time, {vec1[1],vec[1]}, {vec2[1],vec2[1]})
+		return command:createCommand('vr', easing, time, {vec1[1],vec1[1]}, {vec2[1],vec2[1]})
 	end
 	if command:equal(com, 'v','vr') then
 		return com
@@ -445,17 +451,19 @@ function command:toString(com)
 		return tostring(com)
 	end
 
+	sb_log:assert(type(com[1]) == "string", "command.toString(): index 1 isn't a string, this can't be a command, got '%s'.", com[1])
+
 	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
 	local result = "{"..com[1]
 
 	if easing then result=result..","..tostring(easing) end
 	if time then
-		local vec1s = "{"
+		local s = "{"
 		for i,v in ipairs(time) do
-			vec1s=vec1s..v
-			if i~=#vec1 then vec1s=vec1s.."," end
+			s=s..v
+			if i~=#time then s=s.."," end
 		end
-		result=result..","..vec1s.."}"
+		result=result..","..s.."}"
 	end
 	if vec1 then
 		local vec1s = "{"

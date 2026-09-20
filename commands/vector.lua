@@ -1,4 +1,5 @@
 -- Vector
+local sb_ir = require 'ir'
 return {
 	easing = true,
 	time_points = 2,

@@ -15,11 +15,6 @@ verify.__index = verify
 local sb_time = require 'time'
 local sb_com = require 'commands'
 
-function verify:isPrimitive(com)
-	return sb_com:equal(com,
-		"move","movex","movey","scale","vector","fade","rotate","parameter","colour")
-end
-
 local function filter(t, predicate)
 	local result = {}
 	for i,v in ipairs(t) do
@@ -30,8 +25,15 @@ local function filter(t, predicate)
 	return result
 end
 
-function verify:filterToCommand(commands, types)
+function verify:filterToCommand(commands, ...)
+	local types = {...}
 	return filter(commands, function(x) return sb_com:equal(x, table.unpack(types)) end)
+end
+function verify:containsCommand(commands, ...)
+	local types = {...}
+	for i,v in ipairs(commands) do
+		if sb_com:equal(v, table.unpack(types)) then return true end
+	end
 end
 
 --
@@ -218,7 +220,7 @@ end
 -- any time overlap is undefined behaviour error.
 --
 -- if rel_type is non-nil, then any of the relative commands are collapsed into
--- their absolute versions
+-- their absolute versions. if nil then relative commands stay as relative commands
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	--[[print()
@@ -232,7 +234,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 		dimensions = sb_com[times[1].command[1]].dimension
 	end
 	if not times or #times==0 then
-		return {}
+		return nil
 	end
 	start_vec = start_vec or {}
 
@@ -249,6 +251,17 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	local curr = times[1]
 
 	local linear_easing = sb_easing["linear"]
+
+	local operator = sb_com[com_type].overlap_operator or '+'
+	local identity = 0
+	if operator == '*' then identity = 1 end
+
+	local operator_func = operator == '*'
+	                      and function(a,b) return a*b end
+												 or function(a,b) return a+b end
+	local inverse_func  = operator == '*'
+	                      and function(a,b) return a/b end
+												 or function(a,b) return a-b end
 
 	-- {command, easing_func, time, vec1, vec2} are popped
 	-- on and off here lasting from their start to end time
@@ -282,12 +295,17 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	local last_point_time = nil
 
 	local total_offset = {}
-	for i=1,dimension do total_offset[i]=start_vec[i] or 0 end
+
+	for i=1,dimension do
+		total_offset[i]=start_vec[i] or identity 
+	end
+
 	local function add_to_total_offset(command)
 		for i=#easing_stack,1,-1 do
 			if command == easing_stack[i][1] then
 				for j=1,dimension do
-					total_offset[j] = total_offset[j] + easing_stack[i][5][j] - easing_stack[i][4][j]
+					--                                             + *                                - /
+					total_offset[j] = operator_func(total_offset[j], inverse_func(easing_stack[i][5][j], easing_stack[i][4][j]))
 				end
 			end
 		end
@@ -315,8 +333,9 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				end
 				for i=1,dimension do
 					local D = v[5][i] - v[4][i]
-					--result[i] = result[i] + v[4][i] + (v[2](tau) * D)
-					result[i] = result[i] + (v[2](tau) * D)
+					local VD
+
+					result[i] = operator_func(result[i], (identity + v[2](tau) * D))
 				end
 			end
 		end
@@ -421,6 +440,10 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				
 		elseif curr.prev and not skip then
 
+			if curr[2]=="min" then
+				remove_from_easing_stack(curr.command)
+			end
+
 			-- if previous point-like command can be removed, then remove it
 			if last_point_time == curr[1] then
 				table.remove(final, #final)
@@ -449,8 +472,18 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 						get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
 				else
 
+					local epsilon = sb_config["default-easing-keyframing-epsilon"]
+
+					if sb_com:equal(curr.command, 'scale', 'scalerel', 'vector', 'vectorrel') then
+						epsilon = sb_config["default-easing-keyframing-epsilon-scale"]
+					elseif sb_com:equal(curr.command, 'rotate', 'rotaterel') then
+						epsilon = sb_config["default-easing-keyframing-epsilon-rotate"]
+					elseif sb_com:equal(curr.command, 'col', 'coladd', 'colmul') then
+						epsilon = sb_config["default-easing-keyframing-epsilon-col"]
+					end
+
 					local frames = get_keyframes_from_stack(curr.prev[1], curr[1], sb_config["default-easing-keyframing-interval"])
-					local s_frames = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon"]})
+					local s_frames = sb_keyframe:simplify(frames, {epsilon = epsilon})
 					
 					for i=1,#s_frames-1 do
 						local vec1,vec2 = {},{}
@@ -463,6 +496,10 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 							vec1, vec2, nil, nil))
 					end
 				end
+			end
+
+			if curr[2]=="min" then
+				add_to_easing_stack(curr.command, easing_func, time, vec1, vec2, easing)
 			end
 		end
 
@@ -480,6 +517,11 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				end
 				for i=1,dimension do
 					total_offset[i] = vec1[i] - fix_p[i]
+				end
+			else
+				--                                             + *
+				for i=1,dimension do
+					total_offset[i] = operator_func(total_offset[i] , vec1[i])
 				end
 			end
 		end
