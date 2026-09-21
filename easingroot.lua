@@ -2,10 +2,12 @@ local sb_easing = require 'easing'
 local sb_config = require 'config'
 local sb_log    = require 'log'
 
+local easing_root = {}
+easing_root.__index = easing_root
 local easing_derivatives = {}
 
 local tolerance = 0.0001
-function easing_derivatives:find_root(easing, t1,t2, a,b)
+function easing_root:find_root(easing, t1,t2, a,b)
 
 	if (a < 0 and b < 0) or (a > 0 and b > 0) then
 		sb_log("easing_derivatives:find_root(): %s and %s don't cross 0")
@@ -84,10 +86,6 @@ function easing_derivatives:find_root(easing, t1,t2, a,b)
 	end
 
 	local result = t * (t2-t1) + t1
-
-	if math.abs(func(result)) then
-		print(string.format("Easing %s, Returning %g, f(%g)=%f",sb_easing.names[easing], result,result,func(result)))
-	end
 
 	return result
 end
@@ -210,10 +208,6 @@ easing_derivatives[sb_easing["circinout"]] = function(x)
 	else
 		return (1 - 2*x) / math.sqrt(1 - (2*x - 1)^2)
 	end
-end
-
-for i=0,34 do
-	easing_derivatives:find_root(i, 0, 1, -9, 1)
 end
 
 return easing_root

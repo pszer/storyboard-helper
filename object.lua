@@ -172,28 +172,12 @@ function object:out(...)
 			 self.frame_count, self.frame_delay, self.loop_type)
 	end
 
-	if self.commands then
-		local evaluated = {
-			sb_com:evalTop({
-				start_x     = self.x,
-				start_y     = self.y,
-				start_sx    = self.sx or 1,
-				start_sy    = self.sy or 1,
-				start_r     = self.r or 0,
-				start_col_r = self.col_r or 255,
-				start_col_g = self.col_g or 255,
-				start_col_b = self.col_b or 255},
-				table.unpack(self.commands))
-		}
-
-		for i,com in ipairs(evaluated) do
-			local com_ir  = sb_com:out(com)
-			local com_str = com_ir:out()
-			header=header.."\n"..com_str
-		end
+	local commands_concat = {table.unpack(self.commands or {})}
+	for i,v in ipairs{...} do
+		table.insert(commands_concat, v)
 	end
 
-	if ... then
+	if commands_concat[1] then
 		local evaluated = {
 			sb_com:evalTop({
 				start_x     = self.x,
@@ -204,7 +188,7 @@ function object:out(...)
 				start_col_r = self.col_r or 255,
 				start_col_g = self.col_g or 255,
 				start_col_b = self.col_b or 255},
-				...)
+				table.unpack(commands_concat))
 		}
 
 		for i,com in ipairs(evaluated) do

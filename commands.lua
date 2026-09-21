@@ -130,7 +130,7 @@ function command:parseCommand(com, target)
 			"command '%s' expects a vector, argument is a '%s'.", com_type, type(vec1))
 		if type(vec1) == "number" then vec1 = {vec1} end
 
-		sb_log:assert(#vec1==com_def.dimension, "command '%s' expects a %dD vector, argument is %d.", com_type, com_def.dimension, #vec1)
+		sb_log:assert(#vec1==com_def.dimension, "command '%s' expects a %dD vector, argument is %dD.", com_type, com_def.dimension, #vec1)
 		vec1 = clone(vec1)
 
 		step()
@@ -265,6 +265,7 @@ command:addDefinition(require 'commands.vectorrel', 'vr', 'vectorr', 'vectorrel'
 command.___lock_out = true -- prevent future command definitions with an 'out' function
 
 command:addDefinition(require 'commands.originscale', 'originscale', 'os', 'origin_scale')
+command:addDefinition(require 'commands.protract', 'protract')
 
 function command:type(c)
 	sb_log:assert(c, "command.type(): no argument")
@@ -370,7 +371,7 @@ function command:createCommand(com_type, easing, time, vec1, vec2, args, ...)
 	end
 
 	if com_def.varargs then
-		for i,v in {...} do
+		for i,v in ipairs{...} do
 			table.insert(result, v)
 		end
 	end
@@ -438,9 +439,6 @@ function command:createCommandAddition(c1,c2)
 
 	local c = command:createCommand(type1, easing, time1, new_vec1, new_vec2)
 	return c
-end
-
-function command:getTimeSpan(...)
 end
 
 -- 

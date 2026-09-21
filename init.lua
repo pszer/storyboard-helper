@@ -45,7 +45,7 @@ print(
 storyboard = sb:new("./sb.osb")
 
 storyboard:newObject("slidez.png", "Background", "Center", 320, 240):add(
-	{"move" , "linear"     , {0, 5000}, {100,100}, {200,300}},
+	--[[{"move" , "linear"     , {0, 5000}, {100,100}, {200,300}},
 	{"moverel", "elasticout" , {1000, 2000}, {0,0}, {100,-10}},
 	{"moverel", "elasticout" , {3000, 4000}, {0,0}, {100,-10}},
 	{"moverel", "backout"    , {5000, 6000}, {0,0}, {0,-200}},
@@ -55,10 +55,11 @@ storyboard:newObject("slidez.png", "Background", "Center", 320, 240):add(
 	{"move" , "linear"     , {8900, 10000}, {400,240}, {100,240}},
 	{"move" , "linear"     , {10000, 11000}, {100,240}, {320,40}},
 
-	do_the_wiggly_worm_lol(8900, 11000, 500),
+	do_the_wiggly_worm_lol(8900, 11000, 500),--]]
 
-	{"scale" , "circout", {0, 2000}, {0.3}, {0.9}},
-	{"scalerel" , "elasticout", {1000, 2000}, {1.0}, {2.0}}
+	{"vector" , "linear", {0, 2000}, {2,2}, {-1,-1}}
+	--{"vector" , "linear", {3000, 5000}, {2,2}, {-1,-1}}
+	--{"scalerel" , "elasticout", {1000, 2000}, {1.0}, {2.0}}
 )
 
 --print(storyboard:out())

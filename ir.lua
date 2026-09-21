@@ -64,7 +64,14 @@ function sb_ir:out()
 		if vec3_shortcut and i>=8 and i<=10 then x="" skip_comma = true end
 		if vec3_shortcut and i==7 then skip_comma = true end
 
-		if type(x)=="number" then x=string.format("%g",x) end
+		if type(x)=="number" then
+			local int,frac = math.modf(x)
+			if frac==0 or math.abs(frac)<0.0001 then
+				x=string.format("%d",int)
+			else
+				x=string.format("%f",x)
+			end
+		end
 
 		result=result..x
 		if i<c and not skip_comma then

@@ -81,6 +81,9 @@ function storyboard:writeToFile(f, overwrite)
 	local str_out = self:out()
 	file:write(str_out)
 
+	            -- subtract modulo 32 to simplify decimal points
+	local kb = (#str_out - #str_out%64) / 1024.0
+	sb_log:printf("storyboard:writeToFile(): Written %g KiB to %s", kb, f)
 	file:close()
 end
 

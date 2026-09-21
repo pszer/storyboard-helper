@@ -30,11 +30,22 @@ function verify:filterToCommand(commands, ...)
 	local types = {...}
 	return filter(commands, function(x) return sb_com:equal(x, table.unpack(types)) end)
 end
-function verify:containsCommand(commands, ...)
+function verify:extractCommands(commands, ...)
 	local types = {...}
-	for i,v in ipairs(commands) do
-		if sb_com:equal(v, table.unpack(types)) then return true end
+	local out = {}
+	for i= #commands,1,-1 do
+		if sb_com:equal(commands[i], ...) then
+			table.insert(out, commands[i])
+			table.remove(commands, i)
+		end
 	end
+	return out
+end
+function verify:containsCommand(commands, ...)
+	for i,v in ipairs(commands) do
+		if sb_com:equal(v, ...) then return true end
+	end
+	return false
 end
 
 --
@@ -224,11 +235,11 @@ end
 -- their absolute versions. if nil then relative commands stay as relative commands
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
-	--[[print()
+	print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
 	end
-	print()--]]
+	print()
 
 	local dimensions=0
 	if times[1] then
@@ -300,11 +311,14 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	for i=1,dimension do
 		total_offset[i]=start_vec[i] or identity 
 	end
+	print("total_offset", table.unpack(total_offset))
 
 	local function add_to_total_offset(command)
 		for i=#easing_stack,1,-1 do
 			if command == easing_stack[i][1] then
 				for j=1,dimension do
+					--print(string.format("operator_func(%s, inverse(%s, %s) = %s)", total_offset[j], easing_stack[i][5][j], easing_stack[i][4][j],
+					--	inverse_func(easing_stack[i][5][j], easing_stack[i][4][j]) ))
 					--                                             + *                                - /
 					total_offset[j] = operator_func(total_offset[j], inverse_func(easing_stack[i][5][j], easing_stack[i][4][j]))
 				end
@@ -334,10 +348,13 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				end
 				for i=1,dimension do
 					local D = v[5][i] - v[4][i]
-					local VD
+
+					print(string.format("D[%d]=%f",i,D))
 
 					result[i] = operator_func(result[i], (identity + v[2](tau) * D))
 				end
+				print("time", time, "totaloffset", table.unpack(result))
+				print("time", time, table.unpack(result))
 			end
 		end
 
@@ -461,6 +478,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 
 				if (not is_stack_overlapping() or is_stack_linear())
 					and not (easing ~= linear_easing and curr.prev.command ~= curr.command) then 
+					print("lolz", table.unpack(get_from_stack(curr[1])))
 					table.insert(final, sb_com:createCommand(abs_type, easing, {curr.prev[1], curr[1]},
 						get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
 				elseif sb_config["disable-easing-keyframing"] then
@@ -508,28 +526,28 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 			last_point_time = nil
 		end
 
-		if curr[2]=="min" then
-			if is_abs then
-				local current_p = get_from_stack(curr[1])
-				local fix_p = {}
+		if curr[2]=="min" and is_abs then
+			local current_p = get_from_stack(curr[1])
+			local fix_p = {}
 
-				for i = 1,dimension do
-					fix_p[i] = current_p[i] - total_offset[i]
-				end
-				for i=1,dimension do
-					total_offset[i] = vec1[i] - fix_p[i]
-				end
-			else
-				--                                             + *
-				for i=1,dimension do
-					total_offset[i] = operator_func(total_offset[i] , vec1[i])
-				end
+			for i = 1,dimension do
+				fix_p[i] = current_p[i] - total_offset[i]
+			end
+			for i=1,dimension do
+				total_offset[i] = vec1[i] - fix_p[i]
+			end
+		else
+			--                                             + *
+			for i=1,dimension do
+				total_offset[i] = operator_func(total_offset[i] , vec1[i])
 			end
 		end
 
 		if curr[2]=="max" then
+			print("gup gup", table.unpack(total_offset))
 			--if not is_abs then
 				add_to_total_offset(curr.command)
+			print("gup gup", table.unpack(total_offset))
 			--else
 			--	add_to_total_offset_abs_command(vec1, vec2)
 			--end
@@ -544,6 +562,10 @@ end
 
 -- expects non-overlapping vector commands
 function verify:resolveNegativeScales(coms)
+	if not coms or not coms[1] then
+		return {}, {}
+	end
+
 	--
 	local converted = {}
 	for i,v in ipairs(coms) do
@@ -555,33 +577,236 @@ function verify:resolveNegativeScales(coms)
 		end)
 	end
 
-	local result = {}
+	local result_s_v = {}
+	local result_p   = {}
 
-	local negative_x_start = nil
-	local negative_y_start = nil
+	local function pos(x) return x >= 0 end
+	local function neg(x) return x  < 0 end
 
-	local function pos(x) return x>0 end
-	local function neg(x) return x<0 end
+	local h_flip_markers = {}
+	local v_flip_markers = {}
 
-	local function root_linear(t1,t2,a,b)
-		return t1 - (a/(b-a)) * (t2 - t1)
+	if converted[1] then
+		local vec1,vec2 = sb_com:parseCommand(converted[1], "vec")
+		if neg(vec1[1]) then
+			table.insert(h_flip_markers, {vec1[1], true} )
+		end
+		if neg(vec1[2]) then
+			table.insert(v_flip_markers, {vec1[2], true} )
+		end
 	end
-	local function root_easing(easing,t1,t2,a,b)
-		local root_f = require 'root'
+
+	local function linear_root(t1,t2, a,b)
+		if a*b > 0 then return nil end
+		if a==0 then return t1 end
+		if b==0 then return t2 end
+
+		return t1 + (-a/(b-a))*(t2-t1)
 	end
 
 	for i,v in ipairs(converted) do
-		local time = sb_com:parseCommand(v, "time")
-		local vec1, vec2 = sb_com:parseCommand(v, "vec")
+		local easing, time, vec1, vec2 = sb_com:parseCommand(v)
+
+		local is_linear = easing == sb_easing['linear']
+
+		local function get_root(i)
+			if is_linear then
+				return linear_root(time[1], time[2], vec1[i], vec2[i])
+			end
+
+			return sb_easingroot:find_root(easing, time[1], time[2], vec1[i], vec2[i])
+		end
 
 		-- if nothing needs to be done
 		if pos(vec1[1]) and pos(vec1[2]) and pos(vec2[1]) and pos(vec2[2]) then
-			table.insert(result, v)
+			table.insert(result_s_v, v)
 		end
 
+		local x_root, y_root
+
+		--
+		-- positive to negative
+		--
 		if pos(vec1[1]) and neg(vec2[1]) then
+			x_root = get_root(1)
+			table.insert(h_flip_markers, {x_root, true} ) end
+
+		if pos(vec1[2]) and neg(vec2[2]) then
+			y_root = get_root(2)
+			table.insert(v_flip_markers, {y_root, true} ) end
+
+		--
+		-- negative to positive
+		--
+		if neg(vec1[1]) and pos(vec2[1]) then
+			x_root = get_root(1)
+			table.insert(h_flip_markers, {x_root, false} ) end
+
+		if neg(vec1[2]) and pos(vec2[2]) then
+			y_root = get_root(2)
+			table.insert(v_flip_markers, {y_root, false} ) end
+
+		local function gen_frames()
+			local frames = {}
+			local easing_func = sb_easing.funcs[easing]
+			local dx = vec2[1] - vec1[1]
+			local dy = vec2[2] - vec1[2]
+
+			local add_time2 = true
+			for i=time[1],time[2],sb_config["default-easing-keyframing-interval"] do
+				if i==time[2] then add_time2 = false end
+
+				local t = (i-time[1])/(time[2]-time[1])
+				if t==1/0 then t=1 end
+				local e = easing_func(t)
+				table.insert(frames, {i, math.abs((e * dx)+vec1[1]), math.abs((e * dy)+vec1[2]) })
+			end
+
+			if add_time2 then
+				table.insert(frames, {time[2], math.abs(vec2[1]), math.abs(vec2[2]) })
+			end
+			return frames
+		end
+
+		--
+		if x_root or y_root then
+
+			--
+			--
+			-- if the easing is non_linear, the resulting scale commands
+			-- are approximated using keyframing.
+			-- when linear, an exact solution can be created easily.
+			--
+
+			if not is_linear then
+
+				local frames = gen_frames()
+				local K = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon-scale"]})
+				for i=1,#K-1 do
+					local Ki = K[i]
+					local Kj = K[i+1]
+					table.insert(result_s_v, sb_com:createCommand('vector', 0, {Ki[1], Kj[1]}, {Ki[2], Kj[2]}, {Ki[3], Kj[3]}))
+				end
+
+			else
+
+				local d_vec = {
+					vec2[1]-vec1[1],
+					vec2[2]-vec1[2],
+				}
+
+				local split_a = math.min(x_root or y_root, y_root or x_root)
+				local split_b = math.max(x_root or y_root, y_root or x_root)
+
+				if split_a ~= split_b then
+					local tau = (split_a - time[1])/(time[2] - time[1])
+					if time[2]==time[1] then tau = 1.0 end
+					table.insert(result_s_v, sb_com:createCommand('vector', 0,
+						{time[1],split_a},                       -- t1___a   b   t2
+						{math.abs(vec1[1]), math.abs(vec1[2])},  -- 
+						{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])} --
+					))
+
+					local tau_b = (split_b - time[1])/(time[2] - time[1])
+					if time[2]==time[1] then tau_b = 1.0 end
+					table.insert(result_s_v, sb_com:createCommand('vector', 0,
+						{split_a, split_b},                      -- t1   a___b   t2
+						{math.abs(vec1[1] + tau*d_vec[1])  , math.abs(vec1[2] + tau*d_vec[2])},  -- 
+						{math.abs(vec1[1] + tau_b*d_vec[1]), math.abs(vec1[2] + tau_b*d_vec[2])} --
+					))
+
+					table.insert(result_s_v, sb_com:createCommand('vector', 0,
+						{split_b, time[2]},                      -- t1   a   b___t2
+						{math.abs(vec1[1] + tau_b*d_vec[1]), math.abs(vec1[2] + tau_b*d_vec[2])},  -- 
+						{math.abs(vec2[1])                 , math.abs(vec2[2])} --
+					))
+				elseif split_a == split_b then
+
+					local tau = (split_a - time[1])/(time[2] - time[1])
+					if time[2]==time[1] then tau = 1.0 end
+					table.insert(result_s_v, sb_com:createCommand('vector', 0,
+						{time[1],split_a},                       -- t1___a   t2
+						{math.abs(vec1[1]), math.abs(vec1[2])},  -- 
+						{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])} --
+					))
+
+					table.insert(result_s_v, sb_com:createCommand('vector', 0,
+						{split_a, time[2]},                      -- t1   a___t2
+						{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])},  -- 
+						{math.abs(vec2[1])               , math.abs(vec2[2])} --
+					))
+
+				end
+
+			end
+
+		elseif neg(vec1[1]) or neg(vec1[2]) or neg(vec2[1]) or neg(vec2[2]) then
+
+			table.insert(result_s_v, sb_com:createCommand('vector', easing, time,
+				{math.abs(vec1[1]), math.abs(vec1[2])}, {math.abs(vec2[1]), math.abs(vec2[2])}))
+
 		end
 	end
+
+	local h_start = nil
+	for i,v in ipairs(h_flip_markers) do
+		if v[2] == true then
+			h_start = v[1]
+		elseif v[2] == false then
+			local v_time = v[1]
+			table.insert(result_p, sb_com:createCommand('param', nil, {h_start, v_time}, nil, nil, {value = "H"}))
+			h_start = nil
+		end
+	end
+	if h_start then
+		table.insert(result_p, sb_com:createCommand('protract', nil, nil, nil, nil, nil,
+		 sb_com:createCommand('param', nil, {h_start, h_start}, nil, nil, {value = "H"})
+		 )
+		)
+	end
+
+	local v_start = nil
+	for i,v in ipairs(h_flip_markers) do
+		if v[2] == true then
+			v_start = v[1]
+		elseif v[2] == false then
+			local v_time = v[1]
+			table.insert(result_p, sb_com:createCommand('param', nil, {v_start, v_time}, nil, nil, {value = "V"}))
+			v_start = nil
+		end
+	end
+	if v_start then
+		table.insert(result_p, sb_com:createCommand('protract', nil, nil, nil, nil, nil,
+		  sb_com:createCommand('param', nil, {v_start, v_start}, nil, nil, {value = "V"})
+	 	))
+	end
+
+	return result_s_v, result_p
+end
+
+function verify:getCommandsTimeSpan(coms)
+	if not coms or #coms==0 then return nil, nil end
+
+	local min= 1/0
+	local max=-1/0
+
+	for i,v in ipairs(coms) do
+		local time = sb_com:parseCommand(v, "time")
+		local v_min,v_max
+
+		if time then
+			v_min,v_max = sb_time:getMinMax(time)
+			
+			min = math.min(min, v_min)
+			max = math.max(max, v_max)
+		end
+	end
+
+	return min,max
+end
+
+function verify:resolveProtract(coms)
+	local coms = verify:filterToCommand(coms, 'protract')
 end
 
 --[[function verify:checkTimeOverlaps(commands_list)

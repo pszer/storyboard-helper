@@ -46,6 +46,8 @@ return {
 			end
 		end
 
+		local time_min,time_max = sb_verify:getCommandsTimeSpan(evals)
+
 		local start_pos   = {args.start_x, args.start_y}
 		if not start_pos[1] then start_pos = nil end
 
@@ -62,8 +64,8 @@ return {
 		-- at the same time, even if they do behave correctly a percentage
 		-- of the time. for now all scale commands are converted to vector.
 		local function simplify_scale_vector()
-			local scales = sb_verify:filterToCommand(evals, 'scale', 'scalerel')
-			local vector = sb_verify:filterToCommand(evals, 'vector', 'vectorrel')
+			local scales = sb_verify:extractCommands(evals, 'scale', 'scalerel')
+			local vector = sb_verify:extractCommands(evals, 'vector', 'vectorrel')
 
 			if #vector == 0 and (start_scale and start_scale[1] == start_scale[2]) then
 				return scales, 'scalerel'
@@ -78,7 +80,8 @@ return {
 		end
 
 		local function resolve(rel_type, start_vec, ...)
-			local time, dim = sb_verify:sortedTimes(evals, {rel_type, ...})
+			local extract = sb_verify:extractCommands(evals, rel_type, ...)
+			local time, dim = sb_verify:sortedTimes(extract)
 			return {sb_verify:resolveTransformOverlaps(time, dim, rel_type, start_vec)}
 		end
 
@@ -88,6 +91,15 @@ return {
 		local s_v_commands, s_v_rel_type, s_v_type = simplify_scale_vector()
 		local s_time, s_dim = sb_verify:sortedTimes(s_v_commands)
 		local s_v = {sb_verify:resolveTransformOverlaps(s_time, s_dim, s_v_rel_type, start_scale)}
+
+		for i,v in ipairs(s_v) do
+			print(sb_com:toString(v))
+		end
+
+		local flips
+
+		s_v, flips = sb_verify:resolveNegativeScales(s_v)
+		print("s_v, flips", #s_v, #flips)
 
 		local concat = {}
 		for _,v in ipairs(m) do concat[#concat+1] = v end

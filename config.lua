@@ -12,10 +12,10 @@ local config = {
 
 	["disable-easing-keyframing"] = false,
 	["default-easing-keyframing-epsilon"]        = 2.4,
-	["default-easing-keyframing-epsilon-scale"]  = 0.001,
+	["default-easing-keyframing-epsilon-scale"]  = 0.014,
 	["default-easing-keyframing-epsilon-rotate"] = 0.1,
 	["default-easing-keyframing-epsilon-color"]  = 2,
-	["default-easing-keyframing-interval"] = 1,
+	["default-easing-keyframing-interval"] = 16,
 
 	["default-epsilon"] = 2.0,
 

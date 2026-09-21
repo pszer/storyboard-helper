@@ -28,7 +28,7 @@ function log:popStack()
 end
 
 function log:evalStackTraceback()
-	local sb_com = require 'command'
+	local sb_com = require 'commands'
 	local result = "Command eval traceback:\n"
 
 	for i=log.eval_stack[0], 1, -1 do
@@ -36,6 +36,14 @@ function log:evalStackTraceback()
 	end
 
 	return result
+end
+
+function log:printf(fstr, ...)
+	local sb_config = require 'config'
+	if not sb_config["-silent"] and self.__out then
+		self.__out:write(string.format(fstr, ... ))
+		self.__out:write('\n')
+	end
 end
 
 function log:warn(fstr, ...)
