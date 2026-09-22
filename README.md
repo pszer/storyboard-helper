@@ -18,8 +18,9 @@ evaluation:
 
 `{'MoveRel', 'linear', {'00:01:000', '00:02:000'}, {0,0}, {50, 0}}`
 
-Relative commands have no limits to how they can overlap in time, and in cases of non-linear easings
-their final motion will be resolved and keyframed to create the correct visual effect.
+Relative commands have no limit to how they can overlap in time, and in cases of non-linear easings
+their final motion will be resolved and keyframed to create the correct visual effect without additional
+steps.
 
 With relative commands, there are option for more abstract and advanced ways of scripting animations.
 Custom, compounded and potentially recursive commands can be created in the manner of functional programming,
