@@ -42,7 +42,7 @@ function sb_ir:out()
 		if v==self[1] then vec3_shortcut=true break end end
 
 	if time_shortcut and self[3]~=self[4] then time_shortcut = false end
-	if vec1_shortcut and self[6]~=self[6] then vec1_shortcut = false end
+	if vec1_shortcut and self[6]~=self[7] then vec1_shortcut = false end
 	if vec2_shortcut and (self[5]~=self[7] or self[6]~=self[8]) then vec2_shortcut = false end
 	if vec3_shortcut and (self[5]~=self[8] or self[6]~=self[9] or self[7]~=self[10]) then vec3_shortcut = false end
 

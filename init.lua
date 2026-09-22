@@ -60,6 +60,8 @@ storyboard:newObject("slidez.png", "Background", "Center", 320, 240):add(
 	{"vector" , "linear", {9000, 11000}, {2,2}, {-1,-1}},
 	{"scalerel" , "elasticout", {1000, 1500}, {1.0}, {1.5}},
 	{"vector" , "linear", {12000, 13000}, {-1,-1}, {-2,-2}}--]]
-	{"rotate", 'linear', {0,9500}, 0, 6.1}
+	--{"move", 'linear' , {0,1500}, {0,0}, {7,7}},
+	--{"move", 'linear', {1500,3000}, {1,1}, {7,7}},
+	{"rotate", 'linear' , {4000,5500}, 0, 7}
 )
 storyboard:writeToFile()

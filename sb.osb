@@ -3,7 +3,7 @@
 //Background and Video events
 //Storyboard Layer 0 (Background)
 Sprite,0,1,"slidez.png",320,240
-_R,0,0,9500,0
+_R,0,4000,5500,0,7
 //Storyboard Layer 1 (Fail)
 //Storyboard Layer 2 (Pass)
 //Storyboard Layer 3 (Foreground)

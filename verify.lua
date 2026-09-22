@@ -235,11 +235,11 @@ end
 -- their absolute versions. if nil then relative commands stay as relative commands
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
-	--[[print()
+	print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
 	end
-	print()--]]
+	print()
 
 	local dimensions=0
 	if times[1] then
@@ -248,9 +248,8 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	if not times or #times==0 then
 		return nil
 	end
-	start_vec = start_vec or {}
+	local start_vec = start_vec or {}
 
-	local clone = require 'clone'
 	local final = {}
 
 	local com_type = rel_type or times[1].command[1]
@@ -266,6 +265,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 
 	local operator = sb_com[com_type].overlap_operator or '+'
 	local identity = 0
+
 	if operator == '*' then identity = 1 end
 
 	local operator_func = operator == '*'
@@ -351,8 +351,6 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 
 					result[i] = operator_func(result[i], (v[4][i] + v[2](tau) * D))
 				end
-				--print("time", time, "totaloffset", table.unpack(result))
-				--print("time", time, table.unpack(result))
 			end
 		end
 
@@ -475,10 +473,14 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				--
 
 				if (not is_stack_overlapping() or is_stack_linear())
-					and not (easing ~= linear_easing and curr.prev.command ~= curr.command) then 
-				--	print("lolz", table.unpack(get_from_stack(curr[1])))
+					and not (easing ~= linear_easing and curr.prev.command ~= curr.command)
+					then 
 					table.insert(final, sb_com:createCommand(abs_type, easing, {curr.prev[1], curr[1]},
 						get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
+
+
+				-- keyframe
+
 				elseif sb_config["disable-easing-keyframing"] then
 
 					sb_log:warn(
@@ -528,6 +530,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 			--print("")
 			--print("Setting total offset, currently ", table.unpack(total_offset))
 
+
 			local current_p = get_from_stack(curr[1])
 			local fix_p = {}
 
@@ -539,8 +542,11 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 			--print("fix_p is ", table.unpack(fix_p))
 
 			for i=1,dimension do
-				if fix_p[i] ~= 0 then
+				local x = fix_p[i]
+				if (x ~= 0 and (x == x and x ~= math.huge and x ~= -math.huge)) or operator == '+' then
 					total_offset[i] = inverse_func(vec1[i] , fix_p[i])
+				else
+					total_offset[i] = vec1[i]
 				end
 			end
 
