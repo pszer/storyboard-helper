@@ -12,9 +12,7 @@ return {
 	overlapping=true,
 	absolute_equal="vector",
 	overlap_operator='*',
-	out = function(t, easing, vector_a, vector_b, args, varargs)
-		local sb_log = require 'log'
-		local sb_ir  = require 'ir'
+	out = function(easing, t, vector_a, vector_b, args, varargs)
 		sb_log:assert(args.start_sx, "vectorrel out(): no starting X scale. can't proceed.")
 		sb_log:assert(args.start_sy, "vectorrel out(): no starting Y scale. can't proceed.")
 

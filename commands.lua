@@ -189,83 +189,6 @@ function command:parseCommand(com, target)
 	return ease, time, vec1, vec2, args, varargs
 end
 
--- def - command definition
--- ... - (variable number of) string keys for the command.
-command.___lock_out = false
-function command:addDefinition(def, ...)
-	sb_log:assert(def, "command.addDefinition(): missing command definition.")
-	local keys = {...}
-	sb_log:assert(#keys > 0, "command.addDefinition(): missing key names to assign to this command")
-
-	local definition_str = " for \'"..keys[1].."\'"
-
-	sb_log:assert(type(def.easing)=="boolean", "command.addDefinition(): malformed easing definition"..definition_str)
-	sb_log:assert(type(def.time_points)=="number"
-	              and math.type(def.time_points)=="integer"
-								and def.time_points >= 0, "command.addDefinition(): malformed time points definition"..definition_str)
-	sb_log:assert(type(def.dimension)=="number"
-	              and math.type(def.dimension)=="integer"
-								and def.time_points >= 0, "command.addDefinition(): malformed dimension(s) definition"..definition_str)
-
-	sb_log:assert(type(def.args)=="table" or type(def.args)=="nil",
-								"command.addDefinition(): malformed arg(s) table definition"..definition_str)
-	for i,v in ipairs(def.args or {}) do
-		sb_log:assert(type(v)=="string", "command.addDefinition(): malformed arg(s) table definition"..definition_str)
-	end
-
-	sb_log:assert(type(def.args_valid)=="table" or type(def.args_valid)=="nil",
-								"command.addDefinition(): malformed arg(s) valid functions table definition"..definition_str)
-	for i,v in pairs(def.args_valid or {}) do
-		sb_log:assert(type(v)=="function" or type(v)=="nil", "command.addDefinition(): malformed arg(s) valod functions table definition"..definition_str)
-	end
-	sb_log:assert(type(def.varargs)=="boolean", "command.addDefinition(): malformed variable args definition"..definition_str)
-	sb_log:assert(not (type(def.out)=="function" and command.___lock_out),
-		"command.addDefinition(): the out function are fixed for primitives only.")
-
-
-	sb_log:assert(type(def.overlapping)=="boolean" or def.overlapping==nil, "command.addDefinition(): malformed overlapping flag definition"..definition_str)
-	def.overlapping = def.overlapping==true
-	if def.overlapping then
-		sb_log:assert(type(def.absolute_equal)=="string", "command.addDefinition(): malformed absolute_equal specifier definition"..definition_str)
-	end
-
-	sb_log:assert(type(def.eval)=="function" or type(def.eval)=="nil", "command.addDefinition(): malformed eval defintion"..definition_str)
-
-	for i,v in ipairs(keys) do
-		local str = v
-		sb_log:assert(type(str)=="string",
-			"command.addDefinition(): only strings are allowed to be used as keys for commands, got a '%s'.", type(str))
-		str = str:lower()
-		sb_log:assert(command[str]==nil, "command.addDefinition(): key [\"%s\"] is already in use.", str)
-		command[str] = def
-	end
-end
-
-command:addDefinition(require 'commands.root'       , '__root__', 'root','eval')
-command:addDefinition(require 'commands.move'       , 'm', 'move')
-command:addDefinition(require 'commands.movex'      , 'mx', 'movex', 'move_x', 'm_x')
-command:addDefinition(require 'commands.movey'      , 'my', 'movey', 'move_y', 'm_y')
-command:addDefinition(require 'commands.fade'       , 'f', 'fade')
-command:addDefinition(require 'commands.rotate'     , 'r', 'rotate', 'rot')
-command:addDefinition(require 'commands.scale'      , 's', 'scale')
-command:addDefinition(require 'commands.vector'     , 'v', 'vector', 'vectorscale', 'vector_scale')
-command:addDefinition(require 'commands.parameter'  , 'p', 'parameter', 'param')
-command:addDefinition(require 'commands.colour'     , 'c', 'col', 'color', 'colour')
-command:addDefinition(require 'commands.colouradd'  , 'ca', 'cadd','coladd', 'coloradd', 'colouradd', 'c_add','col_add',
-                                                      'color_add', 'colour_add')
-command:addDefinition(require 'commands.colourmul'  , 'cm', 'cmul','colmul', 'colormul', 'colourmul', 'c_mul','col_mul',
-                                                      'color_mul', 'colour_mul')
-command:addDefinition(require 'commands.moverel'  , 'mr', 'mover', 'moverel', 'moverelative', 'm_r', 'move_r', 'move_rel', 'move_relative')
-command:addDefinition(require 'commands.rotaterel', 'rr', 'rotr', 'rotrel', 'rotrelative', 'r_r', 'rot_r', 'rot_rel', 'rot_relative',
-                                                    'rotater', 'rotaterel', 'rotaterelative', 'rotate_r', 'rotate_rel',
-																										'rotate_relative')
-command:addDefinition(require 'commands.scalerel' , 'sr', 'scaler', 'scalerel', 'scalerelative', 's_r', 'scale_r', 'scale_rel','scale_relative')
-command:addDefinition(require 'commands.vectorrel', 'vr', 'vectorr', 'vectorrel', 'vectorrelative', 'v_r', 'vector_r', 'vector_rel',
-                                                    'vector_relative')
-command.___lock_out = true -- prevent future command definitions with an 'out' function
-
-command:addDefinition(require 'commands.originscale', 'originscale', 'os', 'origin_scale')
-command:addDefinition(require 'commands.protract', 'protract')
 
 function command:type(c)
 	sb_log:assert(c, "command.type(): no argument")
@@ -332,7 +255,7 @@ function command:out(com)
 
 	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
 
-	return out_func(time, easing, vec1, vec2, args, varargs)
+	return out_func(easing, time, vec1, vec2, args, varargs)
 end
 
 -- creates a command based on the type.
@@ -608,11 +531,11 @@ function command:evalTop(params, ...)
 	for i,v in pairs(params) do
 		root[i]=v
 	end
-	return command:eval(root)
+	return command:evalCommands(root)
 end
 
 -- evaluates commands, if wraps them in a root command first
-function command:eval(...)
+function command:evalCommands(...)
 	local args = {...}
 
 	local c1 = args[1]
@@ -620,7 +543,7 @@ function command:eval(...)
 
 	-- if table is passed instead of lua varargs
 	if type(c1[1])~="string" then
-		command:eval(table.unpack(args[1]))
+		command:evalCommands(table.unpack(args[1]))
 	end
 
 	local eval = require 'eval'

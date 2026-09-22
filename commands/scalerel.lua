@@ -10,9 +10,7 @@ return {
 	overlapping=true,
 	absolute_equal="scale",
 	overlap_operator='*',
-	out = function(t, easing, vector_a, vector_b, args, varargs)
-		local sb_log = require 'log'
-		local sb_ir  = require 'ir'
+	out = function(easing, t, vector_a, vector_b, args, varargs)
 		sb_log:assert(args.start_scale, "scalerel out(): no starting X scale. can't proceed.")
 
 		return sb_ir:new("S",easing,t[1],t[2],

@@ -883,7 +883,7 @@ end
 --
 function verify:resolveParameterOverlaps(coms)
 	if not coms or not coms[1] then
-		return {} end
+		return {},{},{} end
 	for i,v in ipairs(coms) do
 		sb_log:assert(sb_com:equal(v,'param'), "verify:resolveParameterOverlaps(): got non-parameter command.") end
 

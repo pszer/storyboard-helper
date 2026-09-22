@@ -3,6 +3,8 @@ local object = require 'object'
 local verify = require 'verify'
 local sb = require 'storyboard'
 
+require 'load_commands'
+
 --local testobj = object:new("slidez.png", "Background", "TopLeft", 320, 240)
 
 --[[
@@ -42,7 +44,7 @@ local function wiggle(t,dur,period)
 end
 storyboard = sb:new("./sb.osb")
 storyboard:newObject("slidez.png", "Background", "Center", 320, 240):add(
-	{"move" , "linear"     , {0, 5000}, {100,100}, {200,300}},
+	--[[{"move" , "linear"     , {0, 5000}, {100,100}, {200,300}},
 	{"moverel", "elasticout" , {1000, 2000}, {0,0}, {100,-10}},
 	{"moverel", "elasticout" , {3000, 4000}, {0,0}, {100,-10}},
 	{"moverel", "backout"    , {5000, 6000}, {0,0}, {0,-200}},
@@ -57,6 +59,7 @@ storyboard:newObject("slidez.png", "Background", "Center", 320, 240):add(
 	{"vector" , "linear", {6000, 8000}, {2,2}, {-1,-1}},
 	{"vector" , "linear", {9000, 11000}, {2,2}, {-1,-1}},
 	{"scalerel" , "elasticout", {1000, 1500}, {1.0}, {1.5}},
-	{"vector" , "linear", {12000, 13000}, {-1,-1}, {-2,-2}}
+	{"vector" , "linear", {12000, 13000}, {-1,-1}, {-2,-2}}--]]
+	{"rotate", 'linear', {0,9500}, 0, 6.1}
 )
 storyboard:writeToFile()

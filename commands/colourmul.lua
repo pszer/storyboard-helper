@@ -12,9 +12,7 @@ return {
 	overlapping=true,
 	overlap_operator='*',
 	absolute_equal='colour',
-	out = function(t, easing, vector_a, vector_b, args, varargs)
-		local sb_log = require 'log'
-		local sb_ir  = require 'ir'
+	out = function(easing, t, vector_a, vector_b, args, varargs)
 		sb_log:assert(args.start_x, "colourmul out(): no starting R. can't proceed.")
 		sb_log:assert(args.start_y, "colourmul out(): no starting G. can't proceed.")
 		sb_log:assert(args.start_z, "colourmul out(): no starting B. can't proceed.")

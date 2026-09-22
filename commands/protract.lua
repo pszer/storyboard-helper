@@ -12,7 +12,6 @@
 -- enables a horizontal flip until the end of the current command block/sprite
 -- lifespan, without having to manually keep track of where to put the end point.
 --
-local sb_log = require 'log'
 return {
 	easing = false,
 	time_points = 0,
@@ -20,7 +19,7 @@ return {
 	args = { "span_end" },
 	args_valid = { function(x) return x end },
 	varargs = true,
-	eval = function(t, easing, vector_a, vector_b, args, varargs)
+	eval = function(easing, t, vector_a, vector_b, args, varargs)
 		if not args.span_end then
 			return {'protract', table.unpack(varargs)}
 		end

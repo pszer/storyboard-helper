@@ -91,7 +91,8 @@ local function eval(t)
 	--   ...
 	-- end
 	--```
-	--
+	
+
 	if type(t)=="function" then
 		local collect_out = {}
 		setmetatable(collect_out, out_table_mt)
@@ -126,7 +127,7 @@ local function eval(t)
 	sb_log:addToStack(t)
 
 	local ease, time, vec1, vec2, args, varargs = sb_command:parseCommand(t)
-	local eval_pass = { sb_command[com_type].eval(time, ease, vec1, vec2, args, varargs) }
+	local eval_pass = { sb_command[com_type].eval(ease, time, vec1, vec2, args, varargs) }
 	local eval_result = {}
 
 	for i,v in ipairs(eval_pass) do
@@ -140,14 +141,5 @@ local function eval(t)
 
 	return table.unpack(eval_result)
 end
-
---local test = {eval{
---
---	"__root__",
---	{"move"  , 0, {10,50}, {50,50}, {250,250}},
---	{"rotate", 0, {10,50}, 0, 3.14},
---	function(out) out{"rotate", 0, {10,50}, 0, 3.14} end
---
---}}
 
 return eval

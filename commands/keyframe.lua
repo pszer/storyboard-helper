@@ -1,6 +1,4 @@
 -- Root
-local sb_ir = require 'ir'
-local sb_log = require 'log'
 return {
 	easing = false,
 	time_points = 0,
@@ -46,13 +44,6 @@ return {
 			return false
 		end,
 		function(x)
-			if x==nil then return true end
-			if type(x)~="boolean" then
-				return false, "'memo' expects a boolean value, for whether to enable/disable memorisation."
-			end
-			return x
-		end,
-		function(x)
 			return x 
 		end,
 		function(y)
@@ -60,10 +51,10 @@ return {
 		end
 	},
 	varargs = true,
-	eval = function(t, easing, vector_a, vector_b, args, varargs)
+	eval = function(easing, t, vector_a, vector_b, args, varargs)
 		local sb_verify = require 'verify'
-		--return table.unpack(varargs)
-		--
+
+		--TODO
 		local time, dim = sb_verify:sortedTimes(varargs)
 		local movers = sb_verify:resolveTransformOverlaps(time, dim, "moverel")
 

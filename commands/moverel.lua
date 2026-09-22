@@ -12,9 +12,7 @@ return {
 	overlapping=true,
 	overlap_operator='+',
 	absolute_equal='move',
-	out = function(t, easing, vector_a, vector_b, args, varargs)
-		local sb_log = require 'log'
-		local sb_ir  = require 'ir'
+	out = function(easing, t, vector_a, vector_b, args, varargs)
 		sb_log:assert(args.start_x, "moverel out(): no starting X co-ordinate. can't proceed.")
 		sb_log:assert(args.start_y, "moverel out(): no starting Y co-ordinate. can't proceed.")
 

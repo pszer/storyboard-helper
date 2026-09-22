@@ -1,6 +1,4 @@
 -- Root
-local sb_ir = require 'ir'
-local sb_log = require 'log'
 return {
 	easing = false,
 	time_points = 0,
@@ -30,15 +28,7 @@ return {
 		function(cb) return b end, -- start blue
 	},
 	varargs = true,
-	eval = function(t, easing, vector_a, vector_b, args, varargs)
-		local sb_verify = require 'verify'
-		local sb_com = require 'commands'
-		local eval = require 'eval'
-
-		--for i,v in pairs(varargs) do
-		--	print(i,table.unpack(v))
-		--end
-
+	eval = function(easing, t, vector_a, vector_b, args, varargs)
 		local evals = sb_com:evalBlock(varargs)
 
 		local time_min,time_max = sb_verify:getCommandsTimeSpan(evals)
@@ -106,12 +96,12 @@ return {
 
 		for i,v in ipairs(flip_protracts) do
 			v.span_end = time_max
-			local protract_eval = { eval(v) }
+			local protract_eval = { sb_eval(v) }
 			for _,z in ipairs(protract_eval) do table.insert(evals, z) end
 		end
 		for i,v in ipairs(protract) do
 			v.span_end = time_max
-			local protract_eval = { eval(v) }
+			local protract_eval = { sb_eval(v) }
 			for _,z in ipairs(protract_eval) do table.insert(evals, z) end
 		end
 		for i,v in ipairs(flips) do
