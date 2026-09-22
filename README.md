@@ -24,7 +24,7 @@ steps.
 
 With relative commands, there are option for more abstract ways of scripting storyboards.
 Custom, compounded and potentially recursive commands can be created in the manner of functional programming,
-or defined by the user and added to the compiler, where they will integrate with the rest of the
-compilation steps and can be used with any other parts/commands of the program such as the *keyframer*.
+or defined by the user where they will integrate with the rest of the compiler and can be used with any
+other parts/commands of the program such as the *keyframer*.
 
 ## Optimisation and documentation WIP
