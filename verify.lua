@@ -235,11 +235,11 @@ end
 -- their absolute versions. if nil then relative commands stay as relative commands
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
-	print()
+	--[[print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
 	end
-	print()
+	print()--]]
 
 	local dimensions=0
 	if times[1] then
