@@ -9,7 +9,7 @@ A sprite can be told to move from one calculated screen coordinate to another, b
 told to move 50 pixels to the right from its current position.
 
 Normally, when scripting, the transformation state of an object has to be manually tracked by
-the user and used to calculate the desired motion. This becomes increasingly
+the user and used extensively to calculate the desired motion. This becomes increasingly
 time-consuming and error-prone when dealing with complex motion.
 
 **storyboard-helper** provides relative, state-less versions of each transformation, so the previous example of
