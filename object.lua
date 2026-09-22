@@ -6,6 +6,8 @@ local sb_log    = require 'log'
 local sb_com    = require 'commands'
 local sb_ir     = require 'ir'
 local sb_eval   = require 'eval'
+local sb_config = require 'config'
+local sb_verify = require 'verify'
 
 local object = {}
 object.__index = object
@@ -190,6 +192,10 @@ function object:out(...)
 				start_col_b = self.col_b or 255},
 				table.unpack(commands_concat))
 		}
+
+		if not sb_config["unsorted-output"] then
+			sb_verify:sortCommandsByTime(evaluated)
+		end
 
 		for i,com in ipairs(evaluated) do
 			local com_ir  = sb_com:out(com)

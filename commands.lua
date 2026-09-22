@@ -494,6 +494,113 @@ function command:toString(com)
 	return result
 end
 
+--
+-- a,b must be the same type
+--
+-- if a and b have overlapping time points, then
+-- this returns a new command with merged time
+-- it will also combine both their vararg tables if
+-- present.
+--
+-- args are combined using the or operator, meaning command 'a'
+-- takes priority.
+--
+-- varargs combine if timepoints combine, if command doesnt have time points
+-- then they will always combine
+--
+-- otherwise, this returns a, b
+--
+-- this is only useful for dimension-less commands
+-- like
+--
+function command:union(a,b,   clone_func)
+	sb_log:assert(a and b, "command.union(): got nil ('%s' '%s').", a, b)
+	sb_log:assert(type(a) and type(b), "command.union(): expected commands (got '%s' and '%s').", type(a), type(b))
+	local a_com_t = command[a[1]]
+	local b_com_t = command[b[1]]
+	sb_log:assert(a_com_t == b_com_t, "command.union(): mismatching types (got '%s' and '%s').", a[1], b[1])
+
+	local clone = require 'clone'
+	local clone_func = clone_func or clone
+
+	local ease_a, time_a, vec_a1, vec_a2, args_a, varargs_a = command:parseCommand(a)
+	local ease_b, time_b, vec_b1, vec_b2, args_b, varargs_b = command:parseCommand(b)
+
+	local time_c = nil
+	local time_d = nil
+	local vec_c1, vec_c2 = nil, nil
+	local vec_d1, vec_d2 = nil, nil
+	local args_c, varargs_c = nil, nil
+	local args_d, varargs_d = nil, nil
+
+	-- check if times need to be merged, creates suitable
+	-- vectors if command requires them.
+	if time_a and time_b then
+		local min_a, max_a = time:getMinMax(time_a)
+		local min_b, max_b = time:getMinMax(time_b)
+
+		if max_a >= min_b or
+			max_b >= min_a then
+			time_c = {math.min(min_a,min_b),math.max(max_a,max_b)}
+
+			if vec_a1 then
+				if min_a < min_b then vec_c1 = clone_func(vec_a1)
+				                 else vec_c1 = clone_func(vec_b1) end
+				if max_a > max_b then vec_c2 = clone_func(vec_a2)
+				                 else vec_c2 = clone_func(vec_b2) end
+			end
+
+			if args_a or args_b then
+				args_c = {}
+				for i,v in pairs(args_b or {}) do
+					args_c[i] = clone_func(v)
+				end
+				for i,v in pairs(args_a or {}) do
+					args_c[i] = clone_func(v) or args_c[i]
+				end
+			end
+
+			if varargs_a or varargs_b then
+				local varargs_c = {}
+				for _,v in ipairs(varargs_a) do table.insert(varargs_c, v) end
+				for _,v in ipairs(varargs_b) do table.insert(varargs_c, v) end
+			end
+		else
+			time_c = clone_func(time_a)
+			time_d = clone_func(time_b)
+			if vec_a1 then
+				vec_c1,vec_c2 = clone_func(vec_a1),clone_func(vec_a2)
+				vec_d1,vec_d2 = clone_func(vec_b1),clone_func(vec_b2)
+			end
+			args_c,varargs_c = clone_func(args_a), clone_func(varargs_a)
+			args_d,varargs_d = clone_func(args_b), clone_func(varargs_b)
+		end
+	else
+		if args_a or args_b then
+			args_c = {}
+			for i,v in pairs(args_b or {}) do
+				args_c[i] = clone_func(v)
+			end
+			for i,v in pairs(args_a or {}) do
+				args_c[i] = clone_func(v) or args_c[i]
+			end
+		end
+
+		if varargs_a or varargs_b then
+			local varargs_c = {}
+			for _,v in ipairs(varargs_a) do table.insert(varargs_c, v) end
+			for _,v in ipairs(varargs_b) do table.insert(varargs_c, v) end
+		end
+	end
+
+	local com_c, com_d
+	com_c = command:createCommand(a[1], easing_a, time_c, vec1_c, vec2_c, args_c, table.unpack(varargs_c or {}))
+	if time_d or vec1_d or args_d or varargs_d then
+		com_d = command:createCommand(a[1], easing_a, time_d, vec1_d, vec2_d, args_d, table.unpack(varargs_d or {}))
+	end
+	return com_c, com_d
+end
+
 -- called at the top levels, fills out starting states like
 -- start_x, start_y, etc...
 function command:evalTop(params, ...)

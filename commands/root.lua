@@ -1,5 +1,6 @@
 -- Root
 local sb_ir = require 'ir'
+local sb_log = require 'log'
 return {
 	easing = false,
 	time_points = 0,
@@ -92,19 +93,54 @@ return {
 		local s_time, s_dim = sb_verify:sortedTimes(s_v_commands)
 		local s_v = {sb_verify:resolveTransformOverlaps(s_time, s_dim, s_v_rel_type, start_scale)}
 
-		for i,v in ipairs(s_v) do
-			print(sb_com:toString(v))
-		end
-
 		local flips
-
 		s_v, flips = sb_verify:resolveNegativeScales(s_v)
-		print("s_v, flips", #s_v, #flips)
 
 		local concat = {}
 		for _,v in ipairs(m) do concat[#concat+1] = v end
 		for _,v in ipairs(r) do concat[#concat+1] = v end
 		for _,v in ipairs(s_v) do concat[#concat+1] = v end
+
+		---
+		--- resolve protract commands to lifespan of this block.
+		---
+		
+		local protract = sb_verify:extractCommands(evals, 'protract')
+		local flip_protracts = sb_verify:extractCommands(flips, 'protract')
+		local time_min, time_max = sb_verify:getCommandsTimeSpan(concat)
+		local protract_results = {}
+
+		for i,v in ipairs(flip_protracts) do
+			v.span_end = time_max
+			local protract_eval = { eval(v) }
+			for _,z in ipairs(protract_eval) do table.insert(evals, z) end
+		end
+		for i,v in ipairs(protract) do
+			v.span_end = time_max
+			local protract_eval = { eval(v) }
+			for _,z in ipairs(protract_eval) do table.insert(evals, z) end
+		end
+		for i,v in ipairs(flips) do
+			table.insert(evals, v)
+		end
+
+		local params = sb_verify:extractCommands(evals, 'param')
+		local hh,vv,aa = sb_verify:resolveParameterOverlaps(params)
+
+		for _,v in ipairs(hh) do concat[#concat+1] = v end
+		for _,v in ipairs(vv) do concat[#concat+1] = v end
+		for _,v in ipairs(aa) do concat[#concat+1] = v end
+
+		if #evals > 0 then
+			sb_log:printf("testing, still commands left in eval stack!")
+			for i,v in ipairs(evals) do
+				print(sb_com:toString(v))
+			end
+		end
+
+		--
+		--
+		--
 
 		return table.unpack(concat)
 	end,

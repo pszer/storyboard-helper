@@ -235,11 +235,11 @@ end
 -- their absolute versions. if nil then relative commands stay as relative commands
 --
 function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
-	print()
+	--[[print()
 	for i,v in ipairs(times) do
 		print(v[1],v[2],sb_com:toString(v.command))
 	end
-	print()
+	print()--]]
 
 	local dimensions=0
 	if times[1] then
@@ -311,7 +311,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	for i=1,dimension do
 		total_offset[i]=start_vec[i] or identity 
 	end
-	print("total_offset", table.unpack(total_offset))
+	--print("total_offset", table.unpack(total_offset))
 
 	local function add_to_total_offset(command)
 		for i=#easing_stack,1,-1 do
@@ -349,12 +349,10 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				for i=1,dimension do
 					local D = v[5][i] - v[4][i]
 
-					print(string.format("D[%d]=%f",i,D))
-
-					result[i] = operator_func(result[i], (identity + v[2](tau) * D))
+					result[i] = operator_func(result[i], (v[4][i] + v[2](tau) * D))
 				end
-				print("time", time, "totaloffset", table.unpack(result))
-				print("time", time, table.unpack(result))
+				--print("time", time, "totaloffset", table.unpack(result))
+				--print("time", time, table.unpack(result))
 			end
 		end
 
@@ -478,7 +476,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 
 				if (not is_stack_overlapping() or is_stack_linear())
 					and not (easing ~= linear_easing and curr.prev.command ~= curr.command) then 
-					print("lolz", table.unpack(get_from_stack(curr[1])))
+				--	print("lolz", table.unpack(get_from_stack(curr[1])))
 					table.insert(final, sb_com:createCommand(abs_type, easing, {curr.prev[1], curr[1]},
 						get_from_stack(curr.prev[1]), get_from_stack(curr[1]), nil, nil))
 				elseif sb_config["disable-easing-keyframing"] then
@@ -527,15 +525,26 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 		end
 
 		if curr[2]=="min" and is_abs then
+			--print("")
+			--print("Setting total offset, currently ", table.unpack(total_offset))
+
 			local current_p = get_from_stack(curr[1])
 			local fix_p = {}
 
 			for i = 1,dimension do
-				fix_p[i] = current_p[i] - total_offset[i]
+				fix_p[i] = inverse_func(current_p[i] , total_offset[i])
 			end
+
+			--print("current_p is ", table.unpack(current_p))
+			--print("fix_p is ", table.unpack(fix_p))
+
 			for i=1,dimension do
-				total_offset[i] = vec1[i] - fix_p[i]
+				if fix_p[i] ~= 0 then
+					total_offset[i] = inverse_func(vec1[i] , fix_p[i])
+				end
 			end
+
+			--print("Set total offset to ", table.unpack(total_offset))
 		else
 			--                                             + *
 			for i=1,dimension do
@@ -544,13 +553,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 		end
 
 		if curr[2]=="max" then
-			print("gup gup", table.unpack(total_offset))
-			--if not is_abs then
-				add_to_total_offset(curr.command)
-			print("gup gup", table.unpack(total_offset))
-			--else
-			--	add_to_total_offset_abs_command(vec1, vec2)
-			--end
+			add_to_total_offset(curr.command)
 			remove_from_easing_stack(curr.command)
 		end
 
@@ -585,6 +588,27 @@ function verify:resolveNegativeScales(coms)
 
 	local h_flip_markers = {}
 	local v_flip_markers = {}
+
+	local function append_h_flip(time, val)
+		local top = h_flip_markers[#h_flip_markers]
+		if not top then
+			if val then
+				table.insert(h_flip_markers, {time, val})
+			end
+		elseif top[2]~= val then
+			table.insert(h_flip_markers, {time, val})
+		end
+	end
+	local function append_v_flip(time, val)
+		local top = v_flip_markers[#v_flip_markers]
+		if not top then
+			if val then
+				table.insert(v_flip_markers, {time, val})
+			end
+		elseif top[2]~= val then
+			table.insert(v_flip_markers, {time, val})
+		end
+	end
 
 	if converted[1] then
 		local vec1,vec2 = sb_com:parseCommand(converted[1], "vec")
@@ -622,16 +646,25 @@ function verify:resolveNegativeScales(coms)
 			table.insert(result_s_v, v)
 		end
 
+		if neg(vec1[1]) and neg(vec1[2]) then
+			append_h_flip(time[1], true)
+		end
+		if neg(vec2[1]) and neg(vec2[2]) then
+			append_v_flip(time[1], true)
+		end
+
 		local x_root, y_root
 
 		--
 		-- positive to negative
 		--
 		if pos(vec1[1]) and neg(vec2[1]) then
+			append_h_flip(time[1], false)
 			x_root = get_root(1)
 			table.insert(h_flip_markers, {x_root, true} ) end
 
 		if pos(vec1[2]) and neg(vec2[2]) then
+			append_v_flip(time[1], false)
 			y_root = get_root(2)
 			table.insert(v_flip_markers, {y_root, true} ) end
 
@@ -639,10 +672,12 @@ function verify:resolveNegativeScales(coms)
 		-- negative to positive
 		--
 		if neg(vec1[1]) and pos(vec2[1]) then
+			append_h_flip(time[1], true)
 			x_root = get_root(1)
 			table.insert(h_flip_markers, {x_root, false} ) end
 
 		if neg(vec1[2]) and pos(vec2[2]) then
+			append_v_flip(time[1], true)
 			y_root = get_root(2)
 			table.insert(v_flip_markers, {y_root, false} ) end
 
@@ -751,37 +786,51 @@ function verify:resolveNegativeScales(coms)
 	local h_start = nil
 	for i,v in ipairs(h_flip_markers) do
 		if v[2] == true then
-			h_start = v[1]
+			h_start = hstart or v[1]
 		elseif v[2] == false then
 			local v_time = v[1]
-			table.insert(result_p, sb_com:createCommand('param', nil, {h_start, v_time}, nil, nil, {value = "H"}))
+			table.insert(result_p, sb_com:createCommand('param', nil, {h_start, v_time}, nil, nil, {value = "h"}))
 			h_start = nil
 		end
 	end
 	if h_start then
 		table.insert(result_p, sb_com:createCommand('protract', nil, nil, nil, nil, nil,
-		 sb_com:createCommand('param', nil, {h_start, h_start}, nil, nil, {value = "H"})
+		 sb_com:createCommand('param', nil, {h_start, h_start}, nil, nil, {value = "h"})
 		 )
 		)
 	end
 
 	local v_start = nil
-	for i,v in ipairs(h_flip_markers) do
+	for i,v in ipairs(v_flip_markers) do
 		if v[2] == true then
-			v_start = v[1]
+			v_start = v_start or v[1]
 		elseif v[2] == false then
 			local v_time = v[1]
-			table.insert(result_p, sb_com:createCommand('param', nil, {v_start, v_time}, nil, nil, {value = "V"}))
+			table.insert(result_p, sb_com:createCommand('param', nil, {v_start, v_time}, nil, nil, {value = "v"}))
 			v_start = nil
 		end
 	end
 	if v_start then
 		table.insert(result_p, sb_com:createCommand('protract', nil, nil, nil, nil, nil,
-		  sb_com:createCommand('param', nil, {v_start, v_start}, nil, nil, {value = "V"})
+		  sb_com:createCommand('param', nil, {v_start, v_start}, nil, nil, {value = "v"})
 	 	))
 	end
 
 	return result_s_v, result_p
+end
+
+function verify:sortCommandsByTime(coms)
+	if not coms then return nil end
+	sb_log:assert(type(coms)=="table", "verify.sortCommandsByTime(): expected a table.")
+	table.sort(coms,
+		function(a,b)
+			local time1,time2
+			time1 = sb_com:parseCommand(a, "time")
+			time2 = sb_com:parseCommand(b, "time")
+			if not time1 or not time2 then return true end
+			return time1[1]<time2[1]
+		end
+	)
 end
 
 function verify:getCommandsTimeSpan(coms)
@@ -805,8 +854,78 @@ function verify:getCommandsTimeSpan(coms)
 	return min,max
 end
 
-function verify:resolveProtract(coms)
-	local coms = verify:filterToCommand(coms, 'protract')
+function verify:commandTimeLessThan(a,b)
+	local time1 = sb_com:parseCommand(a, "time")
+	local time2 = sb_com:parseCommand(b, "time")
+	return time1 < time 
+end
+
+--
+-- overlapping H or V parameters will cancel each other out
+--
+function verify:resolveParameterOverlaps(coms)
+	if not coms or not coms[1] then
+		return {} end
+	for i,v in ipairs(coms) do
+		sb_log:assert(sb_com:equal(v,'param'), "verify:resolveParameterOverlaps(): got non-parameter command.") end
+
+	local H_coms = filter(coms, function(x) return x.value == "h" end)
+	local V_coms = filter(coms, function(x) return x.value == "v" end)
+	local A_coms = filter(coms, function(x) return x.value == "a" end)
+
+	local H_points = verify:sortedTimes(H_coms)
+	local V_points = verify:sortedTimes(V_coms)
+	local A_points = verify:sortedTimes(A_coms)
+
+	local result = {}
+
+	local H_flip_start=nil
+	for i,v in ipairs(H_points) do
+		if v[2] == "min" or v[2] == "max" then
+			if H_flip_start then
+				table.insert(result,
+					{'param', {H_flip_start,v[1]}, value='h'})
+				h_flip_start = nil
+			else
+				H_flip_start = v[1]
+			end
+		end
+	end
+
+	local V_flip_start=nil
+	for i,v in ipairs(V_points) do
+		if v[2] == "min" or v[2] == "max" then
+			if V_flip_start then
+				table.insert(result,
+					{'param', {V_flip_start,v[1]}, value='v'})
+				h_flip_start = nil
+			else
+				H_flip_start = v[1]
+			end
+		end
+	end
+
+	-- additive blend parameter commands are combined
+	-- and simplified, instead of toggling flips like H and V
+	local A_count_start = nil
+	local A_count=nil
+	for i,v in ipairs(A_points) do
+		if v[2] == "min" then
+			A_count_start = A_count_start or v[1]
+			A_count = A_count + 1
+		elseif v[2] == "max" then
+			A_count = A_count - 1
+		end
+
+		if A_count and A_count == 0 then
+			table.insert(result,
+				{'param', {A_count_start, v[1]}, value='a'})
+			A_count = nil
+			A_count_start = nil
+		end
+	end
+
+	return H_coms,V_coms,A_coms
 end
 
 --[[function verify:checkTimeOverlaps(commands_list)

@@ -2,9 +2,8 @@
 --
 -- tables 1:1 with .osb form, 
 --
-local sb_ir={
-	whitespace = "_"
-}
+local sb_config = require 'config'
+local sb_ir={}
 sb_ir.__index = sb_ir
 
 function sb_ir:new(...)
@@ -48,7 +47,8 @@ function sb_ir:out()
 	if vec3_shortcut and (self[5]~=self[8] or self[6]~=self[9] or self[7]~=self[10]) then vec3_shortcut = false end
 
 	local c = #self
-	local result = sb_ir.whitespace
+	local result = sb_config["whitespace"]
+	if result~=" " and result~="_" then result = "_" end
 	for i,v in ipairs(self) do
 		local x = v
 
