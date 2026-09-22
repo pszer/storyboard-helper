@@ -22,7 +22,7 @@ Relative commands have no limit to how they can overlap in time, and in cases of
 their final motion will be resolved and keyframed to create the correct visual effect without additional
 steps.
 
-With relative commands, there are option for more abstract and advanced ways of scripting animations.
+With relative commands, there are option for more abstract ways of scripting storyboards.
 Custom, compounded and potentially recursive commands can be created in the manner of functional programming,
 or defined by the user and added to the compiler, where they will integrate with the rest of the
 compilation steps and can be used with any other parts/commands of the program such as the *keyframer*.
