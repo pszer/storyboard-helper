@@ -611,6 +611,7 @@ function command:evalTop(params, ...)
 	return command:eval(root)
 end
 
+-- evaluates commands, if wraps them in a root command first
 function command:eval(...)
 	local args = {...}
 
@@ -628,6 +629,18 @@ function command:eval(...)
 	else
 		return eval{'root', memo=false, ...}
 	end
+end
+
+function command:evalBlock(block)
+	local eval = require 'eval'
+	local evals = {}
+	for i,v in ipairs(block or {}) do
+		local R = { eval(v) }
+		for _,w in ipairs(R) do
+			table.insert(evals, w)
+		end
+	end
+	return evals
 end
 
 local command_mt={}

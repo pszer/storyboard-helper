@@ -39,13 +39,7 @@ return {
 		--	print(i,table.unpack(v))
 		--end
 
-		local evals = {}
-		for i,v in ipairs(varargs) do
-			local R = { eval(v) }
-			for _,w in ipairs(R) do
-				table.insert(evals, w)
-			end
-		end
+		local evals = sb_com:evalBlock(varargs)
 
 		local time_min,time_max = sb_verify:getCommandsTimeSpan(evals)
 

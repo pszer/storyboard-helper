@@ -715,6 +715,7 @@ function verify:resolveNegativeScales(coms)
 
 			if not is_linear then
 
+				-- non linear
 				local frames = gen_frames()
 				local K = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon-scale"]})
 				for i=1,#K-1 do
@@ -722,9 +723,12 @@ function verify:resolveNegativeScales(coms)
 					local Kj = K[i+1]
 					table.insert(result_s_v, sb_com:createCommand('vector', 0, {Ki[1], Kj[1]}, {Ki[2], Kj[2]}, {Ki[3], Kj[3]}))
 				end
+				-- non linear end
 
 			else
 
+
+				-- linear start
 				local d_vec = {
 					vec2[1]-vec1[1],
 					vec2[2]-vec1[2],
@@ -755,23 +759,33 @@ function verify:resolveNegativeScales(coms)
 						{math.abs(vec1[1] + tau_b*d_vec[1]), math.abs(vec1[2] + tau_b*d_vec[2])},  -- 
 						{math.abs(vec2[1])                 , math.abs(vec2[2])} --
 					))
+
+				-- if one root
 				elseif split_a == split_b then
 
 					local tau = (split_a - time[1])/(time[2] - time[1])
 					if time[2]==time[1] then tau = 1.0 end
-					table.insert(result_s_v, sb_com:createCommand('vector', 0,
-						{time[1],split_a},                       -- t1___a   t2
-						{math.abs(vec1[1]), math.abs(vec1[2])},  -- 
-						{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])} --
-					))
 
-					table.insert(result_s_v, sb_com:createCommand('vector', 0,
-						{split_a, time[2]},                      -- t1   a___t2
-						{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])},  -- 
-						{math.abs(vec2[1])               , math.abs(vec2[2])} --
-					))
+					-- check if tau is 0.0 or 1.0, to avoid 0ms length commands that do nothing
+					if tau > 0.0 then
+						table.insert(result_s_v, sb_com:createCommand('vector', 0,
+							{time[1],split_a},                       -- t1___a   t2
+							{math.abs(vec1[1]), math.abs(vec1[2])},  -- 
+							{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])} --
+						))
+					end
+
+					if tau < 1.0 then
+						table.insert(result_s_v, sb_com:createCommand('vector', 0,
+							{split_a, time[2]},                      -- t1   a___t2
+							{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])},  -- 
+							{math.abs(vec2[1])               , math.abs(vec2[2])} --
+						))
+					end
 
 				end
+
+				--linear end
 
 			end
 
@@ -789,7 +803,9 @@ function verify:resolveNegativeScales(coms)
 			h_start = hstart or v[1]
 		elseif v[2] == false then
 			local v_time = v[1]
-			table.insert(result_p, sb_com:createCommand('param', nil, {h_start, v_time}, nil, nil, {value = "h"}))
+			if h_start ~= v_time then
+				table.insert(result_p, sb_com:createCommand('param', nil, {h_start, v_time}, nil, nil, {value = "h"}))
+			end
 			h_start = nil
 		end
 	end
@@ -806,7 +822,9 @@ function verify:resolveNegativeScales(coms)
 			v_start = v_start or v[1]
 		elseif v[2] == false then
 			local v_time = v[1]
-			table.insert(result_p, sb_com:createCommand('param', nil, {v_start, v_time}, nil, nil, {value = "v"}))
+			if v_start ~= v_time then
+				table.insert(result_p, sb_com:createCommand('param', nil, {v_start, v_time}, nil, nil, {value = "v"}))
+			end
 			v_start = nil
 		end
 	end
