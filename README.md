@@ -1,30 +1,26 @@
 # storyboard-helper
 
-**storyboard-helper** is a DSL compiler that lets you write **.osb** format osu! storyboards in **Lua**.
+**storyboard-helper** is a DSL compiler for writing **.osb** format osu! storyboards in **Lua**.
 
-It aims to make animating and scripting storyboards easier in three ways:
+The goal is to make animating and scripting storyboards easier by supporting *relative transformations that combine additively/multiplicatively*, and metaprogramming*.
 
-1. Relative, combinable transformations.
-2. Metaprogramming support.
-3. Automatic optimisation.
+In the .osb format all transformation commands work in absolute units, a sprite can be told to
+move from one calculated screen co-ordinate to another, but it can't be told to move 50 pixels to the right from it's current position.
+Normally when scripting, the transformation state of an object has to be manually kept track of by the user and used in calculating
+desired a motion, which is time consuming and error-prone if dealing with any sort of complex motion,
 
-In the .osb format all the transformation commands work in absolutes, you can tell a sprite to
-move from one specific screen co-ordinate to another, but you can't tell it to move 50 pixels
-to the right from where it currently is, same with scales, rotations and colour. Normally when scripting
-the transformation states of objects have to be manually kept track of.
-**storyboard-helper** allows for relative versions of all the transformations, moving
-a sprite 50 pixels to the right becomes a single command that will automatically resolve state upon
-evaluation:
+**storyboard-helper** allows for relative versions of all the transformations, the previous example of moving
+a sprite 50 pixels to the right becomes a single command that will resolve to it's final state upon compilation:
 
 `{'MoveRel', 'linear', {'00:01:000', '00:02:000'}, {0,0}, {50, 0}}`
 
-Relative commands have no limit to how they can overlap in time, and in cases of non-linear easings
-their final motion will be resolved and keyframed to create the correct visual effect without additional
-steps.
+Relative transformations have no limit to how they can overlap in time, allowing for compounded transformations.
+In cases of several commands with non-linear easings being compounded, the final motion is automatically sampled
+and keyframed to create the correct visual effect without additional steps.
 
-With relative commands there are options for more abstract ways of scripting storyboards.
-Custom, compounded and potentially recursive commands, can be created through the manner of functional programming,
-or defined to the compiler by the user where they will integrate with the rest of the program and can be used with any
-other commands and tools such as the *keyframer*.
+With relative commands there are more abstract ways of scripting storyboards.
+Any work that compounds several transformations/commands can be turned into a new command,
+either by functions and closures, or through a definition passed to the compiler. Custom commands fully integrate themselves with the program
+and can be used in any other compound commands and tools such as the *keyframer*.
 
 ## Optimisation and documentation WIP
