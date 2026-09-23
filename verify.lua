@@ -680,6 +680,8 @@ function verify:resolveNegativeScales(coms)
 		return t1 + (-a/(b-a))*(t2-t1)
 	end
 
+	local tolerance = sb_config["minimum-scale-tolerance"]
+
 	for i,v in ipairs(converted) do
 		local easing, time, vec1, vec2 = sb_com:parseCommand(v)
 
@@ -733,25 +735,31 @@ function verify:resolveNegativeScales(coms)
 			y_root = get_root(2)
 			table.insert(v_flip_markers, {y_root, false} ) end
 
-		local function gen_frames()
+		local function clamp(a)
+			if math.abs(a) < tolerance then return 0 end
+			return math.abs(a)
+		end
+		local function gen_frames(a, b)
 			local frames = {}
 			local easing_func = sb_easing.funcs[easing]
 			local dx = vec2[1] - vec1[1]
 			local dy = vec2[2] - vec1[2]
 
-			local add_time2 = true
-
-			for i=time[1],time[2],sb_config["default-easing-keyframing-interval"] do
-				if i==time[2] then add_time2 = false end
+			local add_time_b = true
+			for i=a,b,sb_config["default-easing-keyframing-interval"] do
+				if i==b then add_time_b = false end
 
 				local t = (i-time[1])/(time[2]-time[1])
 				if (t~=t or t==math.huge or t==-math.huge) then t=1 end
 				local e = easing_func(t)
-				table.insert(frames, {i, math.abs((e * dx)+vec1[1]), math.abs((e * dy)+vec1[2]) })
+
+				table.insert(frames, {i, clamp((e * dx)+vec1[1]), clamp((e * dy)+vec1[2]) })
 			end
 
-			if add_time2 then
-				table.insert(frames, {time[2], math.abs(vec2[1]), math.abs(vec2[2]) })
+			if add_time_b then
+				local t = (b-time[1])/(time[2]-time[1])
+				local e = easing_func(t)
+				table.insert(frames, {b, clamp((e * dx)+vec1[1]), clamp((e * dy)+vec1[2]) })
 			end
 			return frames
 		end
@@ -766,40 +774,60 @@ function verify:resolveNegativeScales(coms)
 			-- when linear, an exact solution can be created easily.
 			--
 
+			local split_a = math.min(x_root or y_root, y_root or x_root)
+			local split_b = math.max(x_root or y_root, y_root or x_root)
+
 			if not is_linear then
 
-				-- non linear
-				local frames = gen_frames()
-				local K = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon-scale"]})
-
-				for i=1,#K-1 do
-					local Ki = K[i]
-					local Ky = K[i+1]
-					local vector_out = sb_com:createCommand('vector', 0, {Ki[1], Ky[1]}, {Ki[2], Ki[3]}, {Ky[2], Ky[3]})
-					table.insert(result_s_v, vector_out)
+				local function do_frames(a,b)
+					local frames = gen_frames(a,b)
+					local K = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon-scale"]})
+					for i=1,#K-1 do
+						local Ki = K[i]
+						local Ky = K[i+1]
+						local vector_out = sb_com:createCommand('vector', 0, {Ki[1], Ky[1]}, {Ki[2], Ki[3]}, {Ky[2], Ky[3]})
+						table.insert(result_s_v, vector_out)
+					end
 				end
+
+				-- non linear
+				-- avoid 0-length segment
+				if time[1] ~= split_a then
+					do_frames(time[1], split_a)
+				end
+
+				-- avoid 0-length segment
+				if split_a ~= split_b then
+					do_frames(split_a, split_b)
+				end
+
+				-- avoid 0-length segment
+				if time[2] ~= split_b then
+					do_frames(split_b, time[2])
+				end
+
+				--
 				-- non linear end
+				--
 
 			else
-
-
 				-- linear start
 				local d_vec = {
 					vec2[1]-vec1[1],
 					vec2[2]-vec1[2],
 				}
 
-				local split_a = math.min(x_root or y_root, y_root or x_root)
-				local split_b = math.max(x_root or y_root, y_root or x_root)
-
 				if split_a ~= split_b then
 					local tau = (split_a - time[1])/(time[2] - time[1])
 					if time[2]==time[1] then tau = 1.0 end
-					table.insert(result_s_v, sb_com:createCommand('vector', 0,
-						{time[1],split_a},                       -- t1___a   b   t2
-						{math.abs(vec1[1]), math.abs(vec1[2])},  -- 
-						{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])} --
-					))
+
+					if split_a ~= time[1] then
+						table.insert(result_s_v, sb_com:createCommand('vector', 0,
+							{time[1],split_a},                       -- t1___a   b   t2
+							{math.abs(vec1[1]), math.abs(vec1[2])},  -- 
+							{math.abs(vec1[1] + tau*d_vec[1]), math.abs(vec1[2] + tau*d_vec[2])} --
+						))
+					end
 
 					local tau_b = (split_b - time[1])/(time[2] - time[1])
 					if time[2]==time[1] then tau_b = 1.0 end
@@ -809,11 +837,13 @@ function verify:resolveNegativeScales(coms)
 						{math.abs(vec1[1] + tau_b*d_vec[1]), math.abs(vec1[2] + tau_b*d_vec[2])} --
 					))
 
-					table.insert(result_s_v, sb_com:createCommand('vector', 0,
-						{split_b, time[2]},                      -- t1   a   b___t2
-						{math.abs(vec1[1] + tau_b*d_vec[1]), math.abs(vec1[2] + tau_b*d_vec[2])},  -- 
-						{math.abs(vec2[1])                 , math.abs(vec2[2])} --
-					))
+					if split_b ~= time[2] then
+						table.insert(result_s_v, sb_com:createCommand('vector', 0,
+							{split_b, time[2]},                      -- t1   a   b___t2
+							{math.abs(vec1[1] + tau_b*d_vec[1]), math.abs(vec1[2] + tau_b*d_vec[2])},  -- 
+							{math.abs(vec2[1])                 , math.abs(vec2[2])} --
+						))
+					end
 
 				-- if one root
 				elseif split_a == split_b then

@@ -9,8 +9,8 @@ local function wiggle(t,dur,period)
 			out{"moverel", "sineIn"  , {i+P*2, i+P*3}, {0,0}, {0,-15}}
 			out{"moverel", "sineOut" , {i+P*3, i+P*4}, {0,0}, {0,0}}
 
-			out{"vr", "quadin"  , {i    , i+P*2}, {1,1}, {1,-1} }
-			out{"vr", "linear"  , {i+P*2, i+P*4}, {1,1}, {1,-1} }
+			out{"vr", "sinein"  , {i    , i+P*2}, {1,1}, {1,-1} }
+			out{"vr", "sineout"  , {i+P*2, i+P*4}, {1,1}, {1,-1} }
 		end
 	end
 end

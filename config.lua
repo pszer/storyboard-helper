@@ -12,14 +12,16 @@ local config = {
 
 	["disable-easing-keyframing"] = false,
 	["default-easing-keyframing-epsilon"]        = 2.4,
-	["default-easing-keyframing-epsilon-scale"]  = 0.014,
+	["default-easing-keyframing-epsilon-scale"]  = 0.012,
 	["default-easing-keyframing-epsilon-rotate"] = 0.1,
 	["default-easing-keyframing-epsilon-color"]  = 2,
-	["default-easing-keyframing-interval"] = 16,
+	["default-easing-keyframing-interval"] = 4,
+
+	["minimum-scale-tolerance"] = 0.005,
 
 	["default-epsilon"] = 2.0,
 
-	["unsorted-output"] = false,
+	["unsorted-output"] = true,
 	["whitespace"] = "_",
 	["project-folder"] = "."..package.config:sub(1,1),
 }

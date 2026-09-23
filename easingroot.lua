@@ -6,7 +6,7 @@ local easing_root = {}
 easing_root.__index = easing_root
 local easing_derivatives = {}
 
-local tolerance = 0.0001
+local tolerance = 0.00001
 function easing_root:find_root(easing, t1,t2, a,b)
 
 	if (a < 0 and b < 0) or (a > 0 and b > 0) then
@@ -58,7 +58,7 @@ function easing_root:find_root(easing, t1,t2, a,b)
 	local v = func(t)
 	while math.abs(v) > tolerance do
 		depth = depth+1
-		if depth==32 then return 0.5*(low+high)*(t2-t1) + t1 end
+		if depth==48 then return 0.5*(low+high)*(t2-t1) + t1 end
 
 		local dd = derivative(t) * (b-a)
 
