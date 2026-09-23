@@ -316,12 +316,19 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	local function add_to_total_offset(command)
 		for i=#easing_stack,1,-1 do
 			if command == easing_stack[i][1] then
+				--print("Before....", table.unpack(total_offset))
 				for j=1,dimension do
 					--print(string.format("operator_func(%s, inverse(%s, %s) = %s)", total_offset[j], easing_stack[i][5][j], easing_stack[i][4][j],
 					--	inverse_func(easing_stack[i][5][j], easing_stack[i][4][j]) ))
 					--                                             + *                                - /
-					total_offset[j] = operator_func(total_offset[j], inverse_func(easing_stack[i][5][j], easing_stack[i][4][j]))
+					if operator == '+' then
+						total_offset[j] = operator_func(total_offset[j], inverse_func(easing_stack[i][5][j], easing_stack[i][4][j]))
+					else
+						total_offset[j] = operator_func(total_offset[j], easing_stack[i][5][j])
+					end
 				end
+				--print("After....", table.unpack(total_offset))
+				return
 			end
 		end
 	end
@@ -335,7 +342,11 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 		local result = {}
 		for i=1,dimension do result[i]=total_offset[i] end
 
+		print("at "..time, table.unpack(total_offset))
+
 		for i,v in ipairs(easing_stack) do
+			local is_abs = sb_com:isAbsolute(v[1])
+
 			local intersects =
 			 time >= v[3][1] and time <= v[3][2]
 
@@ -538,21 +549,29 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 				fix_p[i] = inverse_func(current_p[i] , total_offset[i])
 			end
 
-			--print("current_p is ", table.unpack(current_p))
-			--print("fix_p is ", table.unpack(fix_p))
+		--	print("current_p is ", table.unpack(current_p))
+		--	print("fix_p is ", table.unpack(fix_p))
 
 			for i=1,dimension do
 				local x = fix_p[i]
-				if (x ~= 0 and (x == x and x ~= math.huge and x ~= -math.huge)) or operator == '+' then
+				--[[if (x ~= 0 and (x == x and x ~= math.huge and x ~= -math.huge)) or operator == '+' then
 					total_offset[i] = inverse_func(vec1[i] , fix_p[i])
 				else
 					total_offset[i] = vec1[i]
+					if total_offset[i] == 0 then
+					--	total_offset[i] = 1
+					end
+				end--]]
+				if operator == '+' then
+					total_offset[i] = inverse_func(vec1[i] , fix_p[i])
+				else
+					total_offset[i] = 1
 				end
 			end
 
-			--print("Set total offset to ", table.unpack(total_offset))
-		else
-			--                                             + *
+		--print("Set total offset to ", table.unpack(total_offset))
+		--elseif curr[2] == "min" and operator == '+' then
+		elseif operator == '+' then
 			for i=1,dimension do
 				total_offset[i] = operator_func(total_offset[i] , vec1[i])
 			end
