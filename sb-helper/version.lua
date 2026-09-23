@@ -1,10 +1,15 @@
-local sb_log = require 'log'
-local sb_config = require 'config'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_log = require (modules..'log')
+local sb_config = require (modules..'config')
 
 local version =
 {
 	0, 1
 }
+
+function version:toString()
+	return string.format("%d.%d", version[1], version[2])
+end
 
 function version:verify(ver)
 	local function str(t)

@@ -17,8 +17,9 @@
 -- these time points will become truncated for the final
 -- storyboard.
 
-local sb_log = require 'log'
-local sb_config = require 'config'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_log = require (modules..'log')
+local sb_config = require (modules..'config')
 
 local time = {}
 local time_mt = {}

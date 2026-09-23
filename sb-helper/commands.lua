@@ -39,9 +39,12 @@
 --                   for the command (see ir.lua).
 --
 
-local sb_log  = require 'log'
-local sb_time = require 'time'
-local sb_easing = require 'easing'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_log  = require (modules..'log')
+local sb_time = require (modules..'time')
+local sb_easing = require (modules..'easing')
+
+local clone = require (modules..'clone')
 
 local command = {
 }
@@ -50,7 +53,6 @@ local command = {
 -- if target is a string ("easing", "time", "vec1", "vec2", "args", "varargs") only that
 -- part is returned
 function command:parse(com, target)
-	local clone = require 'clone'
 	local step_easing, step_time, step_vec, step_args, step_varargs = false,false,false,false,false
 	local target_easing, target_time, target_vec1, target_vec2, target_vec, target_args, target_varargs =
 		false,false,false,false,false,false,false
@@ -546,7 +548,7 @@ function command:evalCommands(...)
 		command:evalCommands(table.unpack(args[1]))
 	end
 
-	local eval = require 'eval'
+	local eval = require (modules..'eval')
 	if command:equal(c1, 'root') then
 		return eval(c1)
 	else
@@ -555,7 +557,7 @@ function command:evalCommands(...)
 end
 
 function command:evalBlock(block)
-	local eval = require 'eval'
+	local eval = require (modules..'eval')
 	local evals = {}
 	for i,v in ipairs(block or {}) do
 		local R = { eval(v) }

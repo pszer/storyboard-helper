@@ -1,3 +1,5 @@
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+
 require 'table'
 require 'string'
 require 'io'
@@ -28,7 +30,7 @@ function log:popStack()
 end
 
 function log:evalStackTraceback()
-	local sb_com = require 'commands'
+	local sb_com = require (modules..'commands')
 	local result = "\nCommand eval traceback:\n"
 
 	for i=log.eval_stack[0], 1, -1 do
@@ -39,7 +41,7 @@ function log:evalStackTraceback()
 end
 
 function log:printf(fstr, ...)
-	local sb_config = require 'config'
+	local sb_config = require (modules..'config')
 	if not sb_config["-silent"] and self.__out then
 		self.__out:write(string.format(fstr, ... ))
 		self.__out:write('\n')
@@ -55,7 +57,7 @@ function log:warn(fstr, ...)
 
 	table.insert(log.history,str)
 
-	local sb_config = require 'config'
+	local sb_config = require (modules..'config')
 	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')
@@ -73,7 +75,7 @@ function log:error(fstr, ...)
 
 	table.insert(log.history,str)
 
-	local sb_config = require 'config'
+	local sb_config = require (modules..'config')
 	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')
@@ -96,7 +98,7 @@ function log:assert(a, fstr, ...)
 
 	table.insert(log.history,str)
 
-	local sb_config = require 'config'
+	local sb_config = require (modules..(modules..'config'))
 	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')

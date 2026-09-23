@@ -1,4 +1,5 @@
-local sb_log = require 'log'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_log = require (modules..'log')
 
 local config = {
 	["silent"] = false,

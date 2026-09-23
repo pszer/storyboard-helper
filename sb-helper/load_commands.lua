@@ -1,9 +1,10 @@
-local command = require 'commands'
-local sb_verify = require 'verify'
-local sb_config = require 'config'
-local sb_ir     = require 'ir'
-local sb_log    = require 'log'
-local sb_eval   = require 'eval'
+local modules  = (...):gsub('%.[^%.]+$', '') .. "."
+local command  = require (modules..'commands')
+local sb_verify = require (modules..'verify')
+local sb_config = require (modules..'config')
+local sb_ir     = require (modules..'ir')
+local sb_log    = require (modules..'log')
+local sb_eval   = require (modules..'eval')
 
 -- def - command definition
 --
@@ -29,7 +30,7 @@ function command:addDefinition(def, ...)
 			sb_eval = sb_eval,
 		}, {__index=_G})
 
-		local searchf, searcherr = package.searchpath(def, package.path)
+		local searchf, searcherr = package.searchpath(modules..def, package.path)
 		sb_log:assert(searchf, "command.addDefinition(): couldn't get %s, %s", def, searcherr)
 		local chunk = loadfile(searchf, "t", env)
 		sb_log:assert(chunk, "command.addDefinition(): couldn't loadfile %s", def)

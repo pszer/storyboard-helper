@@ -1,13 +1,15 @@
 require 'string'
-local sb_anchor = require 'anchor'
-local sb_file   = require 'file'
-local sb_layer  = require 'layer'
-local sb_log    = require 'log'
-local sb_com    = require 'commands'
-local sb_ir     = require 'ir'
-local sb_eval   = require 'eval'
-local sb_config = require 'config'
-local sb_verify = require 'verify'
+
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_anchor = require (modules..'anchor')
+local sb_file   = require (modules..'file')
+local sb_layer  = require (modules..'layer')
+local sb_log    = require (modules..'log')
+local sb_com    = require (modules..'commands')
+local sb_ir     = require (modules..'ir')
+local sb_eval   = require (modules..'eval')
+local sb_config = require (modules..'config')
+local sb_verify = require (modules..'verify')
 
 local object = {}
 object.__index = object

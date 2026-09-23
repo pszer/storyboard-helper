@@ -2,19 +2,17 @@
 --
 --
 
-local sb_com        = require 'commands'
-local sb_easing     = require 'easing'
-local sb_easingroot = require 'easingroot'
-local sb_config     = require 'config'
-local sb_time       = require 'time'
-local sb_log        = require 'log'
-local sb_keyframe   = require 'keyframe'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_com        = require (modules..'commands')
+local sb_easing     = require (modules..'easing')
+local sb_easingroot = require (modules..'easingroot')
+local sb_config     = require (modules..'config')
+local sb_time       = require (modules..'time')
+local sb_log        = require (modules..'log')
+local sb_keyframe   = require (modules..'keyframe')
 
 local verify = {}
 verify.__index = verify
-
-local sb_time = require 'time'
-local sb_com = require 'commands'
 
 local function filter(t, predicate)
 	local result = {}

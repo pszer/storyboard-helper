@@ -1,9 +1,21 @@
 require 'io'
-local sb_layer = require 'layer'
-local sb_object = require 'object'
-local sb_log = require 'log'
 
-local storyboard = {}
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_layer = require (modules..'layer')
+local sb_object = require (modules..'object')
+local sb_log = require (modules..'log')
+
+local storyboard = {
+
+	layer = sb_layer,
+	object = sb_object,
+	log = sb_log,
+
+	com = require (modules..'commands'),
+	easing = require (modules..'easing'),
+	keyframe = require (modules..'keyframe')
+
+}
 storyboard.__index = storyboard
 
 function storyboard:new(filename, ...)

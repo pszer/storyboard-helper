@@ -1,4 +1,4 @@
-local sb = require '.'
+local sb = require 'sb-helper'
 
 local function wiggle(t,dur,period)
 	return function(out)

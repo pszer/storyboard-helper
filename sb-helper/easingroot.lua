@@ -1,6 +1,7 @@
-local sb_easing = require 'easing'
-local sb_config = require 'config'
-local sb_log    = require 'log'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_easing = require (modules..'easing')
+local sb_config = require (modules..'config')
+local sb_log    = require (modules..'log')
 
 local easing_root = {}
 easing_root.__index = easing_root

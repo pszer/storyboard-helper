@@ -7,7 +7,8 @@
 -- easing.expoInOut
 
 require 'math'
-local sb_log = require 'log'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_log = require (modules..'log')
 
 local function pow(a,b) return a^b end
 

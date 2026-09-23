@@ -2,7 +2,8 @@
 --
 -- tables 1:1 with .osb form, 
 --
-local sb_config = require 'config'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_config = require (modules..'config')
 local sb_ir={}
 sb_ir.__index = sb_ir
 

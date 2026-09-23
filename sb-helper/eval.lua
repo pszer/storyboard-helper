@@ -41,8 +41,9 @@
 -- list of commands
 --
 
-local sb_command = require 'commands'
-local sb_log = require 'log'
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local sb_command = require (modules..'commands')
+local sb_log = require (modules..'log')
 
 local out_table_mt = {}
 function out_table_mt.__call(t, ...)
