@@ -30,6 +30,10 @@ return {
 	varargs = true,
 	eval = function(easing, t, vector_a, vector_b, args, varargs)
 		local evals = sb_com:evalBlock(varargs)
+		local status = sb_verify:checkTimeOverlaps(evals)
+		if status then
+			sb_log:error(status)
+		end
 
 		local time_min,time_max = sb_verify:getCommandsTimeSpan(evals)
 

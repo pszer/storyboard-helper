@@ -29,7 +29,7 @@ end
 
 function log:evalStackTraceback()
 	local sb_com = require 'commands'
-	local result = "Command eval traceback:\n"
+	local result = "\nCommand eval traceback:\n"
 
 	for i=log.eval_stack[0], 1, -1 do
 		result = result.."["..tostring(i).."]   "..sb_com:toString(log.eval_stack[i]).."\n"
@@ -50,7 +50,7 @@ function log:warn(fstr, ...)
 	local str = "//[warning] "
 
 	if fstr then
-		str=str..string.format(fstr,...)
+		str=str..string.format(fstr,...).."\n"
 	end
 
 	table.insert(log.history,str)
@@ -66,7 +66,7 @@ function log:error(fstr, ...)
 	local str = "//[error] "
 
 	if fstr then
-		str=str..string.format(fstr,...)
+		str=str..string.format(fstr,...).."\n"
 	end
 
 	str = str..log:evalStackTraceback()
@@ -89,7 +89,7 @@ function log:assert(a, fstr, ...)
 	local str = "//[error] "
 
 	if fstr then
-		str=str..string.format(fstr,...)
+		str=str..string.format(fstr,...).."\n"
 	end
 
 	str = str..log:evalStackTraceback()

@@ -35,6 +35,7 @@ storyboard:newObject("slidez.png", "Background", "Center", 320, 240):add(
 	{"scaler", 'linear', { 13000, 15000}, {1.2}, {1.7}},
 	{"scaler", 'linear' , {16250, 16300}, {1.1}, {1.3}},
 	{"scaler", 'linear', { 16000, 16500}, {1.2}, {1.6}},
+	{"scaler", 'linear', { 16000, 16500}, {1}, {-1}},
 	{"rotate", 'linear' , {4000,5500}, 0, 7}
 )
 storyboard:writeToFile()

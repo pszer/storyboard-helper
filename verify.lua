@@ -47,6 +47,27 @@ function verify:containsCommand(commands, ...)
 	end
 	return false
 end
+function verify:getCommandsTypeSet(commands)
+	local set = {}
+
+	for i,v in ipairs(commands) do
+		local c_type = v[1]
+
+		local add = true
+		for j,z in ipairs(set) do
+			if sb_com:equal(v, z) then
+				add = false
+				break
+			end
+		end
+
+		if add then
+			table.insert(set, c_type)
+		end
+	end
+
+	return set
+end
 
 --
 -- returns a doubly linked list table (and dimensions).
@@ -150,9 +171,13 @@ end
 --
 --
 -- tests for and outputs any overlaps found in an informational table
+-- if none, then return nil
 --
 --
 function verify:testSortedTimes(times)
+	if not times then return nil end
+	if #times==0 then return nil end
+
 	local overlaps = {}
 
 	local stack = require 'stack'
@@ -220,7 +245,11 @@ function verify:testSortedTimes(times)
 		curr = curr.next
 	end
 
-	return overlaps
+	if overlaps[1] then
+		return overlaps
+	else
+		return nil
+	end
 end
 
 --
@@ -341,8 +370,6 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	local function get_from_stack(time)
 		local result = {}
 		for i=1,dimension do result[i]=total_offset[i] end
-
-		print("at "..time, table.unpack(total_offset))
 
 		for i,v in ipairs(easing_stack) do
 			local is_abs = sb_com:isAbsolute(v[1])
@@ -971,23 +998,34 @@ function verify:resolveParameterOverlaps(coms)
 	return H_coms,V_coms,A_coms
 end
 
---[[function verify:checkTimeOverlaps(commands_list)
-	local abs_move_coms   = filter(commands_list, function(x) return sb_com:equal(x, "move", "movex", "movey") end)
-	local rel_move_coms   = filter(commands_list, function(x) return sb_com:equal(x, "move_relative") end)
+function verify:checkTimeOverlaps(commands_list)
+	local set = verify:getCommandsTypeSet(commands_list)
+	set = filter(set, function (x) return sb_com[x].overlapping == false end)
+
+	for i,v in ipairs(set) do
+		local times = verify:sortedTimes(filter(commands_list, function(x) return sb_com:equal(x,v) end))
+		local test  = verify:testSortedTimes(times)
+		if test then return string.format("Overlapping '%s' commands", v) end
+	end
+
+	--[[
+	local move_coms   = filter(commands_list, function(x) return sb_com:equal(x, "move", "movex", "movey") end)
 	local rot_coms   = filter(commands_list, function(x) return sb_com:equal(x, "rotate") end)
 	local scale_coms = filter(commands_list, function(x) return sb_com:equal(x, "scale", "vector") end)
 	local colour_coms = filter(commands_list, function(x) return sb_com:equal(x, "colour") end)
 	local fade_coms = filter(commands_list, function(x) return sb_com:equal(x, "fade") end)
-	local param_coms = filter(commands_list, function(x) return sb_com:equal(x, "parameter") end)
 
-	local abs_move_times = verify:sortedTimes(abs_move_coms)
-	local rel_move_times = verify:sortedTimes(rel_move_coms)
-	local rot_times = verify:sortedTimes(rot_coms)
-	local scale_times = verify:sortedTimes(scale_coms)
-	local colour_times = verify:sortedTimes(colour_coms)
-	local fade_times = verify:sortedTimes(fade_coms)
-	local param_times = verify:sortedTimes(param_coms)
-end--]]
+	local move = verify:sortedTimes(move_coms)
+	move = verify:testSortedTimes(move)
+	if move then return string.format("Overlapping 'move' commands.") end
+
+	local rot = verify:sortedTimes(rot_coms)
+	local scale = verify:sortedTimes(scale_coms)
+	local colour = verify:sortedTimes(colour_coms)
+	local fade = verify:sortedTimes(fade_coms)--]]
+
+	return nil
+end
 
 function verify:resolve(commands_list)
 	if not sb_config["no-overlap-checks"] then
