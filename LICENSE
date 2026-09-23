@@ -1,2 +1,42 @@
+MIT License
 
+Copyright (c) 2026 pszer
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Third-party software
+====================
+
+imagesize/
+
+Copying and distribution are permitted under the terms of the Artistic
+License 2.0 (http://www.opensource.org/licenses/artistic-license-2.0.php) or
+the GNU LGPL (http://www.opensource.org/licenses/lgpl-license.php).
+
+This Lua module was ported from the Perl Image::Size module by
+Geoff Richards.  The Lua port and documentation is Copyright (c) 2008
+Geoff Richards <geoff@geoffrichards.co.uk>.
+
+The original Perl module was written by Randy J. Ray 
+<rjray@blackperl.com>, based on image-sizing code by Alex Knowles
+<alex@ed.ac.uk> and Andrew Tong <werdna@ugcs.caltech.edu>,
+used with their joint permission.
+
+Many bug fixes and patches were provided by other people.  See the 
+documentation for the Image::Size Perl module for details.
