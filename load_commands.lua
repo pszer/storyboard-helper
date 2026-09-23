@@ -108,7 +108,7 @@ command:addDefinition('commands.rotaterel', 'rr', 'rotr', 'rotrel', 'rotrelative
 																						'rotate_relative')
 command:addDefinition('commands.scalerel' , 'sr', 'scaler', 'scalerel', 'scalerelative', 's_r', 'scale_r', 'scale_rel','scale_relative')
 command:addDefinition('commands.vectorrel', 'vr', 'vectorr', 'vectorrel', 'vectorrelative', 'v_r', 'vector_r', 'vector_rel',
-                                                    'vector_relative')
+                                            'vrel', 'v_rel', 'vector_relative')
 command.___lock_out = true -- prevent future command definitions with an 'out' function
 
 command:addDefinition('commands.originscale', 'originscale', 'os', 'origin_scale')

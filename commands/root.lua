@@ -122,7 +122,7 @@ return {
 		if #evals > 0 then
 			sb_log:printf("testing, still commands left in eval stack!")
 			for i,v in ipairs(evals) do
-				print(sb_com:toString(v))
+				sb_log:printf("(%d), "..sb_com:toString(v), i)
 			end
 		end
 

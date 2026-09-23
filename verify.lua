@@ -740,11 +740,12 @@ function verify:resolveNegativeScales(coms)
 			local dy = vec2[2] - vec1[2]
 
 			local add_time2 = true
+
 			for i=time[1],time[2],sb_config["default-easing-keyframing-interval"] do
 				if i==time[2] then add_time2 = false end
 
 				local t = (i-time[1])/(time[2]-time[1])
-				if t==1/0 then t=1 end
+				if (t~=t or t==math.huge or t==-math.huge) then t=1 end
 				local e = easing_func(t)
 				table.insert(frames, {i, math.abs((e * dx)+vec1[1]), math.abs((e * dy)+vec1[2]) })
 			end
@@ -770,10 +771,12 @@ function verify:resolveNegativeScales(coms)
 				-- non linear
 				local frames = gen_frames()
 				local K = sb_keyframe:simplify(frames, {epsilon = sb_config["default-easing-keyframing-epsilon-scale"]})
+
 				for i=1,#K-1 do
 					local Ki = K[i]
-					local Kj = K[i+1]
-					table.insert(result_s_v, sb_com:createCommand('vector', 0, {Ki[1], Kj[1]}, {Ki[2], Kj[2]}, {Ki[3], Kj[3]}))
+					local Ky = K[i+1]
+					local vector_out = sb_com:createCommand('vector', 0, {Ki[1], Ky[1]}, {Ki[2], Ki[3]}, {Ky[2], Ky[3]})
+					table.insert(result_s_v, vector_out)
 				end
 				-- non linear end
 
