@@ -4,10 +4,8 @@ local function wiggle(t,dur,period)
 	return function(out)
 		local P = period/4.0
 		for i=t,dur,period do
-			out{"moverel", "sineIn"  , {i    , i+P}, {0,0}, {0,15}}
-			out{"moverel", "sineOut" , {i+P  , i+P*2}, {0,0}, {0,0}}
-			out{"moverel", "sineIn"  , {i+P*2, i+P*3}, {0,0}, {0,-15}}
-			out{"moverel", "sineOut" , {i+P*3, i+P*4}, {0,0}, {0,0}}
+			out{"moverel", "sineIn"  , {i    , i+P*2}, {0,0}, {0,15}}
+			out{"moverel", "sineIn"  , {i+P*2, i+P*4}, {0,0}, {0,-15}}
 
 			out{"vr", "sinein"  , {i    , i+P*2}, {1,1}, {1,-1} }
 			out{"vr", "sineout"  , {i+P*2, i+P*4}, {1,1}, {1,-1} }

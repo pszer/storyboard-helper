@@ -149,7 +149,7 @@ function verify:sortedTimes(commands, types)
 	end
 
 	for i,v in ipairs(commands) do
-		local t = sb_com:parseCommand(v, "time")
+		local t = sb_com:parse(v, "time")
 		local tmin,tmax = sb_time:getMinMax(t)
 
 		if tmin==tmax then
@@ -445,7 +445,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 	while curr do
 		local com_type = curr.command[1]
 
-		local easing, time, vec1, vec2 = sb_com:parseCommand(curr.command)
+		local easing, time, vec1, vec2 = sb_com:parse(curr.command)
 		local easing_func = sb_easing.funcs[easing]
 
 		-- in case there is a custom relative transformation command that makes use of the
@@ -626,8 +626,8 @@ function verify:resolveNegativeScales(coms)
 	for i,v in ipairs(coms) do
 		table.insert(converted, sb_com:scaleToVector( v ))
 		table.sort(converted, function(a,b)
-			local time1 = sb_com:parseCommand(a, "time")
-			local time2 = sb_com:parseCommand(b, "time")
+			local time1 = sb_com:parse(a, "time")
+			local time2 = sb_com:parse(b, "time")
 			return time1[1] < time2[1]
 		end)
 	end
@@ -663,7 +663,7 @@ function verify:resolveNegativeScales(coms)
 	end
 
 	if converted[1] then
-		local vec1,vec2 = sb_com:parseCommand(converted[1], "vec")
+		local vec1,vec2 = sb_com:parse(converted[1], "vec")
 		if neg(vec1[1]) then
 			table.insert(h_flip_markers, {vec1[1], true} )
 		end
@@ -683,7 +683,7 @@ function verify:resolveNegativeScales(coms)
 	local tolerance = sb_config["minimum-scale-tolerance"]
 
 	for i,v in ipairs(converted) do
-		local easing, time, vec1, vec2 = sb_com:parseCommand(v)
+		local easing, time, vec1, vec2 = sb_com:parse(v)
 
 		local is_linear = easing == sb_easing['linear']
 
@@ -928,8 +928,8 @@ function verify:sortCommandsByTime(coms)
 	table.sort(coms,
 		function(a,b)
 			local time1,time2
-			time1 = sb_com:parseCommand(a, "time")
-			time2 = sb_com:parseCommand(b, "time")
+			time1 = sb_com:parse(a, "time")
+			time2 = sb_com:parse(b, "time")
 			if not time1 or not time2 then return true end
 			return time1[1]<time2[1]
 		end
@@ -943,7 +943,7 @@ function verify:getCommandsTimeSpan(coms)
 	local max=-1/0
 
 	for i,v in ipairs(coms) do
-		local time = sb_com:parseCommand(v, "time")
+		local time = sb_com:parse(v, "time")
 		local v_min,v_max
 
 		if time then
@@ -958,8 +958,8 @@ function verify:getCommandsTimeSpan(coms)
 end
 
 function verify:commandTimeLessThan(a,b)
-	local time1 = sb_com:parseCommand(a, "time")
-	local time2 = sb_com:parseCommand(b, "time")
+	local time1 = sb_com:parse(a, "time")
+	local time2 = sb_com:parse(b, "time")
 	return time1 < time 
 end
 

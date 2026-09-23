@@ -126,7 +126,7 @@ local function eval(t)
 
 	sb_log:addToStack(t)
 
-	local ease, time, vec1, vec2, args, varargs = sb_command:parseCommand(t)
+	local ease, time, vec1, vec2, args, varargs = sb_command:parse(t)
 	local eval_pass = { sb_command[com_type].eval(ease, time, vec1, vec2, args, varargs) }
 	local eval_result = {}
 

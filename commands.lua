@@ -49,7 +49,7 @@ local command = {
 -- returns the easing, time, first vector, second vector, table of arguments, and table of variable arguments, of a command.
 -- if target is a string ("easing", "time", "vec1", "vec2", "args", "varargs") only that
 -- part is returned
-function command:parseCommand(com, target)
+function command:parse(com, target)
 	local clone = require 'clone'
 	local step_easing, step_time, step_vec, step_args, step_varargs = false,false,false,false,false
 	local target_easing, target_time, target_vec1, target_vec2, target_vec, target_args, target_varargs =
@@ -253,7 +253,7 @@ function command:out(com)
 	sb_log:assert(out_func,
 		"command.out(): '%s' is not a primitive command, and cannot be outputted in a .osb format.", com_type)
 
-	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
+	local easing, time, vec1, vec2, args, varargs = command:parse(com)
 
 	return out_func(easing, time, vec1, vec2, args, varargs)
 end
@@ -318,11 +318,11 @@ end
 -- also works on scalerel
 function command:scaleToVector(com)
 	if command:equal(com, 's') then
-		local easing,time,vec1,vec2 = command:parseCommand(com)
+		local easing,time,vec1,vec2 = command:parse(com)
 		return command:createCommand('v', easing, time, {vec1[1],vec1[1]}, {vec2[1],vec2[1]})
 	end
 	if command:equal(com, 'sr') then
-		local easing,time,vec1,vec2 = command:parseCommand(com)
+		local easing,time,vec1,vec2 = command:parse(com)
 		return command:createCommand('vr', easing, time, {vec1[1],vec1[1]}, {vec2[1],vec2[1]})
 	end
 	if command:equal(com, 'v','vr') then
@@ -343,14 +343,14 @@ function command:createCommandAddition(c1,c2)
 
 	sb_log:assert(command[type1].overlapping, "command:createCommandAddition(): command '%s' doesn't support overlaps/addition.", type1)
 
-	local time1 = command:parseCommand(c1, "time")
-	local time2 = command:parseCommand(c2, "time")
+	local time1 = command:parse(c1, "time")
+	local time2 = command:parse(c2, "time")
 	for i,v in ipairs(time1) do
 		sb_log:assert(time1[i]==time2[i], "command:createCommandAddition(): expected same time points, got '%s' and '%s'", time1[i], time2[i])
 	end
 
-	local vec1_1,vec1_2 = command:parseCommand(c1, "vec")
-	local vec2_1,vec2_2 = command:parseCommand(c2, "vec")
+	local vec1_1,vec1_2 = command:parse(c1, "vec")
+	local vec2_1,vec2_2 = command:parse(c2, "vec")
 
 	local new_vec1, new_vec2 = {},{}
 	for i = 1, #vec1_1 do
@@ -358,7 +358,7 @@ function command:createCommandAddition(c1,c2)
 		new_vec2[i] = vec1_2[i] + vec2_2[i]
 	end
 
-	local easing = command:parseCommand(c1, "easing")
+	local easing = command:parse(c1, "easing")
 
 	local c = command:createCommand(type1, easing, time1, new_vec1, new_vec2)
 	return c
@@ -374,7 +374,7 @@ function command:toString(com)
 
 	sb_log:assert(type(com[1]) == "string", "command.toString(): index 1 isn't a string, this can't be a command, got '%s'.", com[1])
 
-	local easing, time, vec1, vec2, args, varargs = command:parseCommand(com)
+	local easing, time, vec1, vec2, args, varargs = command:parse(com)
 	local result = "{"..com[1]
 
 	if easing then result=result..","..tostring(easing) end
@@ -446,8 +446,8 @@ function command:union(a,b,   clone_func)
 	local clone = require 'clone'
 	local clone_func = clone_func or clone
 
-	local ease_a, time_a, vec_a1, vec_a2, args_a, varargs_a = command:parseCommand(a)
-	local ease_b, time_b, vec_b1, vec_b2, args_b, varargs_b = command:parseCommand(b)
+	local ease_a, time_a, vec_a1, vec_a2, args_a, varargs_a = command:parse(a)
+	local ease_b, time_b, vec_b1, vec_b2, args_b, varargs_b = command:parse(b)
 
 	local time_c = nil
 	local time_d = nil
@@ -565,6 +565,7 @@ function command:evalBlock(block)
 	end
 	return evals
 end
+--command.eval = command.evalBlock
 
 local command_mt={}
 function command_mt.__index(table,key)
@@ -576,7 +577,7 @@ function command_mt.__index(table,key)
 end
 setmetatable(command,command_mt)
 
---command:parseCommand{	"m", 01, {"00:01:500"}, {320, 240}, {360, 280} }
+--command:parse{	"m", 01, {"00:01:500"}, {320, 240}, {360, 280} }
 --
 
 return command
