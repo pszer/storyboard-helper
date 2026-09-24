@@ -14,6 +14,9 @@ log.__index = {}
 log.history = {}
 log.eval_stack = { [0]=0 }
 
+--function log:()
+--end
+
 function log:silent(b)
 	self.__silent = (b~=nil)
 end
@@ -34,7 +37,7 @@ function log:evalStackTraceback()
 	local result = "\nCommand eval traceback:\n"
 
 	for i=log.eval_stack[0], 1, -1 do
-		result = result.."["..tostring(i).."]   "..sb_com:toString(log.eval_stack[i]).."\n"
+		result = result.."["..tostring(i).."]   "..sb_com:toStringSafe(log.eval_stack[i]).."\n"
 	end
 
 	return result
@@ -98,7 +101,7 @@ function log:assert(a, fstr, ...)
 
 	table.insert(log.history,str)
 
-	local sb_config = require (modules..(modules..'config'))
+	local sb_config = require (modules..'config')
 	if not sb_config["-silent"] and self.__out then
 		self.__out:write(str)
 		self.__out:write('\n')

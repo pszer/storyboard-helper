@@ -13,7 +13,14 @@ local storyboard = {
 
 	com = require (modules..'commands'),
 	easing = require (modules..'easing'),
-	keyframe = require (modules..'keyframe')
+	keyframe = require (modules..'keyframe'),
+	time = require (modules..'time'),
+	verify = require (modules..'verify'),
+	eval = require (modules..'eval'),
+	ir = require (modules..'ir'),
+	clone = require (modules..'clone'),
+
+	unpack = table.unpack
 
 }
 storyboard.__index = storyboard

@@ -9,13 +9,12 @@ return {
 			local x=X:lower()
 			if x=="a"or x=="h"or x=="v"
 				then return x end
-			sb_log:error("invalid ['value'] for parameter command: '%s'. expected 'a','h' or 'v'",X)
-			return nil
+			return string.format("invalid ['value'] for parameter command: '%s'. expected 'a','h' or 'v'",X), "a"
 		end
 	},
 	varargs = false,
 	eval = nil,
 	out = function(easing, t, vector_a, vector_b, args, varargs)
-		return sb_ir:new("P",0,math.floor(t[1]),math.floor(t[2]),args["value"]:upper())
+		return sb.ir:new("P",0,math.floor(t[1]),math.floor(t[2]),args["value"]:upper())
 	end
 }

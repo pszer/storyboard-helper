@@ -21,14 +21,16 @@ local sb_eval   = require (modules..'eval')
 command.___lock_out = false
 function command:addDefinition(def, ...)
 	if type(def) == "string" then
-		local env = setmetatable({
+		--[[local env = setmetatable({
 			sb_com    = command,
 			sb_verify = sb_verify,
 			sb_config = sb_config,
 			sb_ir  = sb_ir,
 			sb_log = sb_log,
 			sb_eval = sb_eval,
-		}, {__index=_G})
+		}, {__index=_G})-]]
+		local env = setmetatable(
+			{sb=require (modules..'storyboard')}, {__index=_G})
 
 		local searchf, searcherr = package.searchpath(modules..def, package.path)
 		sb_log:assert(searchf, "command.addDefinition(): couldn't get %s, %s", def, searcherr)
@@ -37,6 +39,7 @@ function command:addDefinition(def, ...)
 		def = chunk()
 
 		sb_log:assert(type(def)=="table", "command.addDefinition(): expected table, file returned '%s'", type(def))
+
 	elseif type(def) ~= "table" then
 		sb_log:error("command.addDefinition(): expected filepath or table, got '%s'.", type(def))
 	end
@@ -47,7 +50,7 @@ function command:addDefinition(def, ...)
 
 	local definition_str = " for \'"..keys[1].."\'"
 
-	sb_log:assert(type(def.easing)=="boolean", "command.addDefinition(): malformed easing definition"..definition_str)
+	sb_log:assert(type(def.easing)=="boolean" or type(def.easing)=="nil", "command.addDefinition(): malformed easing definition"..definition_str)
 	sb_log:assert(type(def.time_points)=="number"
 	              and math.type(def.time_points)=="integer"
 								and def.time_points >= 0, "command.addDefinition(): malformed time points definition"..definition_str)
@@ -66,7 +69,7 @@ function command:addDefinition(def, ...)
 	for i,v in pairs(def.args_valid or {}) do
 		sb_log:assert(type(v)=="function" or type(v)=="nil", "command.addDefinition(): malformed arg(s) valod functions table definition"..definition_str)
 	end
-	sb_log:assert(type(def.varargs)=="boolean", "command.addDefinition(): malformed variable args definition"..definition_str)
+	sb_log:assert(type(def.varargs)=="boolean" or type(def.varargs)=="nil", "command.addDefinition(): malformed variable args definition"..definition_str)
 	sb_log:assert(not (type(def.out)=="function" and command.___lock_out),
 		"command.addDefinition(): the out function are fixed for primitives only.")
 
@@ -89,7 +92,7 @@ function command:addDefinition(def, ...)
 	end
 end
 
-command:addDefinition('commands.root'       , '__root__', 'root','eval')
+command:addDefinition('commands.root'       , '__root__', 'root')
 command:addDefinition('commands.move'       , 'm', 'move')
 command:addDefinition('commands.movex'      , 'mx', 'movex', 'move_x', 'm_x')
 command:addDefinition('commands.movey'      , 'my', 'movey', 'move_y', 'm_y')

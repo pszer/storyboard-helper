@@ -178,7 +178,7 @@ function verify:testSortedTimes(times)
 
 	local overlaps = {}
 
-	local stack = require 'stack'
+	local stack = require (modules..'stack')
 	local s = stack:newStack()
 
 	local curr = times[1]
@@ -474,6 +474,7 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 		end
 
 		if curr[2]=="point" then
+
 			if not is_abs then
 				add_to_easing_stack(curr.command, easing_func, time, vec1, vec2, easing)
 				add_to_total_offset(curr.command)
@@ -560,51 +561,53 @@ function verify:resolveTransformOverlaps(times, dimension, rel_type, start_vec)
 
 		if curr[2]~="point" then
 			last_point_time = nil
-		end
-
-		if curr[2]=="min" and is_abs then
-			--print("")
-			--print("Setting total offset, currently ", table.unpack(total_offset))
 
 
-			local current_p = get_from_stack(curr[1])
-			local fix_p = {}
+			if curr[2]=="min" and is_abs then
+				--print("")
+				--print("Setting total offset, currently ", table.unpack(total_offset))
 
-			for i = 1,dimension do
-				fix_p[i] = inverse_func(current_p[i] , total_offset[i])
-			end
 
-		--	print("current_p is ", table.unpack(current_p))
-		--	print("fix_p is ", table.unpack(fix_p))
+				local current_p = get_from_stack(curr[1])
+				local fix_p = {}
 
-			for i=1,dimension do
-				local x = fix_p[i]
-				--[[if (x ~= 0 and (x == x and x ~= math.huge and x ~= -math.huge)) or operator == '+' then
-					total_offset[i] = inverse_func(vec1[i] , fix_p[i])
-				else
-					total_offset[i] = vec1[i]
-					if total_offset[i] == 0 then
-					--	total_offset[i] = 1
+				for i = 1,dimension do
+					fix_p[i] = inverse_func(current_p[i] , total_offset[i])
+				end
+
+			--	print("current_p is ", table.unpack(current_p))
+			--	print("fix_p is ", table.unpack(fix_p))
+
+				for i=1,dimension do
+					local x = fix_p[i]
+					--[[if (x ~= 0 and (x == x and x ~= math.huge and x ~= -math.huge)) or operator == '+' then
+						total_offset[i] = inverse_func(vec1[i] , fix_p[i])
+					else
+						total_offset[i] = vec1[i]
+						if total_offset[i] == 0 then
+						--	total_offset[i] = 1
+						end
+					end--]]
+					if operator == '+' then
+						total_offset[i] = inverse_func(vec1[i] , fix_p[i])
+					else
+						total_offset[i] = 1
 					end
-				end--]]
-				if operator == '+' then
-					total_offset[i] = inverse_func(vec1[i] , fix_p[i])
-				else
-					total_offset[i] = 1
+				end
+
+			--print("Set total offset to ", table.unpack(total_offset))
+			--elseif curr[2] == "min" and operator == '+' then
+			elseif operator == '+' then
+				for i=1,dimension do
+					total_offset[i] = operator_func(total_offset[i] , vec1[i])
 				end
 			end
 
-		--print("Set total offset to ", table.unpack(total_offset))
-		--elseif curr[2] == "min" and operator == '+' then
-		elseif operator == '+' then
-			for i=1,dimension do
-				total_offset[i] = operator_func(total_offset[i] , vec1[i])
+			if curr[2]=="max" then
+				add_to_total_offset(curr.command)
+				remove_from_easing_stack(curr.command)
 			end
-		end
 
-		if curr[2]=="max" then
-			add_to_total_offset(curr.command)
-			remove_from_easing_stack(curr.command)
 		end
 
 		curr = curr.next
@@ -1036,7 +1039,36 @@ function verify:checkTimeOverlaps(commands_list)
 	for i,v in ipairs(set) do
 		local times = verify:sortedTimes(filter(commands_list, function(x) return sb_com:equal(x,v) end))
 		local test  = verify:testSortedTimes(times)
-		if test then return string.format("Overlapping '%s' commands", v) end
+
+		if test then
+			local header = string.format("Overlapping '%s' commands:\n", v)
+
+			for com,info in pairs(test) do
+				if type(com)=="table" then
+					header = header .. string.format("%s at time points ",
+						sb_com:toString(com, {time=true,vec=true,easing=false,args=false,varargs=false}))
+
+
+					for j,p in ipairs(info) do
+
+						-- limit output to 9 overlaps, then ..., then last overlap
+
+						if j == 9 and #info > 9 then
+							header = header .. "(...)"
+						elseif j < 9 or #info == j then
+							header = header .. p[1]
+						end
+
+						if j ~= #info and j <= 9 then
+							header = header .. ', '
+						end
+					end
+					header = header .. '\n'
+				end
+			end
+
+			return header
+		end
 	end
 
 	--[[

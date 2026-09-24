@@ -33,8 +33,8 @@ return {
 	args_valid = {
 
 		function(x)
-			local sb_com = require 'commands'
-			sb_log:assert(sb_com[x], "invalid ['action'] for keyframe command: %s", x)
+			local com = require 'commands'
+			sb.log:assert(com[x], "invalid ['action'] for keyframe command: %s", x)
 			return false
 		end,
 		function(x)
@@ -52,12 +52,10 @@ return {
 	},
 	varargs = true,
 	eval = function(easing, t, vector_a, vector_b, args, varargs)
-		local sb_verify = require 'verify'
-
 		--TODO
-		local time, dim = sb_verify:sortedTimes(varargs)
-		local movers = sb_verify:resolveTransformOverlaps(time, dim, "moverel")
+		local time, dim = sb.verify:sortedTimes(varargs)
+		local movers = sb.verify:resolveTransformOverlaps(time, dim, "moverel")
 
-		return table.unpack(movers)
+		return sb.unpack(movers)
 	end,
 }

@@ -8,6 +8,6 @@ return {
 	varargs = false,
 	eval = nil,
 	out = function(easing, t, vector_a, vector_b, args, varargs)
-		return sb_ir:new("R",easing,math.floor(t[1]),math.floor(t[2]),vector_a[1],vector_b[1])
+		return sb.ir:new("R",easing,math.floor(t[1]),math.floor(t[2]),vector_a[1],vector_b[1])
 	end
 }

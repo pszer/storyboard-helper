@@ -22,7 +22,7 @@ local config = {
 
 	["default-epsilon"] = 2.0,
 
-	["unsorted-output"] = true,
+	["unsorted-output"] = false,
 	["whitespace"] = "_",
 	["project-folder"] = "."..package.config:sub(1,1),
 }

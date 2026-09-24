@@ -13,10 +13,10 @@ return {
 	overlap_operator='+',
 	absolute_equal='move',
 	out = function(easing, t, vector_a, vector_b, args, varargs)
-		sb_log:assert(args.start_x, "moverel out(): no starting X co-ordinate. can't proceed.")
-		sb_log:assert(args.start_y, "moverel out(): no starting Y co-ordinate. can't proceed.")
+		sb.log:assert(args.start_x, "moverel out(): no starting X co-ordinate. can't proceed.")
+		sb.log:assert(args.start_y, "moverel out(): no starting Y co-ordinate. can't proceed.")
 
-		return sb_ir:new("M",easing,t[1],t[2],
+		return sb.ir:new("M",easing,t[1],t[2],
 			vector_a[1]+args.start_x,vector_a[2]+args.start_y,
 			vector_b[1]+args.start_x,vector_b[2]+args.start_y)
 	end

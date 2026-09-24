@@ -24,15 +24,14 @@ return {
 			return {'protract', table.unpack(varargs)}
 		end
 
-		local sb_com = require 'commands'
 		local result = {}
 		for i,v in ipairs(varargs) do
 			local v_easing, v_time, v_vec1, v_vec2, v_args, v_varargs =
-				sb_com:parse(v)
+				sb.com:parse(v)
 			local extended = {table.unpack(v_time)}
 			extended[#extended] = args.span_end
-			table.insert(result, sb_com:createCommand(v[1], v_easing, extended, v_vec1, v_vec2, v_args, v_varargs))
+			table.insert(result, sb.com:createCommand(v[1], v_easing, extended, v_vec1, v_vec2, v_args, v_varargs))
 		end
-		return table.unpack(result)
+		return sb.unpack(result)
 	end
 }

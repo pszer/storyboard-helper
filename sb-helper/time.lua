@@ -28,7 +28,7 @@ time_mt.__call = function(t,...)
 	local points = {}
 
 	for i,v in ipairs(arg) do
-		table.insert(points, time.convert(v))
+		table.insert(points, time:convert(v))
 	end
 
 	return points
@@ -74,7 +74,7 @@ function time:getMinMax(t)
 	return min,max
 end
 
-function time.convert(x)
+function time:convert(x)
 	local large_number_warning = 
 		"large time point '%s' greater than 1.5 hours detected, "..
 		"suppress warning with -ignore-large-time-points if this makes sense."

@@ -170,10 +170,12 @@ function command:parse(com, target)
 	end
 	if target_varargs then return varargs end
 
+	local valids = com_def.args_valid or {}
+
 	if com_def.args then
 		args={}
 		for i,arg_name in ipairs(com_def.args) do
-			local valid_func = com_def.args_valid[i]
+			local valid_func = valids[i]
 			local A = com[arg_name]
 			local err
 
@@ -369,18 +371,30 @@ end
 -- 
 -- not serialised (doesn't seriaise args or varargs), only for debugging purposes
 --
-function command:toString(com)
+-- params is an optional table argument, determining what things to include/omit
+-- by default all things are true
+-- {
+--  easing = true/false,
+--  time = true/false,
+--  vec1 = true/false,
+--  vec2 = true/false,
+--  args = true/false,
+-- }
+--
+function command:toString(com, params)
 	if type(com)~="table" then
 		return tostring(com)
 	end
+
+	local params = params or {}
 
 	sb_log:assert(type(com[1]) == "string", "command.toString(): index 1 isn't a string, this can't be a command, got '%s'.", com[1])
 
 	local easing, time, vec1, vec2, args, varargs = command:parse(com)
 	local result = "{"..com[1]
 
-	if easing then result=result..","..tostring(easing) end
-	if time then
+	if easing and (params.easing==nil or params.easing==true)then result=result..","..tostring(easing) end
+	if time and (params.time==nil or params.time==true) then
 		local s = "{"
 		for i,v in ipairs(time) do
 			s=s..v
@@ -388,7 +402,7 @@ function command:toString(com)
 		end
 		result=result..","..s.."}"
 	end
-	if vec1 then
+	if vec1 and ((params.vec1 == nil or params.vec1 == true or params.vec == true or params.vec == nil) and not (params.vec == false))then
 		local vec1s = "{"
 		for i,v in ipairs(vec1) do
 			vec1s=vec1s..v
@@ -396,7 +410,7 @@ function command:toString(com)
 		end
 		result=result..","..vec1s.."}"
 	end
-	if vec2 then
+	if vec2 and ((params.vec2 == nil or params.vec2== true or params.vec == true or params.vec == nil) and not (params.vec == false)) then
 		local vec2s = "{"
 		for i,v in ipairs(vec2) do
 			vec2s=vec2s..v
@@ -404,7 +418,7 @@ function command:toString(com)
 		end
 		result=result..","..vec2s.."}"
 	end
-	if args then
+	if args and (params.args == nil or param.args == true) then
 		result=result.."{"
 
 		for i,v in pairs(args) do
@@ -413,11 +427,28 @@ function command:toString(com)
 		end
 		result=result.."}"
 	end
-	if varargs then
+	if varargs and (params.varargs == nil or params.varargs == true) then
 		result=result..", ... " end
 	result = result.."}"
 	return result
 end
+
+function command:toStringSafe(com, params)
+	if type(com)~="table" then
+		return tostring(com)
+	end
+
+	local params = params or {}
+
+	local result = "{"
+	for i,v in ipairs(com) do
+		result=result..tostring(v)
+		if i~=#com then result=result..',' end
+	end
+	result = result..'}'
+	return result
+end
+
 
 --
 -- a,b must be the same type
@@ -556,8 +587,9 @@ function command:evalCommands(...)
 	end
 end
 
-function command:evalBlock(block)
+function command:eval(block)
 	local eval = require (modules..'eval')
+
 	local evals = {}
 	for i,v in ipairs(block or {}) do
 		local R = { eval(v) }
@@ -567,7 +599,6 @@ function command:evalBlock(block)
 	end
 	return evals
 end
---command.eval = command.evalBlock
 
 local command_mt={}
 function command_mt.__index(table,key)

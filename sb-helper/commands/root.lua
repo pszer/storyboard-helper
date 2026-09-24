@@ -29,13 +29,19 @@ return {
 	},
 	varargs = true,
 	eval = function(easing, t, vector_a, vector_b, args, varargs)
-		local evals = sb_com:evalBlock(varargs)
-		local status = sb_verify:checkTimeOverlaps(evals)
+		local evals = sb.com:eval(varargs)
+
+		--[[
+		for i,v in ipairs(evals) do
+			print(sb.com:toString(v))
+		end--]]
+
+		local status = sb.verify:checkTimeOverlaps(evals)
 		if status then
-			sb_log:error(status)
+			sb.log:error(status)
 		end
 
-		local time_min,time_max = sb_verify:getCommandsTimeSpan(evals)
+		local time_min,time_max = sb.verify:getCommandsTimeSpan(evals)
 
 		local start_pos   = {args.start_x, args.start_y}
 		if not start_pos[1] then start_pos = nil end
@@ -53,15 +59,15 @@ return {
 		-- at the same time, even if they do behave correctly a percentage
 		-- of the time. for now all scale commands are converted to vector.
 		local function simplify_scale_vector()
-			local scales = sb_verify:extractCommands(evals, 'scale', 'scalerel')
-			local vector = sb_verify:extractCommands(evals, 'vector', 'vectorrel')
+			local scales = sb.verify:extractCommands(evals, 'scale', 'scalerel')
+			local vector = sb.verify:extractCommands(evals, 'vector', 'vectorrel')
 
 			if #vector == 0 and (start_scale and start_scale[1] == start_scale[2]) then
 				return scales, 'scalerel'
 			end
 
 			for i,s in ipairs(scales) do
-				local V = sb_com:scaleToVector(s)
+				local V = sb.com:scaleToVector(s)
 				table.insert(vector, V)
 			end
 
@@ -69,20 +75,20 @@ return {
 		end
 
 		local function resolve(rel_type, start_vec, ...)
-			local extract = sb_verify:extractCommands(evals, rel_type, ...)
-			local time, dim = sb_verify:sortedTimes(extract)
-			return {sb_verify:resolveTransformOverlaps(time, dim, rel_type, start_vec)}
+			local extract = sb.verify:extractCommands(evals, rel_type, ...)
+			local time, dim = sb.verify:sortedTimes(extract)
+			return {sb.verify:resolveTransformOverlaps(time, dim, rel_type, start_vec)}
 		end
 
 		local m = resolve('moverel', start_pos, 'move')
 		local r = resolve('rotrel', start_rot, 'rot')
 
 		local s_v_commands, s_v_rel_type, s_v_type = simplify_scale_vector()
-		local s_time, s_dim = sb_verify:sortedTimes(s_v_commands)
-		local s_v = {sb_verify:resolveTransformOverlaps(s_time, s_dim, s_v_rel_type, start_scale)}
+		local s_time, s_dim = sb.verify:sortedTimes(s_v_commands)
+		local s_v = {sb.verify:resolveTransformOverlaps(s_time, s_dim, s_v_rel_type, start_scale)}
 
 		local flips
-		s_v, flips = sb_verify:resolveNegativeScales(s_v)
+		s_v, flips = sb.verify:resolveNegativeScales(s_v)
 
 		local concat = {}
 		for _,v in ipairs(m) do concat[#concat+1] = v end
@@ -93,36 +99,36 @@ return {
 		--- resolve protract commands to lifespan of this block.
 		---
 		
-		local protract = sb_verify:extractCommands(evals, 'protract')
-		local flip_protracts = sb_verify:extractCommands(flips, 'protract')
-		local time_min, time_max = sb_verify:getCommandsTimeSpan(concat)
+		local protract = sb.verify:extractCommands(evals, 'protract')
+		local flip_protracts = sb.verify:extractCommands(flips, 'protract')
+		local time_min, time_max = sb.verify:getCommandsTimeSpan(concat)
 		local protract_results = {}
 
 		for i,v in ipairs(flip_protracts) do
 			v.span_end = time_max
-			local protract_eval = { sb_eval(v) }
+			local protract_eval = { sb.eval(v) }
 			for _,z in ipairs(protract_eval) do table.insert(evals, z) end
 		end
 		for i,v in ipairs(protract) do
 			v.span_end = time_max
-			local protract_eval = { sb_eval(v) }
+			local protract_eval = { sb.eval(v) }
 			for _,z in ipairs(protract_eval) do table.insert(evals, z) end
 		end
 		for i,v in ipairs(flips) do
 			table.insert(evals, v)
 		end
 
-		local params = sb_verify:extractCommands(evals, 'param')
-		local hh,vv,aa = sb_verify:resolveParameterOverlaps(params)
+		local params = sb.verify:extractCommands(evals, 'param')
+		local hh,vv,aa = sb.verify:resolveParameterOverlaps(params)
 
 		for _,v in ipairs(hh) do concat[#concat+1] = v end
 		for _,v in ipairs(vv) do concat[#concat+1] = v end
 		for _,v in ipairs(aa) do concat[#concat+1] = v end
 
 		if #evals > 0 then
-			sb_log:printf("testing, still commands left in eval stack!")
+			sb.log:printf("testing, still commands left in eval stack!")
 			for i,v in ipairs(evals) do
-				sb_log:printf("(%d), "..sb_com:toString(v), i)
+				sb.log:printf("(%d), "..com:toString(v), i)
 			end
 		end
 
@@ -130,6 +136,6 @@ return {
 		--
 		--
 
-		return table.unpack(concat)
+		return sb.unpack(concat)
 	end,
 }
