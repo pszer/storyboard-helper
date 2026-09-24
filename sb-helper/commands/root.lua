@@ -31,7 +31,7 @@ return {
 	eval = function(easing, t, vector_a, vector_b, args, varargs)
 		local evals = sb.com:eval(varargs)
 
-		--[[
+		--[[print()
 		for i,v in ipairs(evals) do
 			print(sb.com:toString(v))
 		end--]]
@@ -101,7 +101,16 @@ return {
 		
 		local protract = sb.verify:extractCommands(evals, 'protract')
 		local flip_protracts = sb.verify:extractCommands(flips, 'protract')
+
 		local time_min, time_max = sb.verify:getCommandsTimeSpan(concat)
+		local time_min2, time_max2 = sb.verify:getCommandsTimeSpan(evals)
+		time_min  = time_min  or time_min2
+		time_min2 = time_min2 or time_min
+		time_max  = time_max  or time_max2
+		time_max2 = time_max2 or time_max
+		if time_min and time_min2 < time_min then time_min = time_min2 end
+		if time_max and time_max2 > time_max then time_max = time_max2 end
+
 		local protract_results = {}
 
 		for i,v in ipairs(flip_protracts) do
@@ -125,10 +134,18 @@ return {
 		for _,v in ipairs(vv) do concat[#concat+1] = v end
 		for _,v in ipairs(aa) do concat[#concat+1] = v end
 
+		-- TODO fade relatives and resolution
+		local fade = sb.verify:extractCommands(evals, 'fade')
+		for _,v in ipairs(fade) do concat[#concat+1] = v end
+
+		-- TODO colour relatives and resolution
+		local cols = sb.verify:extractCommands(evals, 'color')
+		for _,v in ipairs(cols) do concat[#concat+1] = v end
+
 		if #evals > 0 then
 			sb.log:printf("testing, still commands left in eval stack!")
 			for i,v in ipairs(evals) do
-				sb.log:printf("(%d), "..com:toString(v), i)
+				sb.log:printf("(%d), "..sb.com:toString(v), i)
 			end
 		end
 

@@ -1,7 +1,7 @@
 require 'io'
 
-package.path = "./imagesize/?.lua;" .. package.path
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
+package.path = (...):gsub('%.[^%.]+$', '').."/imagesize/?.lua;" .. package.path
 local imgsize = require (modules..'imagesize')
 local sb_config  = require (modules..'config')
 

@@ -1016,7 +1016,7 @@ function verify:resolveParameterOverlaps(coms)
 	for i,v in ipairs(A_points) do
 		if v[2] == "min" then
 			A_count_start = A_count_start or v[1]
-			A_count = A_count + 1
+			A_count = (A_count or 0) + 1
 		elseif v[2] == "max" then
 			A_count = A_count - 1
 		end
@@ -1034,7 +1034,7 @@ end
 
 function verify:checkTimeOverlaps(commands_list)
 	local set = verify:getCommandsTypeSet(commands_list)
-	set = filter(set, function (x) return sb_com[x].overlapping == false end)
+	set = filter(set, function (x) return sb_com[x].overlapping == false and sb_com[x].time_points > 0 end)
 
 	for i,v in ipairs(set) do
 		local times = verify:sortedTimes(filter(commands_list, function(x) return sb_com:equal(x,v) end))

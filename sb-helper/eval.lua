@@ -128,13 +128,17 @@ local function eval(t)
 	sb_log:addToStack(t)
 
 	local ease, time, vec1, vec2, args, varargs = sb_command:parse(t)
-	local eval_pass = { sb_command[com_type].eval(ease, time, vec1, vec2, args, varargs) }
+	local eval_pass = { sb_command[com_type].eval(ease, time, vec1, vec2, args, varargs, t) }
 	local eval_result = {}
 
 	for i,v in ipairs(eval_pass) do
-		local v_eval = {eval(v)}
-		for j,w in ipairs(v_eval) do
-			table.insert(eval_result, w)
+		if v == t then
+			table.insert(eval_result, t)
+		else
+			local v_eval = {eval(v)}
+			for j,w in ipairs(v_eval) do
+				table.insert(eval_result, w)
+			end
 		end
 	end
 

@@ -19,9 +19,9 @@ return {
 	args = { "span_end" },
 	args_valid = { function(x) return x end },
 	varargs = true,
-	eval = function(easing, t, vector_a, vector_b, args, varargs)
+	eval = function(easing, t, vector_a, vector_b, args, varargs, self)
 		if not args.span_end then
-			return {'protract', table.unpack(varargs)}
+			return self
 		end
 
 		local result = {}

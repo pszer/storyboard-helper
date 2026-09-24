@@ -15,6 +15,7 @@ local storyboard = {
 	easing = require (modules..'easing'),
 	keyframe = require (modules..'keyframe'),
 	time = require (modules..'time'),
+	file = require (modules..'file'),
 	verify = require (modules..'verify'),
 	eval = require (modules..'eval'),
 	ir = require (modules..'ir'),
@@ -55,6 +56,9 @@ function storyboard:newObject(...)
 	local obj = sb_object:new(...)
 	if obj then table.insert(self.objects, obj) end
 	return obj
+end
+function storyboard:addObject(obj)
+	if obj then table.insert(self.objects, obj) end
 end
 
 function storyboard:out()

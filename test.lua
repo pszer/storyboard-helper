@@ -33,7 +33,7 @@ storyboard:newObject("test.png", "Background", "Center", 320, 240):add(
 
 	--
 	-- Relative transformations, unlike the transformations in native .osb, can
-	-- overlap. Their expected
+	-- overlap. Their expected final motion is evaluated during compilation.
 	--
 	--
 	{"moverel", "elasticout" , {"0:07:000", "0:08:400"}, {0,0}, {-50,5}},
