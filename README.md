@@ -2,7 +2,7 @@
 
 **storyboard-helper** is a DSL compiler for writing **.osb** format osu! storyboards in **Lua**.
 
-The goal is to make animating and scripting storyboards easier by supporting *relative transformations that combine additively/multiplicatively*, and *programmatic composition/metaprogramming*.
+The goal is to make animating and scripting storyboards easier by supporting relative transformations that combine additively/multiplicatively, and programmatic composition/metaprogramming.
 
 In the .osb format, transformation commands operate in absolute units.
 A sprite can be told to move from one calculated screen coordinate to another, but it cannot be
