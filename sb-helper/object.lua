@@ -1,4 +1,4 @@
-require 'string'
+quire 'string'
 
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local sb_anchor = require (modules..'anchor')

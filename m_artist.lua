@@ -7,9 +7,47 @@ sb.file:setProjectFolder("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 K
 redline = {138.37, -25}
 interval_1_4 = sb.time:convert{redline, 0.25}
 interval_1_2 = sb.time:convert{redline, 0.5}
+interval_1_1 = sb.time:convert{redline, 1.0}
 
 local tiles = {{1,3},{1,4},{2,3},{2,4},{3,1},{3,2},{3,3},{3,4},{4,0},{4,1},{4,2},{4,3},{4,4},{5,0},{5,1},{5,2},{5,3},{5,4},{6,0},{6,1},{6,2},{6,3},{6,4},{7,3},{7,4},{8,3},{8,4},
 }
+local tiles_replace_with_square = {
+	{1,3},
+	{2,3},
+	{3,3},
+	{4,3},
+	{5,3},
+	{6,3},
+	{7,3},
+	{8,3},
+
+	{1,4},
+	{2,4},
+	{3,4},
+	{4,4},
+	{5,4},
+	{6,4},
+	{7,4},
+	{8,4},
+}
+
+function tileAfterLogo(X,Y)
+	for _,v in ipairs(tiles_replace_with_square) do
+		if v[1]==X and v[2]==Y then
+
+
+			if X==4 and Y==3 then
+				return "sb/t/43N.png"
+			end
+			if X==5 and Y==3 then
+				return "sb/t/53N.png"
+			end
+
+			return "Sq.png"
+		end
+	end
+	return nil
+end
 
 function tileHasImg(X,Y)
 	for _,v in ipairs(tiles) do
@@ -36,6 +74,10 @@ local DX,DY = 1,0
 
 local logo_fade_in_time = sb.time:convert{redline, 12.75}
 local FF_time = sb.time:convert{redline, 28}
+
+local squares_fade_out_time_1 = sb.time:convert{redline, 30.75}
+
+local reset_time = sb.time:convert{redline, 16*4-0.25}
 
 while true do
 	if std_fadein_times[X][Y] then break end
@@ -113,6 +155,9 @@ end--]]
 
 local fake_3d_square_edges_objects = {}
 
+math.randomseed(500)
+
+local sfx_count = 0
 for x = 0 - (64)*2, 640+107, 64 do
 	for y = 0, 480, 64 do
 
@@ -120,8 +165,8 @@ for x = 0 - (64)*2, 640+107, 64 do
 		table.insert(std_squares, Sq)
 
 		local Sq_time_in = std_fadein_times[Sq[3]][Sq[4]]
-		table.insert(Sq[5], {'move'  , 'linear',  {Sq_time_in, 30000}, {Sq[1],Sq[2]}, {Sq[1],Sq[2]}})
-		table.insert(Sq[5], {'fade'  , 'linear',  {Sq_time_in, 30000}, 1, 1})
+		table.insert(Sq[5], {'move'  , 'linear',  {Sq_time_in, Sq_time_in}, {Sq[1],Sq[2]}, {Sq[1],Sq[2]}})
+		table.insert(Sq[5], {'fade'  , 'linear',  {Sq_time_in, Sq_time_in}, 1, 1})
 
 		local flipd = std_fadein_flipd[Sq[3]][Sq[4]]
 		local edge_v = {}
@@ -147,10 +192,62 @@ for x = 0 - (64)*2, 640+107, 64 do
 			vec2[2] = vec2[2] * 0.5
 		end
 
+		if (Sq[3] >= 0) and (Sq[3] <= 9) and (Sq[3]+Sq[4])%1==0 then
+			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in+DT*0.3, 70)
+		end
+		sfx_count = sfx_count+1
+
 		table.insert(Sq[5], {'vector', 'sineOut', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, vec1, vec2})
 		table.insert(Sq[5], {'color', 'sineOut' , {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {111,111,111},{255,255,255}})
 
-		--local sineOut = sb.easing.funcs['sineOut']
+		-- fade out after 1st sequence
+
+		local D_sq = (Sq_time_in - start_time) / 40.0
+		local rand_i = math.random()
+		local rand_j = math.random()
+		local _v1,_v2 = sb.clone(vec1), sb.clone(vec2)
+		local c
+		if rand_i<0.5 then
+			c=_v2[1]
+			_v2[1]=_v2[2]
+			_v2[2]=c
+			c=_v1[1]
+			_v1[1]=_v1[2]
+			_v1[2]=c
+		end
+		if rand_j < 0.1 then
+			D_sq = -interval_1_2
+		end
+		if rand_j < 0.4 then
+			D_sq = -interval_1_2
+		end
+
+		local newSquare = tileAfterLogo(Sq[3], Sq[4])
+
+		if not newSquare then
+			table.insert(Sq[5], {'fade'  , 'linear',  {squares_fade_out_time_1+interval_1_2+D_sq,
+																								 squares_fade_out_time_1+interval_1_1+D_sq}, 1, 0})
+			table.insert(Sq[5], {'vector', 'sineOut', {squares_fade_out_time_1 + DT*0.1+D_sq, squares_fade_out_time_1 + DT*6.5+D_sq}, _v2, _v1})
+		else
+			local TT=squares_fade_out_time_1 - interval_1_2
+			table.insert(Sq[5], {'fade' , 'linear',  {TT,TT}, 0, 0})
+
+			if newSquare == "Sq.png" then
+				_v1[1] = _v1[1] * 2
+				_v2[1] = _v2[1] * 2
+				_v1[2] = _v1[2] * 2
+				_v2[2] = _v2[2] * 2
+			end
+
+			storyboard:newObject(newSquare, "Background", "Center", 320, 240):add(
+				{'move'  , 'linear',  {TT,TT}, {Sq[1],Sq[2]}, {Sq[1],Sq[2]}},
+				{'fade'  , 'linear',  {squares_fade_out_time_1+interval_1_2+D_sq,
+																								 squares_fade_out_time_1+interval_1_1+D_sq}, 1, 0},
+				{'vector', 'sineOut', {squares_fade_out_time_1 + DT*0.1+D_sq, squares_fade_out_time_1 + DT*6.5+D_sq},
+					_v2, _v1}
+			)
+		end
+
 		local rot = nil
 		if flipd == 2 or flipd == -2 then
 			rot = {'rotate', 0, {Sq_time_in,Sq_time_in}, math.pi/2, math.pi/2}
@@ -168,7 +265,7 @@ for x = 0 - (64)*2, 640+107, 64 do
 end
 
 for _,v in ipairs(std_squares) do
-	local img = tileHasImg(v[3],v[4]) or "sb/Sq.png"
+	local img = tileHasImg(v[3],v[4]) or "Sq.png"
 
 	storyboard:newObject(img, "Background", "Center", 320, 240):add(
 		table.unpack(v[5])
@@ -178,22 +275,44 @@ for _,v in ipairs(fake_3d_square_edges_objects) do
 	storyboard:addObject(v)
 end
 
-storyboard:newObject("sb/Logo.png","Background","Center", 320, 240):add(
+-- switch between badly cropped version to better
+storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
 	{'move', 0, {logo_fade_in_time,logo_fade_in_time}, {64+263,243}},
 	{'fade',   0, {logo_fade_in_time, logo_fade_in_time + 500}, 0, 1},
 	{'vector', 0, {logo_fade_in_time, logo_fade_in_time}, {0.5,0.5}, {0.5,0.5}},
-	{'fade',   0, {logo_fade_in_time + 1500,30000}, 1, 1}
+	--{'fade',   0, {logo_fade_in_time + 1500,30000}, 1, 1},
+
+	{'moverel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		{0,0}, {320*0.65,240*0.77}},
+	{'vectorrel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		{1,1}, {0.32,0.56}},
+	{'fade', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		1, 0}
 )
 
+storyboard:newObject("sb/Logo.png","Background","Center", 320, 240):add(
+	{'move', 0, {squares_fade_out_time_1 + interval_1_4,squares_fade_out_time_1 + interval_1_4}, {64+263,243}},
+	{'vector', 0, {squares_fade_out_time_1 + interval_1_4,squares_fade_out_time_1 + interval_1_4}, {0.5,0.5},{0.5,0.5}},
+
+	{'moverel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		{0,0}, {320*0.65,240*0.77}},
+	{'vectorrel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		{1,1}, {0.32,0.56}},
+	{'fade', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		0, 1},
+	{'fade',   0, {reset_time, reset_time + interval_1_1}, 1, 0}
+)
+
+interval_1_22 = sb.time:convert{redline, 0.55}
 storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
-	{'fade',  'out', {FF_time                 , FF_time + interval_1_2*1.1}, 0, 0.6},
-	{'fade',  'in', {FF_time + interval_1_2*1.1  , FF_time + interval_1_2*1.8}, 0.6, 0},
+	{'fade',  'out', {FF_time                 , FF_time + interval_1_22*1.1}, 0, 0.6},
+	{'fade',  'in', {FF_time + interval_1_22*1.1  , FF_time + interval_1_22*1.8}, 0.6, 0},
 
-	{'fade',  'out', {FF_time + interval_1_2*2, FF_time + interval_1_2*3.1}, 0, 0.6},
-	{'fade',  'in', {FF_time + interval_1_2*3.1, FF_time + interval_1_2*3.8}, 0.6, 0},
+	{'fade',  'out', {FF_time + interval_1_22*2, FF_time + interval_1_22*3.1}, 0, 0.6},
+	{'fade',  'in', {FF_time + interval_1_22*3.1, FF_time + interval_1_22*3.8}, 0.6, 0},
 
-	{'fade',  'out', {FF_time + interval_1_2*4, FF_time + interval_1_2*5.1}, 0, 0.6},
-	{'fade',  'in', {FF_time + interval_1_2*5.1, FF_time + interval_1_2*5.8}, 0.6, 0}
+	{'fade',  'out', {FF_time + interval_1_22*4, FF_time + interval_1_22*5.1}, 0, 0.6},
+	{'fade',  'out', {FF_time + interval_1_22*5.1, FF_time + interval_1_22*5.8}, 0.6, 0}
 	--{'protract', {'param', {FF_time,FF_time}, value='a'}}
 )
 
