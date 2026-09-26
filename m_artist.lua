@@ -275,6 +275,19 @@ for _,v in ipairs(fake_3d_square_edges_objects) do
 	storyboard:addObject(v)
 end
 
+local Tri = { 200,220, 300,40, 480,340 }
+local TriS = sb.tri:getSpriteForTriangle(Tri)
+
+storyboard:newObject(TriS.file, "Foreground", TriS.anchor, TriS.pos[1], TriS.pos[2]):add(
+	{'fade',    0, {15000,30000}, 1,1},
+	{'rot',     0, {15000,30000}, TriS.rot, TriS.rot},
+	{'vector',  0, {15000,30000}, TriS.vector, TriS.vector}
+)
+
+--[[for i,v in pairs(TriS) do
+	print(i,v)
+end--]]
+
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
 	{'move', 0, {logo_fade_in_time,logo_fade_in_time}, {64+263,243}},
