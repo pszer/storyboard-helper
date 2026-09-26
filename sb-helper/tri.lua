@@ -64,8 +64,11 @@ function tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	if result < 0 then return 1 else return -1 end
 end
 
+--
+--
+-- 
+--
 function tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, side)
-
 	if side==2 then
 		return tri:normaliseTriangle(x2,y2, x3,y3, x1,y1, 1)
 	elseif side==3 then
@@ -180,6 +183,7 @@ end
 --
 function tri:getSpriteForTriangle(T, Cols, params)
 	local params = params or {}
+	local params_side = params.side
 	local cull = params.backwards_cull or T.orientation or -1
 	local atan2 = math.atan
 
@@ -190,7 +194,7 @@ function tri:getSpriteForTriangle(T, Cols, params)
 
 	local result = {}
 
-	local test_side = tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
+	local test_side = params_side tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 	local T_i, side, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 
 	local x,y,angle
@@ -214,6 +218,7 @@ function tri:getSpriteForTriangle(T, Cols, params)
 	result.flip   = flip
 
 	result.file   = tri.sample_set[T_i].file
+	result.sample_i = T_i
 
 	result.pos    = { x,y }
 	result.rot    =  angle
@@ -238,14 +243,12 @@ function tri:getSpriteForTriangle(T, Cols, params)
 	local tri3 = nil
 
 	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[2] ]) then
-		print("mogged")
 		tri2 = sb_clone(result)
 		tri2.col = Cols[ v_map[2] ]
 		tri2.file = tri.sample_set[T_i].file_v2
 	end
 
 	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[3] ]) then
-		print("mogged")
 		tri3 = sb_clone(result)
 		tri3.col = Cols[ v_map[3] ]
 		tri3.file = tri.sample_set[T_i].file_v3
@@ -255,6 +258,82 @@ function tri:getSpriteForTriangle(T, Cols, params)
 	result.tri3 = tri3
 
 	return result
+end
+
+-- generates the closest fitting sprite for tri1, and the closest fitting sprite for
+-- tri2 using the same source triangle
+function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
+	local T1 = tri:getSpriteForTriangle(tri1, cols1)
+	local side = T1.side
+	local sample_i = T1.sample_i
+
+	if not T1 then return nil end
+
+	local x1,y1, x2,y2, x3,y3 = tri2[1], tri2[2], tri2[3], tri2[4],tri2[5], tri2[6]
+	local T_i, _, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, side)
+	local x,y,angle
+
+	if side==1 then
+		angle = atan2(y2-y1, x2-x1)
+		x,y = x1+(x2-x1)*0.5 , y1+(y2-y1)*0.5
+	elseif side==2 then
+		angle = atan2(y3-y2, x3-x2)
+		x,y = x2+(x3-x2)*0.5 , y2+(y3-y2)*0.5
+	else
+		angle = atan2(y1-y3, x1-x3)
+		x,y = x3+(x1-x3)*0.5 , y3+(y1-y3)*0.5
+	end
+
+	local Sx = 1
+	if flip==true then Sx=-1 end
+
+	local result = {}
+
+	result.anchor = sb_anchor:out(tri.anchor)
+	result.side   = side
+	result.flip   = flip
+
+	result.file   = T1.file
+	result.sample_i = T_i
+
+	result.pos    = { x,y }
+	result.rot    =  angle
+	result.vector = { Sx*J/tri.DIM, K/tri.DIM }
+
+	local v_map = {1,2,3}
+	if     side == 1 and flip == true then
+		v_map = {2,1,3}
+	elseif side == 2 and flip == false then
+		v_map = {2,3,1}
+	elseif side == 2 and flip == true then
+		v_map = {3,2,1}
+	elseif side == 3 and flip == false then
+		v_map = {3,1,2}
+	elseif side == 3 and flip == true then
+		v_map = {1,3,2}
+	end
+
+	result.col = cols2[ v_map[1] ]
+
+	local tri2 = nil
+	local tri3 = nil
+
+	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[2] ]) then
+		tri2 = sb_clone(result)
+		tri2.col = cols2[ v_map[2] ]
+		tri2.file = tri.sample_set[T_i].file_v2
+	end
+
+	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[3] ]) then
+		tri3 = sb_clone(result)
+		tri3.col = cols2[ v_map[3] ]
+		tri3.file = tri.sample_set[T_i].file_v3
+	end
+
+	result.tri2 = tri2
+	result.tri3 = tri3
+
+	return T1,result
 end
 
 return tri

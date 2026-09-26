@@ -281,31 +281,69 @@ local Cols = {
 	{255,0,0},
 	{0,0,255},
 }
+
+local Tri2 = { 100,40, 180,100, 50,140 }
+local Cols2 = {
+	{255,255,0},
+	{80,50,150},
+	{0,255,0},
+}
+
 local TriS = sb.tri:getSpriteForTriangle(Tri, Cols)
+local TriS2 = sb.tri:getSpriteForTriangle(Tri2, Cols2)
 
-storyboard:newObject(TriS.file, "Foreground", TriS.anchor, TriS.pos[1], TriS.pos[2]):add(
-	{'fade',    0, {15000,30000}, 1,1},
-	{'rot',     0, {15000,30000}, TriS.rot, TriS.rot},
-	{'vector',  0, {15000,30000}, TriS.vector, TriS.vector},
-	{'color' ,  0, {15000,30000}, TriS.col, TriS.col}
-)
-
-if TriS.tri2 then
-	storyboard:newObject(TriS.tri2.file, "Foreground", TriS.tri2.anchor, TriS.tri2.pos[1], TriS.tri2.pos[2]):add(
+if TriS then
+	storyboard:newObject(TriS.file, "Foreground", TriS.anchor, TriS.pos[1], TriS.pos[2]):add(
 		{'fade',    0, {15000,30000}, 1,1},
-		{'rot',     0, {15000,30000}, TriS.tri2.rot, TriS.tri2.rot},
-		{'vector',  0, {15000,30000}, TriS.tri2.vector, TriS.tri2.vector},
-		{'color' ,  0, {15000,30000}, TriS.tri2.col, TriS.tri2.col}
+		{'rot',     0, {15000,30000}, TriS.rot, TriS.rot},
+		{'vector',  0, {15000,30000}, TriS.vector, TriS.vector},
+		{'color' ,  0, {15000,30000}, TriS.col, TriS.col}
 	)
+
+	if TriS.tri2 then
+		storyboard:newObject(TriS.tri2.file, "Foreground", TriS.tri2.anchor, TriS.tri2.pos[1], TriS.tri2.pos[2]):add(
+			{'fade',    0, {15000,30000}, 1,1},
+			{'rot',     0, {15000,30000}, TriS.tri2.rot, TriS.tri2.rot},
+			{'vector',  0, {15000,30000}, TriS.tri2.vector, TriS.tri2.vector},
+			{'color' ,  0, {15000,30000}, TriS.tri2.col, TriS.tri2.col}
+		)
+	end
+
+	if TriS.tri3 then
+		storyboard:newObject(TriS.tri3.file, "Foreground", TriS.tri3.anchor, TriS.tri3.pos[1], TriS.tri3.pos[2]):add(
+			{'fade',    0, {15000,30000}, 1,1},
+			{'rot',     0, {15000,30000}, TriS.tri3.rot, TriS.tri3.rot},
+			{'vector',  0, {15000,30000}, TriS.tri3.vector, TriS.tri3.vector},
+			{'color' ,  0, {15000,30000}, TriS.tri3.col, TriS.tri3.col}
+		)
+	end
 end
 
-if TriS.tri3 then
-	storyboard:newObject(TriS.tri3.file, "Foreground", TriS.tri3.anchor, TriS.tri3.pos[1], TriS.tri3.pos[2]):add(
+if TriS2 then
+	storyboard:newObject(TriS2.file, "Foreground", TriS2.anchor, TriS2.pos[1], TriS2.pos[2]):add(
 		{'fade',    0, {15000,30000}, 1,1},
-		{'rot',     0, {15000,30000}, TriS.tri3.rot, TriS.tri3.rot},
-		{'vector',  0, {15000,30000}, TriS.tri3.vector, TriS.tri3.vector},
-		{'color' ,  0, {15000,30000}, TriS.tri3.col, TriS.tri3.col}
+		{'rot',     0, {15000,30000}, TriS2.rot, TriS2.rot},
+		{'vector',  0, {15000,30000}, TriS2.vector, TriS2.vector},
+		{'color' ,  0, {15000,30000}, TriS2.col, TriS2.col}
 	)
+
+	if TriS2.tri2 then
+		storyboard:newObject(TriS2.tri2.file, "Foreground", TriS2.tri2.anchor, TriS2.tri2.pos[1], TriS2.tri2.pos[2]):add(
+			{'fade',    0, {15000,30000}, 1,1},
+			{'rot',     0, {15000,30000}, TriS2.tri2.rot, TriS2.tri2.rot},
+			{'vector',  0, {15000,30000}, TriS2.tri2.vector, TriS2.tri2.vector},
+			{'color' ,  0, {15000,30000}, TriS2.tri2.col, TriS2.tri2.col}
+		)
+	end
+
+	if TriS2.tri3 then
+		storyboard:newObject(TriS2.tri3.file, "Foreground", TriS2.tri3.anchor, TriS2.tri3.pos[1], TriS2.tri3.pos[2]):add(
+			{'fade',    0, {15000,30000}, 1,1},
+			{'rot',     0, {15000,30000}, TriS2.tri3.rot, TriS2.tri3.rot},
+			{'vector',  0, {15000,30000}, TriS2.tri3.vector, TriS2.tri3.vector},
+			{'color' ,  0, {15000,30000}, TriS2.tri3.col, TriS2.tri3.col}
+		)
+	end
 end
 
 --[[for i,v in pairs(TriS) do
