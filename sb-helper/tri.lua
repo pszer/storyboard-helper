@@ -3,6 +3,8 @@ require 'math'
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local sb_anchor = require (modules..'anchor')
 local sb_clone = require (modules..'clone')
+local sb_object = require (modules..'object')
+local sb_layer = require (modules..'layer')
 
 local tri = {
 	DIM = 192,
@@ -194,7 +196,7 @@ function tri:getSpriteForTriangle(T, Cols, params)
 
 	local result = {}
 
-	local test_side = params_side tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
+	local test_side = params_side or tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 	local T_i, side, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 
 	local x,y,angle
@@ -266,6 +268,7 @@ function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	local T1 = tri:getSpriteForTriangle(tri1, cols1)
 	local side = T1.side
 	local sample_i = T1.sample_i
+	local atan2 = math.atan
 
 	if not T1 then return nil end
 
@@ -318,13 +321,13 @@ function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	local tri2 = nil
 	local tri3 = nil
 
-	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[2] ]) then
+	if not vec3Eq(cols2[ v_map[1] ], cols2[ v_map[2] ]) or T1.tri2 then
 		tri2 = sb_clone(result)
 		tri2.col = cols2[ v_map[2] ]
 		tri2.file = tri.sample_set[T_i].file_v2
 	end
 
-	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[3] ]) then
+	if not vec3Eq(cols2[ v_map[1] ], cols2[ v_map[3] ]) or T1.tri3 then
 		tri3 = sb_clone(result)
 		tri3.col = cols2[ v_map[3] ]
 		tri3.file = tri.sample_set[T_i].file_v3
@@ -334,6 +337,45 @@ function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	result.tri3 = tri3
 
 	return T1,result
+end
+
+function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
+	local obj1,obj2,obj3
+
+	if not T2 then T2=T1 end
+	local L = sb_layer:out(layer)
+
+	if T1 then
+		obj1 = sb_object:new(T1.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
+			{'fade',    0, {time1,time2}, 1,1},
+			{'move',    0, {time1,time2}, T1.pos, T2.pos},
+			{'rot',     0, {time1,time2}, T1.rot, T2.rot},
+			{'vector',  0, {time1,time2}, T1.vector, T2.vector},
+			{'color' ,  0, {time1,time2}, T1.col, T2.col}
+		)
+
+		if T1.tri2 then
+			obj2 = sb_object:new(T1.tri2.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
+				{'fade',    0, {time1,time2}, 1,1},
+				{'move',    0, {time1,time2}, T1.tri2.pos, T2.tri2.pos},
+				{'rot',     0, {time1,time2}, T1.tri2.rot, T2.tri2.rot},
+				{'vector',  0, {time1,time2}, T1.tri2.vector, T2.tri2.vector},
+				{'color' ,  0, {time1,time2}, T1.tri2.col, T2.tri2.col}
+			)
+		end
+
+		if T1.tri3 then
+			obj3 = sb_object:new(T1.tri3.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
+				{'fade',    0, {time1,time2}, 1,1},
+				{'move',    0, {time1,time2}, T1.tri3.pos, T2.tri3.pos},
+				{'rot',     0, {time1,time2}, T1.tri3.rot, T2.tri3.rot},
+				{'vector',  0, {time1,time2}, T1.tri3.vector, T2.tri3.vector},
+				{'color' ,  0, {time1,time2}, T1.tri3.col, T2.tri3.col}
+			)
+		end
+	end
+
+	return obj1, obj2, obj3
 end
 
 return tri

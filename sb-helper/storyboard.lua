@@ -58,8 +58,14 @@ function storyboard:newObject(...)
 	if obj then table.insert(self.objects, obj) end
 	return obj
 end
-function storyboard:addObject(obj)
-	if obj then table.insert(self.objects, obj) end
+function storyboard:addObject(...)
+	local args = {...}
+
+	if args[1] then
+		for i,v in ipairs(args) do
+			table.insert(self.objects, v)
+		end
+	end
 end
 
 function storyboard:out()
