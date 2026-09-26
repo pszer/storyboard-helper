@@ -276,13 +276,37 @@ for _,v in ipairs(fake_3d_square_edges_objects) do
 end
 
 local Tri = { 200,220, 300,40, 480,340 }
-local TriS = sb.tri:getSpriteForTriangle(Tri)
+local Cols = {
+	{255,255,255},
+	{255,0,0},
+	{0,0,255},
+}
+local TriS = sb.tri:getSpriteForTriangle(Tri, Cols)
 
 storyboard:newObject(TriS.file, "Foreground", TriS.anchor, TriS.pos[1], TriS.pos[2]):add(
 	{'fade',    0, {15000,30000}, 1,1},
 	{'rot',     0, {15000,30000}, TriS.rot, TriS.rot},
-	{'vector',  0, {15000,30000}, TriS.vector, TriS.vector}
+	{'vector',  0, {15000,30000}, TriS.vector, TriS.vector},
+	{'color' ,  0, {15000,30000}, TriS.col, TriS.col}
 )
+
+if TriS.tri2 then
+	storyboard:newObject(TriS.tri2.file, "Foreground", TriS.tri2.anchor, TriS.tri2.pos[1], TriS.tri2.pos[2]):add(
+		{'fade',    0, {15000,30000}, 1,1},
+		{'rot',     0, {15000,30000}, TriS.tri2.rot, TriS.tri2.rot},
+		{'vector',  0, {15000,30000}, TriS.tri2.vector, TriS.tri2.vector},
+		{'color' ,  0, {15000,30000}, TriS.tri2.col, TriS.tri2.col}
+	)
+end
+
+if TriS.tri3 then
+	storyboard:newObject(TriS.tri3.file, "Foreground", TriS.tri3.anchor, TriS.tri3.pos[1], TriS.tri3.pos[2]):add(
+		{'fade',    0, {15000,30000}, 1,1},
+		{'rot',     0, {15000,30000}, TriS.tri3.rot, TriS.tri3.rot},
+		{'vector',  0, {15000,30000}, TriS.tri3.vector, TriS.tri3.vector},
+		{'color' ,  0, {15000,30000}, TriS.tri3.col, TriS.tri3.col}
+	)
+end
 
 --[[for i,v in pairs(TriS) do
 	print(i,v)

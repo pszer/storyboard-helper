@@ -2,12 +2,15 @@ require 'math'
 
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local sb_anchor = require (modules..'anchor')
+local sb_clone = require (modules..'clone')
 
 local tri = {
-	DIM = 64,
+	DIM = 192,
 	set_size = 60,
 	anchor = 'TopCentre',
 	file_str_format = 'T/%d.png',
+	file_str_format_v2 = 'T/%dA.png',
+	file_str_format_v3 = 'T/%dB.png',
 	orientation = -1,
 }
 
@@ -28,7 +31,10 @@ for i=0,0.5, 0.5/tri.set_size do
 	love.graphics.setCanvas(Canvas)
 	love.graphics.polygon("fill",0,0,DIM,0,i*DIM,DIM)
 	love.graphics.setCanvas()--]]
-	tri.sample_set[count] = { i,1 , file = string.format(tri.file_str_format, count), }
+	tri.sample_set[count] = { i,1 , file = string.format(tri.file_str_format, count),
+                                  file_v2 = string.format(tri.file_str_format_v2, count),
+                                  file_v3 = string.format(tri.file_str_format_v3, count),
+																}
 	count=count+1
 end
 
@@ -158,20 +164,26 @@ function tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 	return 2
 end
 
+local function vec3Eq(a,b)
+	return a[1]==b[1] and
+	       a[2]==b[2] and
+				 a[3]==b[3]
+end
+
 --
--- Returns { file=, anchor=, pos={}, vector={}, rot=, flip=f/t, side= }
+-- Returns { file=, anchor=, pos={}, vector={}, rot=, flip=f/t, side=, col=, tri2=, tri3= }
+--
+-- tri2 and tri3 are present if the triangle has differently coloured vertices,otherwise it
+-- is entirely one triangle of one colour.
 --
 -- (vector is automatically given the correct negative scale in case of flip)
 --
-function tri:getSpriteForTriangle(T, y1, x2, y2, x3, y3, params)
+function tri:getSpriteForTriangle(T, Cols, params)
 	local params = params or {}
 	local cull = params.backwards_cull or T.orientation or -1
 	local atan2 = math.atan
 
-	local x1
-	if type(T) == "table" then
-		x1,y1, x2,y2, x3,y3 = T[1], T[2], T[3], T[4], T[5], T[6]
-	end
+	local x1,y1, x2,y2, x3,y3 = T[1], T[2], T[3], T[4], T[5], T[6]
 
 	local orientation = tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	if cull and orientation ~= cull then return nil end
@@ -206,6 +218,41 @@ function tri:getSpriteForTriangle(T, y1, x2, y2, x3, y3, params)
 	result.pos    = { x,y }
 	result.rot    =  angle
 	result.vector = { Sx*J/tri.DIM, K/tri.DIM }
+
+	local v_map = {1,2,3}
+	if     test_side == 1 and flip == true then
+		v_map = {2,1,3}
+	elseif test_side == 2 and flip == false then
+		v_map = {2,3,1}
+	elseif test_side == 2 and flip == true then
+		v_map = {3,2,1}
+	elseif test_side == 3 and flip == false then
+		v_map = {3,1,2}
+	elseif test_side == 3 and flip == true then
+		v_map = {1,3,2}
+	end
+
+	result.col = Cols[ v_map[1] ]
+
+	local tri2 = nil
+	local tri3 = nil
+
+	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[2] ]) then
+		print("mogged")
+		tri2 = sb_clone(result)
+		tri2.col = Cols[ v_map[2] ]
+		tri2.file = tri.sample_set[T_i].file_v2
+	end
+
+	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[3] ]) then
+		print("mogged")
+		tri3 = sb_clone(result)
+		tri3.col = Cols[ v_map[3] ]
+		tri3.file = tri.sample_set[T_i].file_v3
+	end
+
+	result.tri2 = tri2
+	result.tri3 = tri3
 
 	return result
 end
