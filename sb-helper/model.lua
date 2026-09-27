@@ -3,7 +3,15 @@ local cpml = require (modules..'cpml')
 local sb_log = require (modules..'log')
 require 'io'
 
-local m3d = {}
+local m3d = {
+
+	-- storyboard dimensions
+	Screen_X_Centre = 320,
+	Screen_Y_Centre = 240,
+	Screen_W = 640,
+	Screen_H = 480,
+
+}
 m3d.__index = m3d
 
 m3d.mat_camera      = nil
@@ -165,6 +173,15 @@ end
 --	anims = A
 --}
 --
+-- typical format attributes are 
+--
+-- VertexPosition
+-- VertexTexCoord
+-- VertexNormal
+-- VertexTangent
+-- VertexBone
+-- VertexWeight
+--
 function m3d:loadModelTable(filename)
 	local test_file = io.open(filename, 'r')
 	sb_log:assert(io.type(test_file)=="file", "m3d.loadModelTable(): couldn't open '%s'.", filename)
@@ -198,8 +215,57 @@ function m3d:getVertexAttributeIndex(vertex, format, attr)
 	return offset, offset+formart[attr][2]
 end
 
-function m3d:vertex(vertex, format, matrix)
+local __pos_reg = {0,0,0,0}
+local __norm_reg = {0,0,0,0}
+local __norm_vec3 = cpml.vec3.new()
 
+--
+-- returns vec3 pos, vec3 normal, screen_x, screen_y
+--
+--
+function m3d:vertexOut(vertex, format, model_m, viewproj_m, bone_m)
+	local Pos_i,Pos_j = m3d;getVertexAttribute(vertex, format, 'VertexPosition')
+	__pos_reg[1]=vertex[Pos_i]
+	__pos_reg[2]=vertex[Pos_i+1]
+	__pos_reg[3]=vertex[Pos_i+2]
+	__pos_reg[4]=1.0
+
+	-- multiply by model matrix, then camera view+perspective matrix
+	cpml.mat4.mul_vec(__pos_reg, model_m, __pos_reg)
+	cpml.mat4.mul_vec(__pos_reg, viewproj_m, __pos_reg)
+
+	local Norm_i,Norm_j = m3d;getVertexAttribute(vertex, format, 'VertexNormal')
+	__norm_reg[1]=vertex[Norm_i]
+	__norm_reg[2]=vertex[Norm_i+1]
+	__norm_reg[3]=vertex[Norm_i+2]
+	__norm_reg[4]=0.0
+
+	-- multiply normal by model matrix
+	cpml.mat4.mul_vec(__norm_reg, model_m, __norm_reg)
+
+	__norm_vec3.x = __norm_reg[1]
+	__norm_vec3.y = __norm_reg[2]
+	__norm_vec3.z = __norm_reg[3]
+	local length = __norm_vec3:len()
+	__norm_vec3.x = __norm_vec3.x/length
+	__norm_vec3.y = __norm_vec3.y/length
+	__norm_vec3.z = __norm_vec3.z/length
+
+	local x_NDC = __pos_reg[1] / __pos_reg[4]
+	local y_NDC = __pos_reg[2] / __pos_reg[4]
+	local z_NDC = __pos_reg[3] / __pos_reg[4]
+
+	local x_screen = (x_NDC + 1) * m3d.Screen_W
+	local y_screen = (y_NDC + 1) * m3d.Screen_H
+
+	return cpml.vec3.new(__pos_reg[1], __pos_reg[2], __pos_reg[3]),
+	       cpml.vec3.new(__norm_vec3.x, __norm_vec3.y, __norm_vec3.z),
+				 x_screen, y_screen
+
+end
+
+function m3d:basicDiffuseColor(vertex, normal, light)
+	return {255,255,255}
 end
 
 function m3d:newModel(verts)
