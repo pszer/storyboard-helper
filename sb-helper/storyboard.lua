@@ -19,8 +19,11 @@ local storyboard = {
 	verify = require (modules..'verify'),
 	eval = require (modules..'eval'),
 	ir = require (modules..'ir'),
-	tri = require (modules..'tri'),
 	clone = require (modules..'clone'),
+
+	-- 3d functionality
+	tri = require (modules..'tri'),
+	model = require (modules..'model'),
 
 	unpack = table.unpack
 
