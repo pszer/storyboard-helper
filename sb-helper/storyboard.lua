@@ -104,6 +104,39 @@ function storyboard:out()
 	return variables .. header
 end
 
+function storyboard:out_file(f)
+	local backgrounds = self:filterObjectsToLayer(0)
+	local foregrounds = self:filterObjectsToLayer(3)
+	local fail = self:filterObjectsToLayer(1)
+	local pass = self:filterObjectsToLayer(2)
+	local overlays = self:filterObjectsToLayer(4)
+
+	local function get(t)
+		--local str = ""
+		for i,v in ipairs(t) do
+			local str = v:out()
+			f:write(str,'\n')
+			--str = str .. v:out() .. "\n"
+		end
+		--return str
+	end
+
+	f:write("[Variables]\n")
+	f:write([[[Events]
+//Background and Video events
+//Storyboard Layer 0 (Background)
+]])
+	get(backgrounds) 
+	f:write("//Storyboard Layer 1 (Fail)\n")
+	get(fail)
+	f:write("//Storyboard Layer 2 (Pass)\n")
+	get(pass)
+	f:write("//Storyboard Layer 3 (Foreground)\n")
+	get(foregrounds)
+	f:write("//Storyboard Layer 4 (Overlays)\n")
+	get(overlays)
+end
+
 function storyboard:writeToFile(f, overwrite)
 	f = f or self.filename
 	local file, err_str, err_num = io.open(f, "w")
@@ -118,6 +151,22 @@ function storyboard:writeToFile(f, overwrite)
 	local kb = (#str_out - #str_out%64) / 1024.0
 	sb_log:printf("storyboard:writeToFile(): Written %g KiB to %s", kb, f)
 	file:close()
+end
+
+function storyboard:writeToFile2(f, overwrite)
+	f = f or self.filename
+	local file, err_str, err_num = io.open(f, "w")
+	if not file then
+		sb_log:error("storyboard:writeToFile(): couldn't write to '%s', %s %d", f, err_str, err_num or 0)
+	end
+
+	local str_out = self:out_file(file)
+	sb_log:printf("storyboard:writeToFile2(): Written.", kb, f)
+	file:close()
+	            -- subtract modulo 32 to simplify decimal points
+	--local kb = (#str_out - #str_out%64) / 1024.0
+	--sb_log:printf("storyboard:writeToFile(): Written %g KiB to %s", kb, f)
+	--file:close()
 end
 
 return storyboard

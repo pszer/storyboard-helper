@@ -300,47 +300,61 @@ local Cols2 = {
 print(T1.tri2, T2.tri2)
 storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, "Background", 15000, 18100))--]]
 
-sb.m3d:setCamera({0,-0.5,-8}, 'xyz', {0,0,0})
+--sb.m3d:setCamera({0,25,-70}, 'xyz', {0,0,0})
+sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
 sb.m3d:setPerspective()
 
 local view,proj = sb.m3d:getViewAndProjMats()
 
+local nitoModel = sb.m3d:loadModelTable('cubeAnim.txt')
+sb.m3d:fixAttribute(nitoModel, 'VertexColor', 0, 255)
+--sb.m3d:addAttributeToModel(nitoModel, 'VertexColor', 'byte', 3, {255,255,255})
+
 ---3dd
 ---
----
----
----
 local lastTri, lastCols, lastT1 = nil, nil, nil
-for t = 15000, 25000, 1000/28 do
+for t = 15000, 25000, 1000/30 do
+	--print(t)
+
 	local diff = (t - 15000)/1000
 
 	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.3+2.2*math.sin(diff/1.9),math.cos(diff*1.4),math.cos(diff/3)})
-	--local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0,0,math.cos(diff)*3.14})
+	--local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {-math.pi/2+0.5,math.sin(diff/2.6)+math.pi,0})
 
 	local light_dir = {0,1/2^0.5,-1/2^0.5}
 
+	--for i,v in ipairs(nitoModel.triangles) do
+	--	
+	--end
+	--
+	local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(nitoModel.vertices, nitoModel.format,
+		model, view, proj,
+		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
+				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
+	--[[
 	local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
 		model, view, proj,
 		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
 
-	local T1s = {}
+	local T1s = {}--]]
 	if lastTri then
 
-		for i,v in ipairs(cubeTri) do
-			local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastCols[i], v, cubeCols[i])
+		for i,v in ipairs(nitoTri) do
+			local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastCols[i], v, nitoCols[i])
 
 			--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
 
 			if T1 then
-				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/28))
+				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/30))
 			end
 		end
 	end
 
-	lastTri = cubeTri
-	lastCols = cubeCols
+	lastTri = nitoTri
+	lastCols = nitoCols
 end--]]
+
 
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
@@ -388,4 +402,4 @@ storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
 
-storyboard:writeToFile()
+storyboard:writeToFile2()

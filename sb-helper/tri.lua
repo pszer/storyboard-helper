@@ -244,7 +244,7 @@ end
 function tri:getSpriteForTriangle(T, Cols, params)
 	local params = params or {}
 	local params_alt_side = params.alt_side or false
-	local cull = params.backwards_cull or T.orientation or -1
+	local cull = params.backwards_cull or tri.orientation or -1
 	local atan2 = math.atan
 
 	local x1,y1, x2,y2, x3,y3 = T[1], T[2], T[3], T[4], T[5], T[6]
@@ -367,6 +367,7 @@ function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 	local atan2 = math.atan
 
 	local T_i, _, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, side)
+	local orientation = tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	local x,y,angle
 
 	flip = T1.flip

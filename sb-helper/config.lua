@@ -22,7 +22,7 @@ local config = {
 
 	["default-epsilon"] = 2.0,
 
-	["output-move-decimal-points"] = 1,
+	["output-move-decimal-points"] = 0,
 	["output-scale-decimal-points"] = 3,
 	["output-rotate-decimal-points"] = 3,
 	["output-fade-decimal-points"] = 2,

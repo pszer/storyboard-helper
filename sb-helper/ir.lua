@@ -36,8 +36,20 @@ function sb_ir:limitDecimalPlaces(str, dp)
 	local DP_i = str:find('%.')
 	if not DP_i then return str end
 
-	if dp==0 then return str:sub(1,DP_i-1) end
-	return str:sub(1,DP_i+dp)
+	local result
+	if dp==0 then result = str:sub(1,DP_i-1)
+	else result = str:sub(1,DP_i+dp) end
+
+	-- get rid of any trailing zeros
+	for i=#result,DP_i+1,-1 do
+		if result:byte(i) ~= string.byte('0') then
+			if i~=#result then
+				result = result:sub(1,i)
+			end
+			break
+		end
+	end
+	return result
 end
 
 function sb_ir:floorTime(x)

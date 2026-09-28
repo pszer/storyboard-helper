@@ -196,7 +196,7 @@ end
 --
 -- {
 --	model_name = string,
---	triangles = table of {v1,v2,v3},
+--	vertces = table,
 --	format = vertex format table
 --	anims = A
 --}
@@ -229,6 +229,33 @@ function m3d:loadModelTable(filename)
 	return m_t
 end
 
+function m3d:addAttributeToModel(m_t, attribute, data_type, dim, default_v)
+	local count=1
+	for i,v in ipairs(m_t.format) do
+		count = count + v[3]
+	end
+
+	local I,J = count+1, count+dim
+	table.insert(m_t.format, {attribute, data_type, dim})
+	m_t.format[attribute] = {I,J}
+
+	for i,v in ipairs(m_t.vertices) do
+		for j=I,J do
+			v[j] = default_v[j-I+1]
+		end
+	end
+end
+
+function m3d:fixAttribute(m_t, attribute, add, mul)
+	local I,J = m3d:getVertexAttributeIndex(m_t.format, attribute)
+
+	for _,v in ipairs(m_t.vertices) do
+		for i=I,J do
+			v[i] = v[i]*mul + add
+		end
+	end
+end
+
 function m3d:getVertexAttributeData(vertex, format, attr)
 	local offset = format[attr][1]
 	local V = {}
@@ -239,6 +266,8 @@ function m3d:getVertexAttributeData(vertex, format, attr)
 end
 
 function m3d:getVertexAttributeIndex(format, attr)
+	sb_log:assert(format[attr], "m3d.getVertexAttributeIndex(): attribute ['%s'] doesn't exist", attr)
+
 	local offset = format[attr][1]
 	return offset, format[attr][2]
 end
@@ -315,7 +344,5 @@ function m3d:basicDiffuseColor(vertex, normal, color, light)
 
 	return {R_x, G_x, B_x}
 end
-
-m3d:loadModelTable('nito.txt')
 
 return m3d
