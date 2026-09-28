@@ -318,6 +318,8 @@ for i,v in ipairs(cubeTri) do
 	storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T1, 'Foreground', 16000,19000))
 end--]]
 
+local triOutput
+
 local lastTri, lastCols, lastT1 = nil, nil, nil
 for t = 15000, 25000, 1000/22 do
 	local diff = (t - 15000)/1000
@@ -329,7 +331,7 @@ for t = 15000, 25000, 1000/22 do
 	local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
 		model, view, proj,
 		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={255,255,255}, ambient={25,25,25}}) end)
+				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
 
 	local T1s = {}
 	if lastTri then
