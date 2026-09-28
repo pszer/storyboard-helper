@@ -14,7 +14,7 @@ return {
 			return math.floor(a)
 		end
 
-		return sb.ir:new("C",easing,math.floor(t[1]),math.floor(t[2]),
+		return sb.ir:new("C",easing,sb.ir:floorTime(t[1]),sb.ir:floorTime(t[2]),
 		 clamp(vector_a[1]),clamp(vector_a[2]),clamp(vector_a[3]),
 		 clamp(vector_b[1]),clamp(vector_b[2]),clamp(vector_b[3]))
 	end

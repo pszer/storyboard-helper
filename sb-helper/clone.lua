@@ -1,5 +1,6 @@
 -- clone
-local function clone(t)
+local clone = nil
+clone = function(t)
 	if type(t) ~= "table" then return t end
 	local T = {}
 	for i,v in pairs(t) do

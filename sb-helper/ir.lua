@@ -4,7 +4,9 @@
 --
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local sb_config = require (modules..'config')
-local sb_ir={}
+local sb_ir={
+	dont_floor_time = false
+}
 sb_ir.__index = sb_ir
 
 function sb_ir:new(...)
@@ -25,9 +27,30 @@ function sb_ir:getEnd()
 	return self[4]
 end
 
+local __base10 = {
+}
+for i=-2,8 do
+	__base10[i] = 10^i
+end
+function sb_ir:limitDecimalPlaces(str, dp)
+	local DP_i = str:find('%.')
+	if not DP_i then return str end
+
+	if dp==0 then return str:sub(1,DP_i-1) end
+	return str:sub(1,DP_i+dp)
+end
+
+function sb_ir:floorTime(x)
+	if sb_ir.dont_floor_time then
+		return x end
+	return math.floor(x)
+end
+
 function sb_ir:out()
 	local x=x or 360
 	local y=y or 240
+
+	local decimal_points = 5
 
 	local time_shortcut=false
 	for i,v in ipairs{"F","M","S","V","MX","MY","R","C"} do
@@ -41,6 +64,13 @@ function sb_ir:out()
 		if v==self[1] then vec2_shortcut=true break end end
 	for i,v in ipairs{"C"} do
 		if v==self[1] then vec3_shortcut=true break end end
+
+	if self[1]=='V' then decimal_points = sb_config['output-scale-decimal-points']
+	elseif self[1]=='S' then decimal_points = sb_config['output-scale-decimal-points']
+	elseif self[1]=='R' then decimal_points = sb_config['output-rotate-decimal-points']
+	elseif self[1]=='M' then decimal_points = sb_config['output-move-decimal-points']
+	elseif self[1]=='F' then decimal_points = sb_config['output-fade-decimal-points']
+	elseif self[1]=='C' then decimal_points = sb_config['output-colour-decimal-points'] end
 
 	if time_shortcut and self[3]~=self[4] then time_shortcut = false end
 	if vec1_shortcut and self[6]~=self[7] then vec1_shortcut = false end
@@ -66,11 +96,10 @@ function sb_ir:out()
 		if vec3_shortcut and i==7 then skip_comma = true end
 
 		if type(x)=="number" then
-			local int,frac = math.modf(x)
-			if frac==0 or math.abs(frac)<0.0001 then
-				x=string.format("%d",int)
+			if math.tointeger(x) then
+				x=string.format("%d",math.tointeger(x))
 			else
-				x=string.format("%f",x)
+				x=string.format("%s", self:limitDecimalPlaces(tostring(x), decimal_points))
 			end
 		end
 

@@ -4,6 +4,7 @@ local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local sb_anchor = require (modules..'anchor')
 local sb_clone = require (modules..'clone')
 local sb_object = require (modules..'object')
+local sb_config = require (modules..'config')
 local sb_layer = require (modules..'layer')
 local sb_m3d = require (modules..'model')
 
@@ -28,12 +29,9 @@ local function radToDeg(x)
 	return 180.0*x/math.pi
 end
 
+-- fill out sample set
 local count = 1
 for i=0,0.5, 0.5/tri.set_size do
-	--[[local Canvas = love.graphics.newCanvas(DIM,DIM)
-	love.graphics.setCanvas(Canvas)
-	love.graphics.polygon("fill",0,0,DIM,0,i*DIM,DIM)
-	love.graphics.setCanvas()--]]
 	tri.sample_set[count] = { i,1 , file = string.format(tri.file_str_format, count),
                                   file_v2 = string.format(tri.file_str_format_v2, count),
                                   file_v3 = string.format(tri.file_str_format_v3, count),
@@ -158,26 +156,85 @@ function tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 
 	end
 
-	return min_i,side,mJ,mK,flip
+	local tri_error = min_dist
+	return min_i,side,mJ,mK,flip, tri_error
+end
+
+function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side)
+	local min_dist=1/0
+	local min_i=nil
+	local side=nil
+	local mJ,mK
+	local flip = false
+
+	local v = tri.sample_set[source_i]
+
+	if test_side==1 or test_side==nil then
+		local Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 1)
+
+			--- 1 
+		local dist = math.abs(v[1] - Nx3)
+		if dist < min_dist then
+			side, min_dist, min_i, mJ, mK, flip = 1, dist, i, NJ,NK, false end
+
+		dist = math.abs( (1.0 - v[1]) - Nx3)
+		if dist < min_dist then
+			side, min_dist, min_i, mJ, mK, flip = 1, dist, i, NJ,NK, true end
+	end
+	---
+	---
+	---
+
+		--- 2
+	if test_side==2 or test_side==nil then
+		Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 2)
+
+		dist = math.abs(v[1] - Nx3)
+		if dist < min_dist then
+			side, min_dist, min_i, mJ, mK, flip = 2, dist, i, NJ,NK, false end
+
+		dist = math.abs((1.0 - v[1]) - Nx3)
+		if dist < min_dist then
+			side, min_dist, min_i, mJ, mK, flip = 2, dist, i, NJ,NK, true end
+	end
+	--
+	--
+	--
+
+		--- 3
+	if test_side==3 or test_side==nil then
+		Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 3)
+
+		dist = math.abs(v[1] - Nx3)
+		if dist < min_dist then
+			side, min_dist, min_i, mJ, mK, flip = 3, dist, i, NJ,NK, false end
+
+		dist = math.abs((1.0 - v[1]) - Nx3)
+		if dist < min_dist then
+			side, min_dist, min_i, mJ, mK, flip = 3, dist, i, NJ,NK, true end
+	end
+	--
+	--
+
+	return min_dist
 end
 
 function tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 	if angleThreePoints(x1,y1,x2,y2,x3,y3) > math.pi/2 then
-		return 3
+		return 3,1
 	elseif angleThreePoints(x1,y1,x3,y3,x2,y2) > math.pi/2 then
-		return 1
+		return 1,2
 	end
-	return 2
+	return 2,3
 end
 
 local function vec3Eq(a,b)
-	return a[1]==b[1] and
-	       a[2]==b[2] and
-				 a[3]==b[3]
+	return (a[1]==b[1]) and (a[2]==b[2]) and (a[3]==b[3])
 end
 
 --
--- Returns { file=, anchor=, pos={}, vector={}, rot=, flip=f/t, side=, col=, tri2=, tri3= }
+-- Returns { file=, anchor=, pos={}, vector={}, rot=, flip=f/t, side=, col=, tri2=, tri3= ,
+--           file_v2=, file_v3= }
 --
 -- tri2 and tri3 are present if the triangle has differently coloured vertices,otherwise it
 -- is entirely one triangle of one colour.
@@ -186,7 +243,7 @@ end
 --
 function tri:getSpriteForTriangle(T, Cols, params)
 	local params = params or {}
-	local params_side = params.side
+	local params_alt_side = params.alt_side or false
 	local cull = params.backwards_cull or T.orientation or -1
 	local atan2 = math.atan
 
@@ -195,10 +252,13 @@ function tri:getSpriteForTriangle(T, Cols, params)
 	local orientation = tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	if cull and orientation ~= cull then return nil end
 
-	local result = {}
+	local test_side, test_side_alt = tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 
-	local test_side = params_side or tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
-	local T_i, side, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
+	if params_alt_side then
+		test_side = test_side_alt
+	end
+
+	local T_i, side, J,K, flip, tri_error = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 
 	local x,y,angle
 
@@ -216,64 +276,96 @@ function tri:getSpriteForTriangle(T, Cols, params)
 	local Sx = 1
 	if flip==true then Sx=-1 end
 
+	local result = {}
 	result.anchor = sb_anchor:out(tri.anchor)
 	result.side   = side
 	result.flip   = flip
 
 	result.file   = tri.sample_set[T_i].file
+	result.file_v2= tri.sample_set[T_i].file_v2
+	result.file_v3= tri.sample_set[T_i].file_v3
 	result.sample_i = T_i
 
 	result.pos    = { x,y }
 	result.rot    =  angle
 	result.vector = { Sx*J/tri.DIM, K/tri.DIM }
+	result.tri_error = tri_error
 
 	local v_map = {1,2,3}
 	if     test_side == 1 and flip == true then
 		v_map = {2,1,3}
+
 	elseif test_side == 2 and flip == false then
 		v_map = {2,3,1}
 	elseif test_side == 2 and flip == true then
 		v_map = {3,2,1}
+
 	elseif test_side == 3 and flip == false then
 		v_map = {3,1,2}
 	elseif test_side == 3 and flip == true then
 		v_map = {1,3,2}
 	end
 
-	result.col = Cols[ v_map[1] ]
+	local t2 = nil
+	local t3 = nil
 
-	local tri2 = nil
-	local tri3 = nil
-
-	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[2] ]) then
-		tri2 = sb_clone(result)
-		tri2.col = Cols[ v_map[2] ]
-		tri2.file = tri.sample_set[T_i].file_v2
+	if not vec3Eq( Cols[v_map[1]], Cols[v_map[2]] ) then
+		t2 = sb_clone(result)
+		t2.col = sb_clone(Cols[ v_map[2] ])
+		t2.file = tri.sample_set[T_i].file_v2
 	end
 
 	if not vec3Eq(Cols[ v_map[1] ], Cols[ v_map[3] ]) then
-		tri3 = sb_clone(result)
-		tri3.col = Cols[ v_map[3] ]
-		tri3.file = tri.sample_set[T_i].file_v3
+		t3 = sb_clone(result)
+		t3.col = sb_clone(Cols[ v_map[3] ])
+		t3.file = tri.sample_set[T_i].file_v3
 	end
 
-	result.tri2 = tri2
-	result.tri3 = tri3
+	result.col = Cols[ v_map[1] ]
+
+	result.tri2 = t2
+	result.tri3 = t3
 
 	return result
 end
 
 -- generates the closest fitting sprite for tri1, and the closest fitting sprite for
 -- tri2 using the same source triangle
-function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
+function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 	local T1 = tri:getSpriteForTriangle(tri1, cols1)
 	if not T1 then return nil end
+
+	local T1alt = tri:getSpriteForTriangle(tri1, cols1, {alt_side=true})
+
+	-- test which side is better
+	--
+	local weight1 = sb_config["3d-interp-1-weight"]
+	local weight2 = sb_config["3d-interp-2-weight"]
+	
+	local x1,y1, x2,y2, x3,y3 = tri2[1], tri2[2], tri2[3], tri2[4],tri2[5], tri2[6]
+
+	local err_a_1 = tri:getSourceTriError(x1,y1, x2,y2, x3,y3, T1.sample_i, T1.side)
+	local err_a_2 = T1.tri_error
+	local err_b_1 = tri:getSourceTriError(x1,y1, x2,y2, x3,y3, T1alt.sample_i, T1alt.side)
+	local err_b_2 = T1alt.tri_error
+
+	err_a_1 = err_a_1 * math.sqrt(weight1)
+	err_b_1 = err_b_1 * math.sqrt(weight1)
+	err_a_2 = err_a_2 * math.sqrt(weight2)
+	err_b_2 = err_b_2 * math.sqrt(weight2)
+
+	local err = (err_a_1*err_a_1 + err_a_2*err_a_2)
+	local err_alt = (err_b_1*err_b_1 + err_b_2*err_b_2)
+
+	if err_alt < err then
+		T1 = T1alt
+	end
+	--
 
 	local side = T1.side
 	local sample_i = T1.sample_i
 	local atan2 = math.atan
 
-	local x1,y1, x2,y2, x3,y3 = tri2[1], tri2[2], tri2[3], tri2[4],tri2[5], tri2[6]
 	local T_i, _, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, side)
 	local x,y,angle
 
@@ -306,6 +398,8 @@ function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	result.flip   = flip
 
 	result.file   = T1.file
+	result.file_v2= tri.sample_set[T_i].file_v2
+	result.file_v3= tri.sample_set[T_i].file_v3
 	result.sample_i = T_i
 
 	result.pos    = { x,y }
@@ -330,13 +424,13 @@ function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	local tri2 = nil
 	local tri3 = nil
 
-	if not vec3Eq(cols2[ v_map[1] ], cols2[ v_map[2] ]) or T1.tri2 then
+	if (not vec3Eq( cols2[ v_map[1] ], cols2[ v_map[2] ])) or T1.tri2 then
 		tri2 = sb_clone(result)
 		tri2.col = cols2[ v_map[2] ]
 		tri2.file = tri.sample_set[T_i].file_v2
 	end
 
-	if not vec3Eq(cols2[ v_map[1] ], cols2[ v_map[3] ]) or T1.tri3 then
+	if (not vec3Eq( cols2[ v_map[1] ], cols2[ v_map[3] ])) or T1.tri3 then
 		tri3 = sb_clone(result)
 		tri3.col = cols2[ v_map[3] ]
 		tri3.file = tri.sample_set[T_i].file_v3
@@ -351,11 +445,11 @@ end
 function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 	local obj1,obj2,obj3
 
-	if not T2 then T2=T1 end
+	if T2==nil then T2=T1 end
 	local L = sb_layer:out(layer)
 
 	if T1 then
-		obj1 = sb_object:new(T1.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
+		obj1 = sb_object:new(T1.file, L, T1.anchor, 0,0):add(
 			{'fade',    0, {time1,time2}, 1,1},
 			{'move',    0, {time1,time2}, T1.pos, T2.pos},
 			{'rot',     0, {time1,time2}, T1.rot, T2.rot},
@@ -364,12 +458,20 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 		)
 
 		if T1.tri2 then
-			obj2 = sb_object:new(T1.tri2.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
+			obj2 = sb_object:new(T1.tri2.file, L, T1.anchor, 0,0):add(
 				{'fade',    0, {time1,time2}, 1,1},
 				{'move',    0, {time1,time2}, T1.tri2.pos, T2.tri2.pos},
 				{'rot',     0, {time1,time2}, T1.tri2.rot, T2.tri2.rot},
 				{'vector',  0, {time1,time2}, T1.tri2.vector, T2.tri2.vector},
 				{'color' ,  0, {time1,time2}, T1.tri2.col, T2.tri2.col}
+			)
+		elseif T2.tri2 then
+			obj2 = sb_object:new(T1.file_v2, L, T1.anchor, 0,0):add(
+				{'fade',    0, {time1,time2}, 1,1},
+				{'move',    0, {time1,time2}, T1.pos, T2.tri2.pos},
+				{'rot',     0, {time1,time2}, T1.rot, T2.tri2.rot},
+				{'vector',  0, {time1,time2}, T1.vector, T2.tri2.vector},
+				{'color' ,  0, {time1,time2}, T1.col, T2.tri2.col}
 			)
 		end
 
@@ -381,7 +483,19 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'vector',  0, {time1,time2}, T1.tri3.vector, T2.tri3.vector},
 				{'color' ,  0, {time1,time2}, T1.tri3.col, T2.tri3.col}
 			)
+		elseif T2.tri3 then
+			obj3 = sb_object:new(T1.file_v3, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
+				{'fade',    0, {time1,time2}, 1,1},
+				{'move',    0, {time1,time2}, T1.pos, T2.tri3.pos},
+				{'rot',     0, {time1,time2}, T1.rot, T2.tri3.rot},
+				{'vector',  0, {time1,time2}, T1.vector, T2.tri3.vector},
+				{'color' ,  0, {time1,time2}, T1.col, T2.tri3.col}
+			)
 		end
+	end
+
+	if not obj2 and obj3 then
+		obj2 = obj3
 	end
 
 	return obj1, obj2, obj3

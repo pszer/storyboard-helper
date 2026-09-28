@@ -22,6 +22,15 @@ local config = {
 
 	["default-epsilon"] = 2.0,
 
+	["output-move-decimal-points"] = 1,
+	["output-scale-decimal-points"] = 3,
+	["output-rotate-decimal-points"] = 3,
+	["output-fade-decimal-points"] = 2,
+	["output-colour-decimal-points"] = 0,
+
+	["3d-interp-1-weight"] = 0.5,
+	["3d-interp-2-weight"] = 0.5,
+
 	["unsorted-output"] = false,
 	["whitespace"] = "_",
 	["project-folder"] = "."..package.config:sub(1,1),

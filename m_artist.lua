@@ -275,56 +275,47 @@ for _,v in ipairs(fake_3d_square_edges_objects) do
 	storyboard:addObject(v)
 end
 
-local Tri = { 200,220, 300,40, 480,340 }
+local Tri = { 300,40, 480,340, 200,220 }
 local Cols = {
-	{255,255,255},
 	{255,0,0},
 	{0,0,255},
+	{255,0,0},
 }
 
-local Tri3 = { 100,260, 300,40, 480,340 }
+local Tri3 = { 300,40, 480,340, 100, 260 }
 local Cols3 = {
-	{255,210,255},
 	{0,255,0},
 	{0,50,240},
+	{255,0,0},
 }
 
 local Tri2 = { 100,40, 180,100, 50,140 }
 local Cols2 = {
 	{255,255,0},
-	{80,50,150},
-	{0,255,0},
+	{80,255,0},
+	{0,0,255},
 }--]]
 
---[[local T1,T2 = sb.tri:getTrianglesTwoFrames(Tri, Cols, Tri3, Cols3)
+--[[local T1,T2 = sb.tri:getSpritesTwoFrames(Tri, Cols, Tri3, Cols3)
+print(T1.tri2, T2.tri2)
 storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, "Background", 15000, 18100))--]]
 
-sb.m3d:setCamera({0,-0,-8}, 'xyz', {0,0,0})
+sb.m3d:setCamera({0,-0.5,-8}, 'xyz', {0,0,0})
 sb.m3d:setPerspective()
 
 local view,proj = sb.m3d:getViewAndProjMats()
 
---local viewproj = sb.m3d:getViewProj()
---[[
-local model = sb.m3d:modelMatrix({0,0,0}, {1,1,1}, 'xyz', {0.3,0.1,0})
-
-local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
-	model, view, proj,
-	nil, function(vert,norm) return sb.m3d:basicDiffuseColor(vert,norm,
-			{dir = {0,0,1}, col={125,125,125}, ambient={130,130,130}}) end)
-
-for i,v in ipairs(cubeTri) do
-	local T1 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
-	storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T1, 'Foreground', 16000,19000))
-end--]]
-
-local triOutput
-
+---3dd
+---
+---
+---
+---
 local lastTri, lastCols, lastT1 = nil, nil, nil
-for t = 15000, 25000, 1000/22 do
+for t = 15000, 25000, 1000/28 do
 	local diff = (t - 15000)/1000
 
 	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.3+2.2*math.sin(diff/1.9),math.cos(diff*1.4),math.cos(diff/3)})
+	--local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0,0,math.cos(diff)*3.14})
 
 	local light_dir = {0,1/2^0.5,-1/2^0.5}
 
@@ -337,17 +328,19 @@ for t = 15000, 25000, 1000/22 do
 	if lastTri then
 
 		for i,v in ipairs(cubeTri) do
-			local T1, T2 = sb.tri:getTrianglesTwoFrames(lastTri[i], lastCols[i], v, cubeCols[i])
+			local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastCols[i], v, cubeCols[i])
+
+			--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
 
 			if T1 then
-				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/22))
+				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/28))
 			end
 		end
 	end
 
 	lastTri = cubeTri
 	lastCols = cubeCols
-end
+end--]]
 
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
