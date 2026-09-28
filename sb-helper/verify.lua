@@ -666,10 +666,12 @@ function verify:resolveNegativeScales(coms)
 	if converted[1] then
 		local vec1,vec2 = sb_com:parse(converted[1], "vec")
 		if neg(vec1[1]) then
-			table.insert(h_flip_markers, {vec1[1], true} )
+			local time = sb_com:parse(converted[1], "time")
+			table.insert(h_flip_markers, {time[1], true} )
 		end
 		if neg(vec1[2]) then
-			table.insert(v_flip_markers, {vec1[2], true} )
+			local time = sb_com:parse(converted[1], "time")
+			table.insert(v_flip_markers, {time[1], true} )
 		end
 	end
 

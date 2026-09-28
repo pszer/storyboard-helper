@@ -8,7 +8,14 @@ return {
 	varargs = false,
 	eval = nil,
 	out = function(easing, t, vector_a, vector_b, args, varargs)
-		return sb.ir:new("C",easing,math.floor(t[1]),math.floor(t[2]),vector_a[1],vector_a[2],vector_a[3],
-		 vector_b[1],vector_b[2],vector_b[3])
+		local function clamp(a)
+			if a < 0 then return 0 end
+			if a > 255 then return 255 end
+			return math.floor(a)
+		end
+
+		return sb.ir:new("C",easing,math.floor(t[1]),math.floor(t[2]),
+		 clamp(vector_a[1]),clamp(vector_a[2]),clamp(vector_a[3]),
+		 clamp(vector_b[1]),clamp(vector_b[2]),clamp(vector_b[3]))
 	end
 }

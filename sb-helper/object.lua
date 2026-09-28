@@ -169,10 +169,10 @@ function object:out(...)
 			self.time,sb_layer:out(self.layer),self.file:out(),self.volume)
 	elseif header=="Sprite" then
 		header=string.format("Sprite,%d,%d,\"%s\",%d,%d",
-			sb_layer:out(self.layer),sb_anchor:out(self.anchor),self.file:out(),self.x,self.y)
+			sb_layer:out(self.layer),sb_anchor:out(self.anchor),self.file:out(),math.floor(self.x),math.floor(self.y))
 	elseif header=="Animation" then
 		header=string.format("Animation,%d,%d,\"%s\",%d,%d,%d,%d,%s",
-			sb_layer:out(self.layer),sb_anchor:out(self.anchor),self.file:out(),self.x,self.y,
+			sb_layer:out(self.layer),sb_anchor:out(self.anchor),self.file:out(),math.floor(self.x),math.floor(self.y),
 			 self.frame_count, self.frame_delay, self.loop_type)
 	end
 

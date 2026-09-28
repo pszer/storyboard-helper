@@ -5,10 +5,11 @@ local sb_anchor = require (modules..'anchor')
 local sb_clone = require (modules..'clone')
 local sb_object = require (modules..'object')
 local sb_layer = require (modules..'layer')
+local sb_m3d = require (modules..'model')
 
 local tri = {
-	DIM = 192,
-	set_size = 60,
+	DIM = 160,
+	set_size = 100,
 	anchor = 'TopCentre',
 	file_str_format = 'T/%d.png',
 	file_str_format_v2 = 'T/%dA.png',
@@ -266,15 +267,17 @@ end
 -- tri2 using the same source triangle
 function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	local T1 = tri:getSpriteForTriangle(tri1, cols1)
+	if not T1 then return nil end
+
 	local side = T1.side
 	local sample_i = T1.sample_i
 	local atan2 = math.atan
 
-	if not T1 then return nil end
-
 	local x1,y1, x2,y2, x3,y3 = tri2[1], tri2[2], tri2[3], tri2[4],tri2[5], tri2[6]
 	local T_i, _, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, side)
 	local x,y,angle
+
+	flip = T1.flip
 
 	if side==1 then
 		angle = atan2(y2-y1, x2-x1)
@@ -285,6 +288,12 @@ function tri:getTrianglesTwoFrames(tri1, cols1, tri2, cols2)
 	else
 		angle = atan2(y1-y3, x1-x3)
 		x,y = x3+(x1-x3)*0.5 , y3+(y1-y3)*0.5
+	end
+
+	if angle > T1.rot+math.pi then
+		angle = angle - 2*math.pi
+	elseif angle < T1.rot - math.pi then
+		angle = angle + 2*math.pi
 	end
 
 	local Sx = 1
@@ -376,6 +385,42 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 	end
 
 	return obj1, obj2, obj3
+end
+
+function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats, frag_shader)
+	local Triangles = {}
+	local Colors    = {}
+
+	local Pos_i, Pos_j = sb_m3d:getVertexAttributeIndex(format, 'VertexPosition')
+
+	local m3d = sb_m3d
+
+	for i=1, #verts, 3 do
+		local v1_pos, v1_norm, v1_c, v1_x, v1_y = m3d:vertexOut(verts[i+0], format, model_m, view_m, proj_m, bonemats)
+		local v2_pos, v2_norm, v2_c, v2_x, v2_y = m3d:vertexOut(verts[i+1], format, model_m, view_m, proj_m, bonemats)
+		local v3_pos, v3_norm, v3_c, v3_x, v3_y = m3d:vertexOut(verts[i+2], format, model_m, view_m, proj_m, bonemats)
+
+		local v1_col = frag_shader(v1_pos, v1_norm, v1_c)
+		local v2_col = frag_shader(v2_pos, v2_norm, v2_c)
+		local v3_col = frag_shader(v3_pos, v3_norm, v3_c)
+
+		--[[
+		print('--------\n')
+		print(v1_pos, v1_norm)
+		print(v1_x, v1_y)
+		print(' ')
+		print(v2_pos, v2_norm)
+		print(v2_x, v2_y)
+		print(' ')
+		print(v3_pos, v3_norm)
+		print(v3_x, v3_y)
+		print(' \n\n')--]]
+
+		table.insert(Triangles, {v1_x,v1_y, v2_x,v2_y, v3_x,v3_y})
+		table.insert(Colors   , {v1_col, v2_col, v3_col})
+	end
+
+	return Triangles, Colors
 end
 
 return tri

@@ -8,7 +8,7 @@ redline = {138.37, -25}
 interval_1_4 = sb.time:convert{redline, 0.25}
 interval_1_2 = sb.time:convert{redline, 0.5}
 interval_1_1 = sb.time:convert{redline, 1.0}
-
+--[[
 local tiles = {{1,3},{1,4},{2,3},{2,4},{3,1},{3,2},{3,3},{3,4},{4,0},{4,1},{4,2},{4,3},{4,4},{5,0},{5,1},{5,2},{5,3},{5,4},{6,0},{6,1},{6,2},{6,3},{6,4},{7,3},{7,4},{8,3},{8,4},
 }
 local tiles_replace_with_square = {
@@ -157,18 +157,18 @@ local fake_3d_square_edges_objects = {}
 
 math.randomseed(500)
 
-local sfx_count = 0
+--[[local sfx_count = 0
 for x = 0 - (64)*2, 640+107, 64 do
 	for y = 0, 480, 64 do
 
 		local Sq = {x + 64/2.0 , y + 64/2.0, math.floor(x/64), math.floor(y/64), {}}
 		table.insert(std_squares, Sq)
 
-		local Sq_time_in = std_fadein_times[Sq[3]][Sq[4]]
+		local Sq_time_in = std_fadein_times[ Sq[3 ] ][Sq[4 ] ]
 		table.insert(Sq[5], {'move'  , 'linear',  {Sq_time_in, Sq_time_in}, {Sq[1],Sq[2]}, {Sq[1],Sq[2]}})
 		table.insert(Sq[5], {'fade'  , 'linear',  {Sq_time_in, Sq_time_in}, 1, 1})
 
-		local flipd = std_fadein_flipd[Sq[3]][Sq[4]]
+		local flipd = std_fadein_flipd[Sq[3] ][Sq[4] ]
 		local edge_v = {}
 		local vec1, vec2
 		if flipd==1 then
@@ -305,8 +305,7 @@ sb.m3d:setPerspective()
 local view,proj = sb.m3d:getViewAndProjMats()
 
 --local viewproj = sb.m3d:getViewProj()
---[[
-local model = sb.m3d:modelMatrix({0,0,0}, {1,1,1}, 'xyz', {0.3,0.1,0})
+local model = sb.m3d:modelMatrix({0,0,0}, {1,1,1}, 'xyz', {0,0,0})
 
 local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
 	model, view, proj,
@@ -315,40 +314,12 @@ local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.Cube
 
 for i,v in ipairs(cubeTri) do
 	local T1 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
-	storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T1, 'Foreground', 16000,19000))
-end--]]
-
-local lastTri, lastCols, lastT1 = nil, nil, nil
-for t = 15000, 25000, 1000/22 do
-	local diff = (t - 15000)/1000
-
-	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.3+2.2*math.sin(diff/1.9),math.cos(diff*1.4),math.cos(diff/3)})
-
-	local light_dir = {0,1/2^0.5,-1/2^0.5}
-
-	local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
-		model, view, proj,
-		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={255,255,255}, ambient={25,25,25}}) end)
-
-	local T1s = {}
-	if lastTri then
-
-		for i,v in ipairs(cubeTri) do
-			local T1, T2 = sb.tri:getTrianglesTwoFrames(lastTri[i], lastCols[i], v, cubeCols[i])
-
-			if T1 then
-				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/22))
-			end
-		end
-	end
-
-	lastTri = cubeTri
-	lastCols = cubeCols
+	storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T1, 'Background', 16000,19000))
 end
 
 -- switch between badly cropped version to better
-storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
+--[[storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
+	
 	{'move', 0, {logo_fade_in_time,logo_fade_in_time}, {64+263,243}},
 	{'fade',   0, {logo_fade_in_time, logo_fade_in_time + 500}, 0, 1},
 	{'vector', 0, {logo_fade_in_time, logo_fade_in_time}, {0.5,0.5}, {0.5,0.5}},
@@ -387,8 +358,7 @@ storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
 	{'fade',  'out', {FF_time + interval_1_22*5.1, FF_time + interval_1_22*5.8}, 0.6, 0}
 	--{'protract', {'param', {FF_time,FF_time}, value='a'}}
 )
-
-
+--]]
 storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )

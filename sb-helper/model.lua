@@ -6,9 +6,9 @@ require 'io'
 local m3d = {
 
 	-- storyboard dimensions
-	Screen_X_Centre = 320,
-	Screen_Y_Centre = 240,
-	Screen_W = 640,
+	Screen_X_Off = -107,
+	Screen_Y_Off = 0,
+	Screen_W = 854,
 	Screen_H = 480,
 
 }
@@ -18,7 +18,7 @@ m3d.mat_camera      = nil
 m3d.mat_perspective = nil
 m3d.mat_viewproj    = cpml.mat4.new()
 
-local CubeVerts_Format = {
+m3d.CubeVerts_Format = {
 	{
 	'VertexPosition', 'float', 3
 	},
@@ -33,66 +33,65 @@ local CubeVerts_Format = {
 	['VertexNormal'] = {4,6},
 	['VertexColor'] = {7,9},
 }
-local CubeVerts = {
+m3d.CubeVerts = {
     -- Front (red)
-    {-0.5, -0.5, -0.5, 0, 0, -1, 1, 0, 0},
-    { 0.5, -0.5, -0.5, 0, 0, -1, 1, 0, 0},
-    { 0.5,  0.5, -0.5, 0, 0, -1, 1, 0, 0},
+    {-0.5, -0.5, -0.5, 0, 0, -1, 255, 0, 0},
+    { 0.5, -0.5, -0.5, 0, 0, -1, 255, 0, 0},
+    { 0.5,  0.5, -0.5, 0, 0, -1, 255, 0, 0},
 
-    {-0.5, -0.5, -0.5, 0, 0, -1, 1, 0, 0},
-    { 0.5,  0.5, -0.5, 0, 0, -1, 1, 0, 0},
-    {-0.5,  0.5, -0.5, 0, 0, -1, 1, 0, 0},
+    {-0.5, -0.5, -0.5, 0, 0, -1, 255, 0, 0},
+    { 0.5,  0.5, -0.5, 0, 0, -1, 255, 0, 0},
+    {-0.5,  0.5, -0.5, 0, 0, -1, 255, 0, 0},
 
     -- Back (green)
-    {-0.5, -0.5,  0.5, 0, 0, 1, 0, 1, 0},
-    { 0.5,  0.5,  0.5, 0, 0, 1, 0, 1, 0},
-    { 0.5, -0.5,  0.5, 0, 0, 1, 0, 1, 0},
+    {-0.5, -0.5,  0.5, 0, 0, 1, 0, 255, 0},
+    { 0.5,  0.5,  0.5, 0, 0, 1, 0, 255, 0},
+    { 0.5, -0.5,  0.5, 0, 0, 1, 0, 255, 0},
 
-    {-0.5, -0.5,  0.5, 0, 0, 1, 0, 1, 0},
-    {-0.5,  0.5,  0.5, 0, 0, 1, 0, 1, 0},
-    { 0.5,  0.5,  0.5, 0, 0, 1, 0, 1, 0},
+    {-0.5, -0.5,  0.5, 0, 0, 1, 0, 255, 0},
+    {-0.5,  0.5,  0.5, 0, 0, 1, 0, 255, 0},
+    { 0.5,  0.5,  0.5, 0, 0, 1, 0, 255, 0},
 
     -- Left (blue)
-    {-0.5, -0.5, -0.5, -1,0,0, 0, 0, 1},
-    {-0.5,  0.5, -0.5, -1,0,0, 0, 0, 1},
-    {-0.5,  0.5,  0.5, -1,0,0, 0, 0, 1},
+    {-0.5, -0.5, -0.5, -1,0,0, 0, 0, 255},
+    {-0.5,  0.5, -0.5, -1,0,0, 0, 0, 255},
+    {-0.5,  0.5,  0.5, -1,0,0, 0, 0, 255},
 
-    {-0.5, -0.5, -0.5, -1,0,0, 0, 0, 1},
-    {-0.5,  0.5,  0.5, -1,0,0, 0, 0, 1},
-    {-0.5, -0.5,  0.5, -1,0,0, 0, 0, 1},
+    {-0.5, -0.5, -0.5, -1,0,0, 0, 0, 255},
+    {-0.5,  0.5,  0.5, -1,0,0, 0, 0, 255},
+    {-0.5, -0.5,  0.5, -1,0,0, 0, 0, 255},
 
     -- Right (yellow)
-    { 0.5, -0.5, -0.5, -1,0,0,  1, 1, 0},
-    { 0.5, -0.5,  0.5, -1,0,0,  1, 1, 0},
-    { 0.5,  0.5,  0.5, -1,0,0,  1, 1, 0},
+    { 0.5, -0.5, -0.5, 1,0,0,  255, 255, 0},
+    { 0.5, -0.5,  0.5, 1,0,0,  255, 255, 0},
+    { 0.5,  0.5,  0.5, 1,0,0,  255, 255, 0},
 
-    { 0.5, -0.5, -0.5, -1,0,0,  1, 1, 0},
-    { 0.5,  0.5,  0.5, -1,0,0,  1, 1, 0},
-    { 0.5,  0.5, -0.5, -1,0,0,  1, 1, 0},
+    { 0.5, -0.5, -0.5, 1,0,0,  255, 255, 0},
+    { 0.5,  0.5,  0.5, 1,0,0,  255, 255, 0},
+    { 0.5,  0.5, -0.5, 1,0,0,  255, 255, 0},
 
     -- Top (magenta)
-    {-0.5,  0.5, -0.5, 0,1,0, 1, 0, 1},
-    { 0.5,  0.5, -0.5, 0,1,0, 1, 0, 1},
-    { 0.5,  0.5,  0.5, 0,1,0, 1, 0, 1},
+    {-0.5,  0.5, -0.5, 0,1,0, 255, 0, 255},
+    { 0.5,  0.5, -0.5, 0,1,0, 255, 0, 255},
+    { 0.5,  0.5,  0.5, 0,1,0, 255, 0, 255},
 
-    {-0.5,  0.5, -0.5, 0,1,0, 1, 0, 1},
-    { 0.5,  0.5,  0.5, 0,1,0, 1, 0, 1},
-    {-0.5,  0.5,  0.5, 0,1,0, 1, 0, 1},
+    {-0.5,  0.5, -0.5, 0,1,0, 255, 0, 255},
+    { 0.5,  0.5,  0.5, 0,1,0, 255, 0, 255},
+    {-0.5,  0.5,  0.5, 0,1,0, 255, 0, 255},
 
     -- Bottom (cyan)
-    {-0.5, -0.5, -0.5, 0,-1,0, 0, 1, 1},
-    { 0.5, -0.5,  0.5, 0,-1,0, 0, 1, 1},
-    { 0.5, -0.5, -0.5, 0,-1,0, 0, 1, 1},
+    {-0.5, -0.5, -0.5, 0,-1,0, 0, 255, 255},
+    { 0.5, -0.5,  0.5, 0,-1,0, 0, 255, 255},
+    { 0.5, -0.5, -0.5, 0,-1,0, 0, 255, 255},
 
-    {-0.5, -0.5, -0.5, 0,-1,0, 0, 1, 1},
-    {-0.5, -0.5,  0.5, 0,-1,0, 0, 1, 1},
-    { 0.5, -0.5,  0.5, 0,-1,0, 0, 1, 1},
+    {-0.5, -0.5, -0.5, 0,-1,0, 0, 255, 255},
+    {-0.5, -0.5,  0.5, 0,-1,0, 0, 255, 255},
+    { 0.5, -0.5,  0.5, 0,-1,0, 0, 255, 255},
 }
 
-function m3d:rotateMatrix(mat, rot_type, ...)
+local __tempvec3_2 = cpml.vec3.new()
+function m3d:rotateMatrix(mat, rot_type, rot)
 	local mat4 = cpml.mat4
-
-	local rot = {...}
 
 	if rot_type == "quaternion" then
 
@@ -101,8 +100,10 @@ function m3d:rotateMatrix(mat, rot_type, ...)
 
 	elseif rot_type == "lookat" then
 
+		__tempvec3_2.x,__tempvec3_2.y,__tempvec3_2.z = rot[1],rot[2],rot[3]
+
 		local LA = mat4.new()
-		mat4.look_at(LA, cpml.vec3.new(rot[1],rot[2],rot[3]), cpml.vec3.zero, __vec3up)
+		mat4.look_at(LA, __tempvec3_2, cpml.vec3.zero, __vec3up)
 		mat:mul(LA, mat)
 
 	elseif rot_type == "xyz" then
@@ -120,21 +121,23 @@ function m3d:rotateMatrix(mat, rot_type, ...)
 	return mat
 end
 
-local __tempvec3={}
+local id = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}
+local __tempvec3=cpml.vec3.new()
 local __vec3up = cpml.vec3.new(0,-1,0)
-function m3d:setCamera(pos, rot_type, ...)
+function m3d:setCamera(pos, rot_type, rot)
 	local mat4 = cpml.mat4
-	local M = mat4.identity()
+	local M = mat4.new()
+	for i=1,16 do M[i]=id[i] end
 
 	-- Position
-	__tempvec3[1]=-pos[1]
-	__tempvec3[2]=-pos[2]
-	__tempvec3[3]=-pos[3]
-	M:translate(M, pos)
-	m3d:rotateMatrix(M, rot_type, ...)
+	__tempvec3.x=-pos[1]
+	__tempvec3.y=-pos[2]
+	__tempvec3.z=-pos[3]
+	M:translate(M, __tempvec3)
+	m3d:rotateMatrix(M, rot_type, rot)
 
 	m3d.mat_camera = M
-	return M
+	return m3d.mat_camera
 end
 
 -- fov
@@ -150,29 +153,39 @@ function m3d:setPerspective(fov, widescreen, near, far)
 	if widescreen:lower()=='standard' then
 		aspect=__4_3
 	end
-	sb_log:assert(type(fov)~='number' or fov<10 or fov>160, "m3d.genPerspectiveMatrix(): expected fov between [10,160], got %s", fov)
+	sb_log:assert(type(fov)=='number' and fov>=10 and fov<=160, "m3d.genPerspectiveMatrix(): expected fov between [10,160], got %s", fov)
 	sb_log:assert(near < far, "m3d.genPerspectiveMatrix(): near (%s) >= far (%s), invalid.", near, far)
 
 	m3d.mat_perspective = cpml.mat4.from_perspective(fov, aspect, near, far)
 	return m3d.mat_perspective
 end
 
-function m3d:getViewProj()
+function m3d:getViewAndProjMats()
+	return m3d.mat_camera, m3d.mat_perspective
+end
+
+--[[function m3d:getViewProj()
 	sb_log:assert(m3d.mat_camera ~= nil, "m3d.getViewProj(): call setCamera first.")
 	sb_log:assert(m3d.mat_perspective ~= nil, "m3d.getViewProj(): call setPerspective first.")
 
 	cpml.mat4.mul(m3d.mat_viewproj, m3d.mat_perspective, m3d.mat_camera)
-end
+	return m3d.mat_viewproj
+end--]]
 
 function m3d:modelMatrix(pos, scale, rot_type, ...)
-	local M = mat4.identity()
+	local M = cpml.mat4.new()
+	for i=1,16 do M[i]=id[i] end
 
-	__tempvec3[1]=scale[1]
-	__tempvec3[2]=scale[2]
-	__tempvec3[3]=scale[3]
+	__tempvec3.x=scale[1]
+	__tempvec3.y=scale[2]
+	__tempvec3.z=scale[3]
+
 	M:scale(M, __tempvec3)
 	m3d:rotateMatrix(M, rot_type, ...)
-	M:translate(M, pos)
+	__tempvec3.x=pos[1]
+	__tempvec3.y=pos[2]
+	__tempvec3.z=pos[3]
+	M:translate(M, __tempvec3)
 
 	return M
 end
@@ -209,14 +222,14 @@ function m3d:loadModelTable(filename)
 	local count=1
 	for i,v in ipairs(m_t.format) do
 		v.offset = count
-		m_t.format[v[1]] = {count,v[2]}
-		count = count + m_t.format[v[3]]
+		m_t.format[v[1]] = {count,count+v[3]-1}
+		count = count + v[3]
 	end
 
 	return m_t
 end
 
-function m3d:getVertexAttribute(vertex, format, attr)
+function m3d:getVertexAttributeData(vertex, format, attr)
 	local offset = format[attr][1]
 	local V = {}
 	for i=offset, offset+format[attr][2], 1 do
@@ -225,39 +238,44 @@ function m3d:getVertexAttribute(vertex, format, attr)
 	return V
 end
 
-function m3d:getVertexAttributeIndex(vertex, format, attr)
+function m3d:getVertexAttributeIndex(format, attr)
 	local offset = format[attr][1]
-	return offset, offset+formart[attr][2]-1
+	return offset, format[attr][2]
 end
 
 local __pos_reg = {0,0,0,0}
 local __norm_reg = {0,0,0,0}
+local __screen_reg = {0,0,0,0}
 local __norm_vec3 = cpml.vec3.new()
 
 --
--- returns vec3 pos, vec3 normal, screen_x, screen_y
+-- returns vec3 pos, vec3 normal, vec3, color, screen_x, screen_y
 --
 --
-function m3d:vertexOut(vertex, format, model_m, viewproj_m, bone_m)
-	local Pos_i,Pos_j = m3d;getVertexAttribute(vertex, format, 'VertexPosition')
+function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
+	local Pos_i,Pos_j = m3d:getVertexAttributeIndex(format, 'VertexPosition')
 	__pos_reg[1]=vertex[Pos_i]
 	__pos_reg[2]=vertex[Pos_i+1]
 	__pos_reg[3]=vertex[Pos_i+2]
 	__pos_reg[4]=1.0
 
 	-- multiply by model matrix, then camera view+perspective matrix
-	cpml.mat4.mul_vec(__pos_reg, model_m, __pos_reg)
-	cpml.mat4.mul_vec(__pos_reg, viewproj_m, __pos_reg)
+	cpml.mat4.mul_vec4(__pos_reg, model_m, __pos_reg)
+	cpml.mat4.mul_vec4(__pos_reg, view_m, __pos_reg)
 
-	local Norm_i,Norm_j = m3d;getVertexAttribute(vertex, format, 'VertexNormal')
+
+	cpml.mat4.mul_vec4(__screen_reg, proj_m, __pos_reg)
+
+	local Norm_i,Norm_j = m3d:getVertexAttributeIndex(format, 'VertexNormal')
 	__norm_reg[1]=vertex[Norm_i]
 	__norm_reg[2]=vertex[Norm_i+1]
 	__norm_reg[3]=vertex[Norm_i+2]
 	__norm_reg[4]=0.0
 
 	-- multiply normal by model matrix
-	cpml.mat4.mul_vec(__norm_reg, model_m, __norm_reg)
+	cpml.mat4.mul_vec4(__norm_reg, model_m, __norm_reg)
 
+	-- normalise
 	__norm_vec3.x = __norm_reg[1]
 	__norm_vec3.y = __norm_reg[2]
 	__norm_vec3.z = __norm_reg[3]
@@ -265,29 +283,39 @@ function m3d:vertexOut(vertex, format, model_m, viewproj_m, bone_m)
 	__norm_vec3.x = __norm_vec3.x/length
 	__norm_vec3.y = __norm_vec3.y/length
 	__norm_vec3.z = __norm_vec3.z/length
+	--
 
-	local x_NDC = __pos_reg[1] / __pos_reg[4]
-	local y_NDC = __pos_reg[2] / __pos_reg[4]
-	local z_NDC = __pos_reg[3] / __pos_reg[4]
+	-- transform to final screen xy coordinates
+	local x_NDC = __screen_reg[1] / __screen_reg[4]
+	local y_NDC = __screen_reg[2] / __screen_reg[4]
+	local z_NDC = __screen_reg[3] / __screen_reg[4]
 
-	local x_screen = (x_NDC + 1) * m3d.Screen_W
-	local y_screen = (y_NDC + 1) * m3d.Screen_H
+	local x_screen = (x_NDC + 0.5) * m3d.Screen_W + m3d.Screen_X_Off
+	local y_screen = (y_NDC + 0.5) * m3d.Screen_H + m3d.Screen_Y_Off
+
+	local VCol_i, VCol_j = m3d:getVertexAttributeIndex(format, 'VertexColor')
 
 	return cpml.vec3.new(__pos_reg[1], __pos_reg[2], __pos_reg[3]),
 	       cpml.vec3.new(__norm_vec3.x, __norm_vec3.y, __norm_vec3.z),
+				 {vertex[VCol_i], vertex[VCol_i+1], vertex[VCol_i+2]},
 				 x_screen, y_screen
 end
 
-function m3d:basicDiffuseColor(vertex, normal, light)
-	return {255,255,255}
+function m3d:basicDiffuseColor(vertex, normal, color, light)
+	local light_dir  = light.dir
+	local light_col  = light.col
+	local amb        = light.ambient
+
+	-- diffuse component
+	local dot = math.max(0.0, light_dir[1]*normal.x + light_dir[2]*normal.y + light_dir[3]*normal.z)
+
+	local R_x = (dot * (light_col[1]/255) + amb[1]/255) * color[1]
+	local G_x = (dot * (light_col[2]/255) + amb[2]/255) * color[2]
+	local B_x = (dot * (light_col[3]/255) + amb[3]/255) * color[3]
+
+	return {R_x, G_x, B_x}
 end
 
-function m3d:newModel(verts)
-	local model = {
-		model_matrix = nil
-	}
-end
-
-print(m3d:loadModelTable('nito.txt'))
+m3d:loadModelTable('nito.txt')
 
 return m3d

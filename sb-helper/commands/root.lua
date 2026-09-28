@@ -90,6 +90,10 @@ return {
 		local flips
 		s_v, flips = sb.verify:resolveNegativeScales(s_v)
 
+		for i,v in ipairs(flips) do
+			local varargs = sb.com:parse(v, 'varargs')
+		end
+
 		local concat = {}
 		for _,v in ipairs(m) do concat[#concat+1] = v end
 		for _,v in ipairs(r) do concat[#concat+1] = v end

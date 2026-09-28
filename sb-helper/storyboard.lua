@@ -23,7 +23,7 @@ local storyboard = {
 
 	-- 3d functionality
 	tri = require (modules..'tri'),
-	model = require (modules..'model'),
+	m3d = require (modules..'model'),
 
 	unpack = table.unpack
 
