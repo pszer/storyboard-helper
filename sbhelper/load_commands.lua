@@ -6,6 +6,8 @@ local sb_ir     = require (modules..'ir')
 local sb_log    = require (modules..'log')
 local sb_eval   = require (modules..'eval')
 
+local mathtype = require (modules..'mathtype')
+
 -- def - command definition
 --
 --       * if this is a table, then this table is used as a the definition
@@ -52,10 +54,10 @@ function command:addDefinition(def, ...)
 
 	sb_log:assert(type(def.easing)=="boolean" or type(def.easing)=="nil", "command.addDefinition(): malformed easing definition"..definition_str)
 	sb_log:assert(type(def.time_points)=="number"
-	              and math.type(def.time_points)=="integer"
+	              and mathtype.type(def.time_points)=="integer"
 								and def.time_points >= 0, "command.addDefinition(): malformed time points definition"..definition_str)
 	sb_log:assert(type(def.dimension)=="number"
-	              and math.type(def.dimension)=="integer"
+	              and mathtype.type(def.dimension)=="integer"
 								and def.time_points >= 0, "command.addDefinition(): malformed dimension(s) definition"..definition_str)
 
 	sb_log:assert(type(def.args)=="table" or type(def.args)=="nil",

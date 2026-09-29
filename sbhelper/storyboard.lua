@@ -25,7 +25,7 @@ local storyboard = {
 	tri = require (modules..'tri'),
 	m3d = require (modules..'model'),
 
-	unpack = table.unpack
+	unpack = table.unpack or unpack
 
 }
 storyboard.__index = storyboard
@@ -160,13 +160,12 @@ function storyboard:writeToFile2(f, overwrite)
 		sb_log:error("storyboard:writeToFile(): couldn't write to '%s', %s %d", f, err_str, err_num or 0)
 	end
 
-	local str_out = self:out_file(file)
-	sb_log:printf("storyboard:writeToFile2(): Written.", kb, f)
-	file:close()
+	self:out_file(file)
 	            -- subtract modulo 32 to simplify decimal points
-	--local kb = (#str_out - #str_out%64) / 1024.0
-	--sb_log:printf("storyboard:writeToFile(): Written %g KiB to %s", kb, f)
-	--file:close()
+	local size = file:seek('end')
+	local kb = (size - size%64) / 1024.0
+	sb_log:printf("storyboard:writeToFile(): Written %g KiB to %s", kb, f)
+	file:close()
 end
 
 return storyboard

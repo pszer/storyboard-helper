@@ -29,7 +29,7 @@ local config = {
 	["output-colour-decimal-points"] = 0,
 
 	["3d-interp-1-weight"] = 0.5,
-	["3d-interp-2-weight"] = 0.5,
+	["3d-interp-2-weight"] = 0.6,
 
 	["unsorted-output"] = false,
 	["whitespace"] = "_",

@@ -220,9 +220,9 @@ function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side)
 end
 
 function tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
-	if angleThreePoints(x1,y1,x2,y2,x3,y3) > math.pi/2 then
+	if angleThreePoints(x1,y1,x2,y2,x3,y3) > math.pi/2.0 then
 		return 3,1
-	elseif angleThreePoints(x1,y1,x3,y3,x2,y2) > math.pi/2 then
+	elseif angleThreePoints(x1,y1,x3,y3,x2,y2) > math.pi/2.0 then
 		return 1,2
 	end
 	return 2,3

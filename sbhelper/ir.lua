@@ -4,6 +4,7 @@
 --
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local sb_config = require (modules..'config')
+local mathtype = require (modules..'mathtype')
 local sb_ir={
 	dont_floor_time = false
 }
@@ -108,8 +109,8 @@ function sb_ir:out()
 		if vec3_shortcut and i==7 then skip_comma = true end
 
 		if type(x)=="number" then
-			if math.tointeger(x) then
-				x=string.format("%d",math.tointeger(x))
+			if mathtype.tointeger(x) then
+				x=string.format("%d",mathtype.tointeger(x))
 			else
 				x=string.format("%s", self:limitDecimalPlaces(tostring(x), decimal_points))
 			end

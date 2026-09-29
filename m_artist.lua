@@ -1,4 +1,9 @@
-local sb = require 'sb-helper'
+package.path = "./?.lua;./?/init.lua;" .. package.path
+local sb = require('sbhelper')
+
+table.unpack = unpack or table.unpack
+
+local x = os.clock()
 
 storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
 sb.file:setProjectFolder("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/")
@@ -323,16 +328,7 @@ for t = 15000, 25000, 1000/30 do
 
 	local light_dir = {0,1/2^0.5,-1/2^0.5}
 
-	--for i,v in ipairs(nitoModel.triangles) do
-	--	
-	--end
-	--
 	local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(nitoModel.vertices, nitoModel.format,
-		model, view, proj,
-		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
-	--[[
-	local cubeTri, cubeCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
 		model, view, proj,
 		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
@@ -403,3 +399,4 @@ storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 )
 
 storyboard:writeToFile2()
+print(string.format("elapsed time: %.2f\n", os.clock() - x))
