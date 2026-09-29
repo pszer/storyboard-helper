@@ -31,12 +31,18 @@ function love.load()
 		count = count + 3
 	end
 
+	local anim_data = {}
+	for i,v in ipairs(A or {}) do
+		anim_data[i] = v
+	end
+
 	local result = {
 		model_name = model_name,
 		vertices = verts_out,
 		format = v_format,
 		skeleton  = A.skeleton,
 		frames    = A.frames,
+		anims     = anim_data,
 		joint_map = A.joint_map,
 	}
 

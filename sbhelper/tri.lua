@@ -10,6 +10,7 @@ local sb_m3d = require (modules..'model')
 
 local tri = {
 	DIM = 160,
+	PIXEL_DIM,
 	set_size = 100,
 	anchor = 'TopCentre',
 	file_str_format = 'T/%d.png',
@@ -17,6 +18,8 @@ local tri = {
 	file_str_format_v3 = 'T/%dB.png',
 	orientation = -1,
 }
+
+tri.PIXEL_DIM = 1.0 / tri.DIM
 
 tri.__index = tri
 
@@ -98,25 +101,38 @@ function tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, side)
 	return x1,y1, x2,y2, x3,y3, J, K
 end
 
-function tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
+function tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side, sample_i, flip_lock)
 	local min_dist=1/0
 	local min_i=nil
 	local side=nil
 	local mJ,mK
 	local flip = false
 
-	for i,v in ipairs(tri.sample_set) do
+	local do_without_flip = true
+	local do_with_flip = true
+
+	local C_x1, C_y1, C_x2, C_y2, C_x3, C_y3
+
+	if flip_lock ~= nil then
+		if flip_lock == false then do_with_flip = false end
+		if flip_lock == true then do_without_flip = false end
+	end
+
+	local set = tri.sample_set
+	if sample_i then set = {set[sample_i]} end
+
+	for i,v in ipairs(set) do
 
 		if test_side==1 or test_side==nil then
 			local Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 1)
 
 				--- 1 
 			local dist = math.abs(v[1] - Nx3)
-			if dist < min_dist then
+			if dist < min_dist and do_without_flip then
 				side, min_dist, min_i, mJ, mK, flip = 1, dist, i, NJ,NK, false end
 
 			dist = math.abs( (1.0 - v[1]) - Nx3)
-			if dist < min_dist then
+			if dist < min_dist and do_with_flip then
 				side, min_dist, min_i, mJ, mK, flip = 1, dist, i, NJ,NK, true end
 		end
 		---
@@ -128,11 +144,11 @@ function tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 			Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 2)
 
 			dist = math.abs(v[1] - Nx3)
-			if dist < min_dist then
+			if dist < min_dist and do_without_flip then
 				side, min_dist, min_i, mJ, mK, flip = 2, dist, i, NJ,NK, false end
 
 			dist = math.abs((1.0 - v[1]) - Nx3)
-			if dist < min_dist then
+			if dist < min_dist and do_with_flip then
 				side, min_dist, min_i, mJ, mK, flip = 2, dist, i, NJ,NK, true end
 		end
 		--
@@ -144,11 +160,11 @@ function tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 			Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 3)
 
 			dist = math.abs(v[1] - Nx3)
-			if dist < min_dist then
+			if dist < min_dist and do_without_flip then
 				side, min_dist, min_i, mJ, mK, flip = 3, dist, i, NJ,NK, false end
 
 			dist = math.abs((1.0 - v[1]) - Nx3)
-			if dist < min_dist then
+			if dist < min_dist and do_with_flip then
 				side, min_dist, min_i, mJ, mK, flip = 3, dist, i, NJ,NK, true end
 		end
 		--
@@ -160,7 +176,7 @@ function tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, test_side)
 	return min_i,side,mJ,mK,flip, tri_error
 end
 
-function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side)
+function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side, flip)
 	local min_dist=1/0
 	local min_i=nil
 	local side=nil
@@ -174,11 +190,11 @@ function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side)
 
 			--- 1 
 		local dist = math.abs(v[1] - Nx3)
-		if dist < min_dist then
+		if dist < min_dist and not flip then
 			side, min_dist, min_i, mJ, mK, flip = 1, dist, i, NJ,NK, false end
 
 		dist = math.abs( (1.0 - v[1]) - Nx3)
-		if dist < min_dist then
+		if dist < min_dist and flip then
 			side, min_dist, min_i, mJ, mK, flip = 1, dist, i, NJ,NK, true end
 	end
 	---
@@ -190,11 +206,11 @@ function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side)
 		Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 2)
 
 		dist = math.abs(v[1] - Nx3)
-		if dist < min_dist then
+		if dist < min_dist and not flip then
 			side, min_dist, min_i, mJ, mK, flip = 2, dist, i, NJ,NK, false end
 
 		dist = math.abs((1.0 - v[1]) - Nx3)
-		if dist < min_dist then
+		if dist < min_dist and flip then
 			side, min_dist, min_i, mJ, mK, flip = 2, dist, i, NJ,NK, true end
 	end
 	--
@@ -206,11 +222,11 @@ function tri:getSourceTriError(x1,y1, x2,y2, x3,y3, source_i, test_side)
 		Nx1,Ny1,Nx2,Ny2,Nx3,Ny3, NJ,NK = tri:normaliseTriangle(x1,y1, x2,y2, x3,y3, 3)
 
 		dist = math.abs(v[1] - Nx3)
-		if dist < min_dist then
+		if dist < min_dist and not flip then
 			side, min_dist, min_i, mJ, mK, flip = 3, dist, i, NJ,NK, false end
 
 		dist = math.abs((1.0 - v[1]) - Nx3)
-		if dist < min_dist then
+		if dist < min_dist and flip then
 			side, min_dist, min_i, mJ, mK, flip = 3, dist, i, NJ,NK, true end
 	end
 	--
@@ -276,6 +292,9 @@ function tri:getSpriteForTriangle(T, Cols, params)
 	local Sx = 1
 	if flip==true then Sx=-1 end
 
+	local edge_padding = sb_config['3d-scale-padding']
+	local sc_pad = edge_padding * tri.PIXEL_DIM
+
 	local result = {}
 	result.anchor = sb_anchor:out(tri.anchor)
 	result.side   = side
@@ -288,7 +307,7 @@ function tri:getSpriteForTriangle(T, Cols, params)
 
 	result.pos    = { x,y }
 	result.rot    =  angle
-	result.vector = { Sx*J/tri.DIM, K/tri.DIM }
+	result.vector = { Sx*J/tri.DIM+sc_pad, K/tri.DIM+sc_pad }
 	result.tri_error = tri_error
 
 	local v_map = {1,2,3}
@@ -335,40 +354,75 @@ function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 	local T1 = tri:getSpriteForTriangle(tri1, cols1)
 	if not T1 then return nil end
 
-	local T1alt = tri:getSpriteForTriangle(tri1, cols1, {alt_side=true})
-
-	-- test which side is better
 	--
-	local weight1 = sb_config["3d-interp-1-weight"]
-	local weight2 = sb_config["3d-interp-2-weight"]
-	
+	--
+	-- Determine which side creates the better end result visual.
+	--
+	--
+	--
+	local T1alt = tri:getSpriteForTriangle(tri1, cols1, {alt_side=true})
 	local x1,y1, x2,y2, x3,y3 = tri2[1], tri2[2], tri2[3], tri2[4],tri2[5], tri2[6]
 
-	local err_a_1 = tri:getSourceTriError(x1,y1, x2,y2, x3,y3, T1.sample_i, T1.side)
-	local err_a_2 = T1.tri_error
-	local err_b_1 = tri:getSourceTriError(x1,y1, x2,y2, x3,y3, T1alt.sample_i, T1alt.side)
-	local err_b_2 = T1alt.tri_error
+	local lengthT1side
+	local lengthT1altside
 
-	err_a_1 = err_a_1 * math.sqrt(weight1)
-	err_b_1 = err_b_1 * math.sqrt(weight1)
-	err_a_2 = err_a_2 * math.sqrt(weight2)
-	err_b_2 = err_b_2 * math.sqrt(weight2)
+	--- Calculate the length of the primary sides used. If one is much smaller it will typically
+	--- create worse results if used
+	---
+	if T1.side == 1 then lengthT1side = math.sqrt(  (tri1[3]-tri1[1])*(tri1[3]-tri1[1]) + (tri1[4]-tri1[2])*(tri1[4]-tri1[2]) ) end
+	if T1.side == 2 then lengthT1side = math.sqrt(  (tri1[5]-tri1[3])*(tri1[5]-tri1[3]) + (tri1[6]-tri1[4])*(tri1[6]-tri1[4]) ) end
+	if T1.side == 3 then lengthT1side = math.sqrt(  (tri1[1]-tri1[5])*(tri1[1]-tri1[5]) + (tri1[2]-tri1[6])*(tri1[2]-tri1[6]) ) end
+	if T1alt.side == 1 then lengthT1altside = math.sqrt(  (tri1[3]-tri1[1])*(tri1[3]-tri1[1]) + (tri1[4]-tri1[2])*(tri1[4]-tri1[2]) ) end
+	if T1alt.side == 2 then lengthT1altside = math.sqrt(  (tri1[5]-tri1[3])*(tri1[5]-tri1[3]) + (tri1[6]-tri1[4])*(tri1[6]-tri1[4]) ) end
+	if T1alt.side == 3 then lengthT1altside = math.sqrt(  (tri1[1]-tri1[5])*(tri1[1]-tri1[5]) + (tri1[2]-tri1[6])*(tri1[2]-tri1[6]) ) end
 
-	local err = (err_a_1*err_a_1 + err_a_2*err_a_2)
-	local err_alt = (err_b_1*err_b_1 + err_b_2*err_b_2)
-
-	if err_alt < err then
+	local length_threshold = sb_config["3d-larger-size-priority-scalar"]
+	if lengthT1side > lengthT1altside*length_threshold then
+		T1 = T1
+	elseif lengthT1altside > lengthT1side*length_threshold then
 		T1 = T1alt
+
+		-- if no side is significantly longer, test error values VVV
+	else
+		-- test which side is better through an error estimate
+		--
+		local weight1 = sb_config["3d-interp-1-weight"]
+		local weight2 = sb_config["3d-interp-2-weight"]
+		
+
+		local err_a_1 = tri:getSourceTriError(x1,y1, x2,y2, x3,y3, T1.sample_i, T1.side, T1.flip)
+		local err_a_2 = T1.tri_error
+		local err_b_1 = tri:getSourceTriError(x1,y1, x2,y2, x3,y3, T1alt.sample_i, T1alt.side, T1alt.flip)
+		local err_b_2 = T1alt.tri_error
+
+		err_a_1 = err_a_1 * math.sqrt(weight1)
+		err_b_1 = err_b_1 * math.sqrt(weight1)
+		err_a_2 = err_a_2 * math.sqrt(weight2)
+		err_b_2 = err_b_2 * math.sqrt(weight2)
+
+		local err = (err_a_1*err_a_1 + err_a_2*err_a_2)
+		local err_alt = (err_b_1*err_b_1 + err_b_2*err_b_2)
+
+		if err_alt < err then
+			T1 = T1alt
+		end
 	end
+	--
+	-- ^^ Side determined
 	--
 
 	local side = T1.side
 	local sample_i = T1.sample_i
 	local atan2 = math.atan
 
-	local T_i, _, J,K, flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, side)
+	local T_i, _, J,K, T2_flip = tri:getClosestSourceTri(x1,y1, x2,y2, x3,y3, side, T1.sample_i, T1.flip)
 	local orientation = tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	local x,y,angle
+
+	if T2_flip ~= T1.flip then print("huh") end
+
+	local edge_padding = sb_config['3d-scale-padding']
+	local sc_pad = edge_padding * tri.PIXEL_DIM
 
 	flip = T1.flip
 
@@ -389,6 +443,19 @@ function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 		angle = angle + 2*math.pi
 	end
 
+	--if math.abs(angle - T1.rot) > 0.0 then
+	--	angle = T1.rot
+	--end
+
+	--[[
+	if math.abs(angle - T1.rot) > 0.1 then
+		print()
+		print(angle, T1.rot)
+		print(T2_flip, T1.flip, T1.side, _)
+		print(x1,y1,x2,y2,x3,y3)
+		print(tri1[1], tri1[2], tri1[3], tri1[4], tri1[5], tri1[6])
+	end--]]
+
 	local Sx = 1
 	if flip==true then Sx=-1 end
 
@@ -405,7 +472,7 @@ function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 
 	result.pos    = { x,y }
 	result.rot    =  angle
-	result.vector = { Sx*J/tri.DIM, K/tri.DIM }
+	result.vector = { Sx*J/tri.DIM + sc_pad, K/tri.DIM + sc_pad}
 
 	local v_map = {1,2,3}
 	if     side == 1 and flip == true then
@@ -518,18 +585,6 @@ function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats
 		local v1_col = frag_shader(v1_pos, v1_norm, v1_c)
 		local v2_col = frag_shader(v2_pos, v2_norm, v2_c)
 		local v3_col = frag_shader(v3_pos, v3_norm, v3_c)
-
-		--[[
-		print('--------\n')
-		print(v1_pos, v1_norm)
-		print(v1_x, v1_y)
-		print(' ')
-		print(v2_pos, v2_norm)
-		print(v2_x, v2_y)
-		print(' ')
-		print(v3_pos, v3_norm)
-		print(v3_x, v3_y)
-		print(' \n\n')--]]
 
 		table.insert(Triangles, {v1_x,v1_y, v2_x,v2_y, v3_x,v3_y})
 		table.insert(Colors   , {v1_col, v2_col, v3_col})

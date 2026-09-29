@@ -218,12 +218,21 @@ function m3d:loadModelTable(filename)
 	local m_t = dofile(filename)
 	sb_log:assert(type(m_t)=="table", "m3d.loadModelTable(): table expected, '%s' is a '%s'.", filename, type(m_t))
 
+	m_t.filename = filename
+
 	-- precalc offsets
 	local count=1
 	for i,v in ipairs(m_t.format) do
 		v.offset = count
 		m_t.format[v[1]] = {count,count+v[3]-1}
 		count = count + v[3]
+	end
+
+	for i,v in ipairs(m_t.anims) do
+		m_t.anims[v.name] = v
+	end
+	if m_t.frames and m_t.skeleton then
+		m3d:setupAnimations(m_t)
 	end
 
 	return m_t
@@ -343,6 +352,135 @@ function m3d:basicDiffuseColor(vertex, normal, color, light)
 	local B_x = (dot * (light_col[3]/255) + amb[3]/255) * color[3]
 
 	return {R_x, G_x, B_x}
+end
+
+function m3d:setupAnimations(m_t)
+	m3d:generateBaseFrames(m_t)
+	m3d:generateAnimationFrames(m_t)
+
+	m_t.outframe_buffer = {}
+	for i=1,#m_t.skeleton do
+		m_t.outframe_buffer = cpml.mat4.new()
+	end
+end
+
+function m3d:generateBaseFrames(m_t)
+	local skeleton = m_t.skeleton
+
+	m_t.baseframe = {}
+	m_t.inversebaseframe = {}
+
+	for bone_id,bone in ipairs(skeleton) do
+		local position_v = bone.position
+		local rotation_q = bone.rotation
+		local scale_v = bone.scale
+
+		local bone_pos_v = cpml.vec3.new(position_v[1], position_v[2], position_v[3])
+		local bone_rot_q = cpml.quat.new(rotation_q[1], rotation_q[2], rotation_q[3], rotation_q[4])
+		bone_rot_q = bone_rot_q:normalize()
+		local bone_scale_v = cpml.vec3.new(scale_v[1], scale_v[2], scale_v[3])
+
+		local rotation_u = cpml.mat4.from_quaternion( bone_rot_q )
+		local position_u = cpml.mat4.new(1)
+		local scale_u    = cpml.mat4.new(1)
+
+		position_u:translate(position_u, bone_pos_v)
+		scale_u:scale(scale_u, bone_scale_v)
+
+		local matrix = position_u * rotation_u * scale_u
+		local invmatrix = cpml.mat4():invert(matrix)
+
+		m_t.baseframe[bone_id] = matrix
+		m_t.inversebaseframe[bone_id] = invmatrix
+
+		if bone.parent > 0 then -- if bone has a parent
+			m_t.baseframe[bone_id] = m_t.baseframe[bone.parent] * m_t.baseframe[bone_id]
+			m_t.inversebaseframe[bone_id] = m_t.inversebaseframe[bone_id] * m_t.inversebaseframe[bone.parent]
+		end
+
+		bone.offset = matrix
+	end
+end
+
+function m3d:generateAnimationFrames(m_t)
+	local Frames = m_t.frames
+	m_t.old_frames = m_t.frames
+	m_t.frames = {}
+
+	for frame_i, frame in ipairs(Frames) do
+		m_t.frames[frame_i] = {}
+		local output_frames = m_t.frames[frame_i]
+
+		for pose_i, pose in ipairs(frame) do
+			
+			local position = pose.translate
+			local rotation = pose.rotate
+			local scale = pose.scale
+
+			local pos_v = cpml.vec3.new(position[1], position[2], position[3])
+			local rot_q = cpml.quat.new(rotation[1], rotation[2], rotation[3], rotation[4])
+			rot_q = rot_q:normalize()
+			local scale_v = cpml.vec3.new(scale[1], scale[2], scale[3])
+
+			local position_u = cpml.mat4.new(1)
+			local rotation_u = cpml.mat4.from_quaternion( rot_q )
+			local scale_u    = cpml.mat4.new(1)
+
+			position_u:translate(position_u, pos_v)
+			scale_u:scale(scale_u, scale_v)
+
+			--local matrix = scale_u * rotation_u * position_u
+			local matrix = position_u * rotation_u * scale_u
+			local invmatrix = cpml.mat4():invert(matrix)
+
+			local bone = m_t.skeleton[pose_i]
+
+			if bone.parent > 0 then -- if bone has a parent
+				output_frames[pose_i] = m_t.baseframe[bone.parent] * matrix * m_t.inversebaseframe[pose_i]
+			else
+				output_frames[pose_i] = matrix * m_t.inversebaseframe[pose_i]
+			end
+		end
+	end
+end
+
+function m3d:getAnimation(m_t, anim_name)
+	sb_log:assert(anim_name, "m3d.getAnimation(): expected animation name.")
+	local A = m_t.anims[anim_name]	
+	sb_log:assert(A, "m3d.getAnimation(): no animation '%s' in '%s'.", anim_name, m_t.filename)
+end
+
+function m3d:interpolateTwoFrames(m_t, frame1, frame2, interp)
+	local skeleton = m_t.skeleton
+
+	local mat4 = cpml.mat4
+	local mat4new = mat4.new
+	local mat4mul = mat4.mul
+
+	local frame_interp   = interp
+	local frame_interp_i = 1.0 - interp
+
+	local temp_mat = mat4new()
+
+	local outframe = m_t.outframe_buffer
+
+	for i,pose1 in ipairs(frame1) do
+		pose2 = frame2[i]
+
+		for j=1,16 do
+			outframe[i][j] =
+			 (frame_interp_i)*pose1[j] + frame_interp*pose2[j]
+		end
+
+		local parent_i = skeleton[i].parent
+		if parent_i > 0 then
+			mat4mul(outframe[i], outframe[parent_i], outframe[i])
+		else
+			--outframe[i] = outframe[i]
+		end
+	end
+
+	return outframe
 end
 
 return m3d

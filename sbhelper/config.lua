@@ -28,8 +28,10 @@ local config = {
 	["output-fade-decimal-points"] = 2,
 	["output-colour-decimal-points"] = 0,
 
-	["3d-interp-1-weight"] = 0.5,
-	["3d-interp-2-weight"] = 0.6,
+	["3d-interp-1-weight"] = 0.6,
+	["3d-interp-2-weight"] = 0.4,
+	["3d-scale-padding"] = 2.1,
+	["3d-larger-size-priority-scalar"] = 3.0,
 
 	["unsorted-output"] = false,
 	["whitespace"] = "_",
