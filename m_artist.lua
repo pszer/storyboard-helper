@@ -339,11 +339,10 @@ for t = 14000, 27500, 1000/30 do
 				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)--]]
 
 	local T1s = {}--]]
-	if lastTri then
+	if lastTri and nitoTri then
 
 		for i,v in ipairs(nitoTri) do
 			local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastCols[i], v, nitoCols[i])
-
 			--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
 
 			if T1 then

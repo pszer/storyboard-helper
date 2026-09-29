@@ -61,6 +61,25 @@ local function rotate(x,y, cos, sin)
 	return X,Y
 end
 
+function tri:triangleVisible(tri, y1, x2,y2, x3,y3)
+	local x1
+	if type(tri) == "table" then
+		x1,y1, x2,y2, x3,y3 = tri[1],tri[2],tri[3],tri[4],tri[5],tri[6]
+	else
+		x1 = tri
+	end
+
+	if (x1<=-107 or x1>=854) and
+	   (x2<=-107 or x2>=854) and
+	   (x3<=-107 or x3>=854) and
+	   (y1<=0 or y1>=480) and
+	   (y2<=0 or y2>=480) and
+	   (y3<=0 or y3>=480)
+	then
+	 return false end
+	return true
+end
+
 function tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	local dx1,dy1 = x2-x1, y2-y1
 	local dx2,dy2 = x3-x1, y3-y1
@@ -258,6 +277,8 @@ end
 -- (vector is automatically given the correct negative scale in case of flip)
 --
 function tri:getSpriteForTriangle(T, Cols, params)
+	if not tri:triangleVisible(T) then return nil end
+
 	local params = params or {}
 	local params_alt_side = params.alt_side or false
 	local cull = params.backwards_cull or tri.orientation or -1

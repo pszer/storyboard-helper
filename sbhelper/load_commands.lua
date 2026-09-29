@@ -33,6 +33,7 @@ function command:addDefinition(def, ...)
 		}, {__index=_G})-]]
 		local env = setmetatable(
 			{sb=require (modules..'storyboard')}, {__index=_G})
+		env.sb.evalroot = require (modules..'evalroot')
 
 		local searchf, searcherr = package.searchpath(modules..def, package.path)
 		sb_log:assert(searchf, "command.addDefinition(): couldn't get %s, %s", def, searcherr)
@@ -95,6 +96,7 @@ function command:addDefinition(def, ...)
 end
 
 command:addDefinition('commands.root'       , '__root__', 'root')
+command:addDefinition('commands.looposb'    , '__loop__', 'loop')
 command:addDefinition('commands.move'       , 'm', 'move')
 command:addDefinition('commands.movex'      , 'mx', 'movex', 'move_x', 'm_x')
 command:addDefinition('commands.movey'      , 'my', 'movey', 'move_y', 'm_y')

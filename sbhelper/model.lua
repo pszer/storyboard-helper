@@ -235,6 +235,15 @@ function m3d:loadModelTable(filename)
 		m3d:setupAnimations(m_t)
 	end
 
+	sb_log:printf("Loaded model '%s'", filename)
+	sb_log:printf("* %s triangles'", math.floor(#m_t.vertices/3.0))
+	sb_log:printf("* %s bones'", #m_t.skeleton)
+	sb_log:printf("* %s animation frames'", #m_t.frames)
+	sb_log:printf("* %s animation defs'", #m_t.anims)
+	for i,v in ipairs(m_t.anims) do
+		sb_log:printf("  - '%s' [%s,%s] @%sfps%s", v.name, v.first, v.last, v.framerate, v.loop and (" (looping)") or "")
+	end
+
 	return m_t
 end
 

@@ -16,6 +16,12 @@ function sb_ir:new(...)
 	return t
 end
 
+function sb_ir:newCompound(inner, ...)
+	local t = {..., inner=inner}
+	setmetatable(t,sb_ir)
+	return t
+end
+
 aa="S,0,50,100,0,1"
 aa="M,0,50,100,0,0,1,1"
 
@@ -119,6 +125,12 @@ function sb_ir:out()
 		result=result..x
 		if i<c and not skip_comma then
 			result=result..","
+		end
+	end
+
+	if self.inner then
+		for i,v in ipairs(self.inner) do
+			result = result..'\n'..v:out()
 		end
 	end
 
