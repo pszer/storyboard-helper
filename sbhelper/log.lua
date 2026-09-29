@@ -51,6 +51,37 @@ function log:printf(fstr, ...)
 	end
 end
 
+function log:initProgressBar(r, width)
+	local result = ""
+	for i=1,width do
+		if (width-i)/width < (1.0-r) then
+			result = result..'-'
+		else
+			result = result..'#'
+		end
+	end
+	result = result.." "..math.floor(r*100).."%"
+	--log:printf(result)
+	self.__out:write(result)
+
+	return function(r)
+		local result = "\r"
+		for i=1,width do
+			if (width-i)/width < (1.0-r) then
+				result = result..'-'
+			else
+				result = result..'#'
+			end
+		end
+	result = result.." "..math.floor(r*100).."%     "
+		self.__out:write(result)
+	end
+end
+
+function log:clearProgressBar()
+	self.__out:write('\r\rDone.                   \n')
+end
+
 function log:warn(fstr, ...)
 	local str = "//[warning] "
 

@@ -315,10 +315,12 @@ local nitoModel = sb.m3d:loadModelTable('cubeAnim.txt')
 sb.m3d:fixAttribute(nitoModel, 'VertexColor', 0, 255)
 --sb.m3d:addAttributeToModel(nitoModel, 'VertexColor', 'byte', 3, {255,255,255})
 
+local progressB = sb.log:initProgressBar(0, 16)
 ---3dd
 ---
 local lastTri, lastCols, lastT1 = nil, nil, nil
 for t = 14000, 27500, 1000/30 do
+	progressB(1.0 - (27500-t)/(27500-14000))
 	--print(t)
 
 	local diff = (t - 14000)/1000
@@ -354,6 +356,7 @@ for t = 14000, 27500, 1000/30 do
 	lastTri = nitoTri
 	lastCols = nitoCols
 end--]]
+sb.log:clearProgressBar()
 
 
 -- switch between badly cropped version to better
