@@ -318,10 +318,10 @@ sb.m3d:fixAttribute(nitoModel, 'VertexColor', 0, 255)
 ---3dd
 ---
 local lastTri, lastCols, lastT1 = nil, nil, nil
-for t = 15000, 25000, 1000/30 do
+for t = 14000, 27500, 1000/24 do
 	--print(t)
 
-	local diff = (t - 15000)/1000
+	local diff = (t - 14000)/1000
 
 	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.3+2.2*math.sin(diff/1.9),math.cos(diff*1.4),math.cos(diff/3)})
 	--local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {-math.pi/2+0.5,math.sin(diff/2.6)+math.pi,0})
@@ -342,7 +342,7 @@ for t = 15000, 25000, 1000/30 do
 			--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
 
 			if T1 then
-				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/30))
+				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/24))
 			end
 		end
 	end

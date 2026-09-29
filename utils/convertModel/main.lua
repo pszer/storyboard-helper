@@ -35,7 +35,9 @@ function love.load()
 		model_name = model_name,
 		vertices = verts_out,
 		format = v_format,
-		anims = A
+		skeleton  = A.skeleton,
+		frames    = A.frames,
+		joint_map = A.joint_map,
 	}
 
 	print('return' .. serialise(result))

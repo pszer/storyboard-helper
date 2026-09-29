@@ -196,7 +196,7 @@ end
 --
 -- {
 --	model_name = string,
---	vertces = table,
+--	vertices = table,
 --	format = vertex format table
 --	anims = A
 --}
