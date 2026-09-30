@@ -319,20 +319,21 @@ local progressB = sb.log:initProgressBar(0, 16)
 ---3dd
 ---
 local lastTri, lastCols, lastT1 = nil, nil, nil
-for t = 14000, 27500, 1000/30 do
+for t = 14000, 27500, 1000/25 do
 	progressB(1.0 - (27500-t)/(27500-14000))
 	--print(t)
 
 	local diff = (t - 14000)/1000
 
-	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.3+2.2*math.sin(diff/1.9),math.cos(diff/1.4),math.cos(diff/3)})
+	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.6*math.sin(diff/1.9)-math.pi,math.pi/2+1.6*math.cos(diff/1.4),math.pi/2+1.2*math.cos(diff/3)})	
 	--local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {-math.pi/2+0.5,math.sin(diff/2.6)+math.pi,0})
 
 	local light_dir = {0,1/2^0.5,-1/2^0.5}
 
 	local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(nitoModel.vertices, nitoModel.format,
 		model, view, proj,
-		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
+		sb.m3d:getAnimationFrame(nitoModel, 'Wiggle', diff*1.8, true),
+		function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)--]]
 
 	--[[local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
@@ -348,14 +349,14 @@ for t = 14000, 27500, 1000/30 do
 			--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
 
 			if T1 then
-				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/30))
+				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/25))
 			end
 		end
 	end
 
 	lastTri = nitoTri
 	lastCols = nitoCols
-end--]]
+end
 sb.log:clearProgressBar()
 
 

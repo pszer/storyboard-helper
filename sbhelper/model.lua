@@ -299,6 +299,7 @@ local __norm_vec3 = cpml.vec3.new()
 -- returns vec3 pos, vec3 normal, vec3, color, screen_x, screen_y
 --
 --
+local deform_mat = cpml.mat4.new()
 function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
 	local Pos_i,Pos_j = m3d:getVertexAttributeIndex(format, 'VertexPosition')
 	__pos_reg[1]=vertex[Pos_i]
@@ -306,10 +307,34 @@ function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
 	__pos_reg[3]=vertex[Pos_i+2]
 	__pos_reg[4]=1.0
 
+	if bone_mats then
+		local VertexBone_i, VertexBone_j = m3d:getVertexAttributeIndex(format, 'VertexBone')
+		local VertexWeight_i, VertexWeight_j = m3d:getVertexAttributeIndex(format, 'VertexWeight')
+
+
+		--[[
+		local deform_mat =
+			bone_mats[ math.floor(vertex[VertexBone_i+0]*255.0) ] * vertex[VertexWeight_i+0] +
+			bone_mats[ math.floor(vertex[VertexBone_i+1]*255.0) ] * vertex[VertexWeight_i+1] +
+			bone_mats[ math.floor(vertex[VertexBone_i+2]*255.0) ] * vertex[VertexWeight_i+2] +
+			bone_mats[ math.floor(vertex[VertexBone_i+3]*255.0) ] * vertex[VertexWeight_i+3]--]]
+		for i=1,16 do
+			deform_mat[i]=0 end
+
+		for i=0,3 do
+			local bm = bone_mats[ math.floor(vertex[VertexBone_i+i]*255.0)+1 ]
+			local scalar = vertex[VertexWeight_i+i]
+
+			for j=1,16 do
+				deform_mat[j] = deform_mat[j] + bm[j]*scalar
+			end
+		end
+		cpml.mat4.mul_vec4(__pos_reg, deform_mat, __pos_reg)
+	end
+
 	-- multiply by model matrix, then camera view+perspective matrix
 	cpml.mat4.mul_vec4(__pos_reg, model_m, __pos_reg)
 	cpml.mat4.mul_vec4(__pos_reg, view_m, __pos_reg)
-
 
 	cpml.mat4.mul_vec4(__screen_reg, proj_m, __pos_reg)
 
@@ -369,7 +394,7 @@ function m3d:setupAnimations(m_t)
 
 	m_t.outframe_buffer = {}
 	for i=1,#m_t.skeleton do
-		m_t.outframe_buffer = cpml.mat4.new()
+		m_t.outframe_buffer[i] = cpml.mat4.new()
 	end
 end
 
@@ -457,6 +482,47 @@ function m3d:getAnimation(m_t, anim_name)
 	sb_log:assert(anim_name, "m3d.getAnimation(): expected animation name.")
 	local A = m_t.anims[anim_name]	
 	sb_log:assert(A, "m3d.getAnimation(): no animation '%s' in '%s'.", anim_name, m_t.filename)
+	return A
+end
+
+function m3d:getAnimationFrame(m_t, anim_name, time, force_loop)
+	local anim = m3d:getAnimation(m_t, anim_name)
+	local dT = 1.0 / anim.framerate -- time per frame
+
+	local frame_t = time / dT
+
+	local start_i = anim.first
+	local end_i   = anim.last
+	local looping = anim.loop
+
+	if force_loop then looping = true end
+
+	local frame_i = start_i + frame_t
+
+	local fi1, fi2
+
+	if not looping and frame_i < start_i then frame_i = start_i end
+	if not looping and frame_i > end_i   then frame_i = end_i end
+	if not looping then
+		fi1 = math.floor(frame_i)
+		fi2 = math.ceil(frame_i)
+
+		if fi1==fi2 then fi2=fi1+1 end
+		if fi2 > end_i then fi2 = end_i end
+	else
+		local wrap = math.fmod(frame_t, end_i-start_i)
+		if wrap<0 then wrap = wrap + end_i-start_i end -- ensure positive
+
+		frame_i = start_i + wrap
+		fi1 = math.floor(frame_i)
+		fi2 = math.ceil(frame_i)
+
+		if fi1==fi2 then fi2=fi1+1 end
+		if fi2 > end_i then fi2 = start_i end
+	end
+
+	local interp_i = frame_i - fi1
+	return m3d:interpolateTwoFrames(m_t, m_t.frames[fi1], m_t.frames[fi2], interp_i)
 end
 
 function m3d:interpolateTwoFrames(m_t, frame1, frame2, interp)
@@ -475,10 +541,10 @@ function m3d:interpolateTwoFrames(m_t, frame1, frame2, interp)
 
 	for i,pose1 in ipairs(frame1) do
 		pose2 = frame2[i]
-
 		for j=1,16 do
-			outframe[i][j] =
-			 (frame_interp_i)*pose1[j] + frame_interp*pose2[j]
+			local A = (frame_interp_i)*pose1[j]
+			local B = frame_interp*pose2[j]
+			outframe[i][j] = A+B
 		end
 
 		local parent_i = skeleton[i].parent

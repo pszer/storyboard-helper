@@ -81,6 +81,10 @@ function tri:triangleVisible(tri, y1, x2,y2, x3,y3)
 end
 
 function tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
+	if type(x1)=="table" then
+		x1,y1,x2,y2,x3,y3 = x1[1],x1[2],x1[3],x1[4],x1[5],x1[6]
+	end
+
 	local dx1,dy1 = x2-x1, y2-y1
 	local dx2,dy2 = x3-x1, y3-y1
 	local result = dx1*dy2 - dy1*dx2
@@ -261,6 +265,76 @@ function tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 		return 1,2
 	end
 	return 2,3
+end
+
+function tri:triangleOverlap(tri1, tri2)
+	local ax, ay = a[1], a[2]
+	local bx, by = a[3], a[4]
+	local cx, cy = a[5], a[6]
+
+	local dx, dy = b[1], b[2]
+	local ex, ey = b[3], b[4]
+	local fx, fy = b[5], b[6]
+
+	local function separated(nx, ny)
+		local amin = math.huge
+		local amax = -math.huge
+		local bmin = math.huge
+		local bmax = -math.huge
+
+		local p = ax * nx + ay * ny
+		amin = math.min(amin, p)
+		amax = math.max(amax, p)
+
+		p = bx * nx + by * ny
+		amin = math.min(amin, p)
+		amax = math.max(amax, p)
+
+		p = cx * nx + cy * ny
+		amin = math.min(amin, p)
+		amax = math.max(amax, p)
+
+		p = dx * nx + dy * ny
+		bmin = math.min(bmin, p)
+		bmax = math.max(bmax, p)
+
+		p = ex * nx + ey * ny
+		bmin = math.min(bmin, p)
+		bmax = math.max(bmax, p)
+
+		p = fx * nx + fy * ny
+		bmin = math.min(bmin, p)
+		bmax = math.max(bmax, p)
+
+		return amax <= bmin or bmax <= amin
+	end
+
+	local function testEdge(x1, y1, x2, y2)
+		-- Perpendicular to edge
+		local nx = -(y2 - y1)
+		local ny =  (x2 - x1)
+
+		return separated(nx, ny)
+	end
+
+	if testEdge(ax, ay, bx, by) then return false end
+	if testEdge(bx, by, cx, cy) then return false end
+	if testEdge(cx, cy, ax, ay) then return false end
+
+	if testEdge(dx, dy, ex, ey) then return false end
+	if testEdge(ex, ey, fx, fy) then return false end
+	if testEdge(fx, fy, dx, dy) then return false end
+
+	return true
+end
+
+function tri:centroid(v1,v2,v3)
+	return (v1.x + v2.x + v3.x)/3.0,
+	       (v1.y + v2.y + v3.y)/3.0,
+	       (v1.z + v2.z + v3.z)/3.0
+end
+function tri:centroidZ(v1,v2,v3)
+	return (v1.z + v2.z + v3.z)/3.0
 end
 
 local function vec3Eq(a,b)
@@ -599,19 +673,68 @@ function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats
 	local m3d = sb_m3d
 
 	for i=1, #verts, 3 do
-		local v1_pos, v1_norm, v1_c, v1_x, v1_y = m3d:vertexOut(verts[i+0], format, model_m, view_m, proj_m, bonemats)
-		local v2_pos, v2_norm, v2_c, v2_x, v2_y = m3d:vertexOut(verts[i+1], format, model_m, view_m, proj_m, bonemats)
-		local v3_pos, v3_norm, v3_c, v3_x, v3_y = m3d:vertexOut(verts[i+2], format, model_m, view_m, proj_m, bonemats)
+		local v1_pos, v1_norm, v1_c, v1_x, v1_y = m3d:vertexOut(verts[i+0], format, model_m, view_m, proj_m, bone_mats)
+		local v2_pos, v2_norm, v2_c, v2_x, v2_y = m3d:vertexOut(verts[i+1], format, model_m, view_m, proj_m, bone_mats)
+		local v3_pos, v3_norm, v3_c, v3_x, v3_y = m3d:vertexOut(verts[i+2], format, model_m, view_m, proj_m, bone_mats)
 
 		local v1_col = frag_shader(v1_pos, v1_norm, v1_c)
 		local v2_col = frag_shader(v2_pos, v2_norm, v2_c)
 		local v3_col = frag_shader(v3_pos, v3_norm, v3_c)
 
-		table.insert(Triangles, {v1_x,v1_y, v2_x,v2_y, v3_x,v3_y})
+		local centroid_z = tri:centroidZ(v1_pos, v2_pos, v3_pos)
+
+		table.insert(Triangles, {v1_x,v1_y, v2_x,v2_y, v3_x,v3_y, ["centroid_z"] = centroid_z, height=1})
 		table.insert(Colors   , {v1_col, v2_col, v3_col})
 	end
 
 	return Triangles, Colors
+end
+
+--
+--
+-- triangle centroid Z is used to approximate depth order, the resulting
+-- depth stack can be used in depth-correct sprite pooling.
+--
+--
+function tri:calculateDepthStack(triangles)
+	local sorted_by_centroid = {}
+	for i,v in ipairs(triangles) do
+		local orientation = tri:getTriangleOrientation(v)
+		-- 
+		if orientation == tri.orientation and v.centroid_z > 0.0 then
+			sorted_by_centroid[i] = v
+
+			v.min_x = math.min(v[1],v[3],v[5])
+			v.min_y = math.min(v[2],v[4],v[6])
+			v.max_x = math.min(v[1],v[3],v[5])
+			v.max_y = math.min(v[2],v[4],v[6])
+		end
+	end
+	table.sort(sorted_by_centroid, function (a,b) return a.centroid_z > b.centroid_z end)
+
+	local function overlap(t1,t2)
+		-- bounding box test first
+		if t1.min_x > t2.max_x or
+			 t1.min_y > t2.max_y or
+			 t2.min_x > t1.max_x or
+			 t2_min_y > t1.max_y then
+			return false
+		end
+		return tri:triangleOverlap(t1,t2)
+	end
+	
+	local set_size = #sorted_by_centroid
+	for i=2,set_size do
+		local test_tri = sorted_by_centroid[i]
+
+		for j=i,1,-1 do
+			local O = overlap(test_tri, sorted_by_centroid[j])
+			
+			if O then
+				test_tri.height = math.max(O.height+1, test_tri.height)
+			end
+		end
+	end
 end
 
 return tri
