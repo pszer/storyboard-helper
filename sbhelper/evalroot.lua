@@ -2,7 +2,7 @@ local modules  = (...):gsub('%.[^%.]+$', '') .. "."
 local sb = require (modules..'storyboard')
 return function(easing, t, vector_a, vector_b, args, varargs)
 	for i,v in ipairs(varargs) do
-		if sb.com:equal(v,'loop') then
+		if type(v)=="table" and sb.com:equal(v,'loop') then
 			v.start_x = args.start_x
 			v.start_y = args.start_y
 			v.start_sx = args.start_sx

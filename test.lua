@@ -1,4 +1,4 @@
-local sb = require 'sb-helper'
+local sb = require 'sbhelper'
 
 storyboard = sb:new("./sb.osb")
 
