@@ -25,7 +25,19 @@ local storyboard = {
 	tri = require (modules..'tri'),
 	m3d = require (modules..'model'),
 
-	unpack = table.unpack or unpack
+	unpack = table.unpack or unpack,
+
+	concadd = function(...)
+		local args = {...}
+		local result = {}
+		for i,T in ipairs(args) do
+			for j,v in ipairs(T) do
+				table.insert(result, v)
+			end
+		end
+
+		return table.unpack(result)
+	end
 
 }
 storyboard.__index = storyboard

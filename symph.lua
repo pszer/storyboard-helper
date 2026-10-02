@@ -78,9 +78,9 @@ storyboard:newObject("sb/ellen.png", "Foreground", "Centre", 395, 405):add(
 
 storyboard:newObject("sb/Ellen.jpg", "Background", "TopLeft", -107, 242):add(
 	{'scale',0, { "0:57:722", "0:57:882"}, 0.667, 0.667},
-	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-60}},
-	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-37}},
-	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-3}},
+	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-70}},
+	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-45}},
+	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5}},
 	{'color',0, { "0:57:722", "0:57:882"}, {225,225,225}, {225,225,225}},
 	{'fade', 1, { "0:57:822", "0:59:053" }, 0,0.85 },
 	{'fade', 0, { "0:59:053", "1:01:453" }, 0.85,1 },
@@ -102,7 +102,7 @@ storyboard:newObject("sb/Ellen.jpg", "Background", "TopLeft", -107, 242):add(
 	{'color','in', { {rl2,3},{rl2,4}}, {160,160,160}, {235,235,235}}
 )
 
-storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 142):add(
+storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 122):add(
 	{'scale',0, { {rl1,107*4-1}, {rl1,107*4-1} }, 0.667, 0.667},
 	{'fade', 'out',  { {rl1,107*4-1}, {rl1,107*4-1} }, 1,1 },
 	{'moverel', 'sineIn',  { {rl1,107*4-1}, {rl1,111*4} }, {0,0},{0,22} },
@@ -117,7 +117,7 @@ storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 142):add(
 	{'fade', 'out',  { {rl1,166*4-1.0}, {rl1,166*4} }, 1,0 }
 )
 
-storyboard:newObject("sb/EllenI2.jpg", "Background", "TopLeft", -107, 142):add(
+storyboard:newObject("sb/EllenI2.jpg", "Background", "TopLeft", -107, 122):add(
 	{'scale',0, { {rl1,126*4-0.5}, {rl1,126*4-0.5} }, 0.667, 0.667},
 	{'fade', 'in',  { {rl1,126*4-0.5}, {rl1,126*4} }, 0,1 },
 	--{'moverel', 'sineIn',  { {rl1,107*4-1}, {rl1,111*4} }, {0,0},{0,22} },
@@ -132,7 +132,7 @@ storyboard:newObject("sb/EllenI2.jpg", "Background", "TopLeft", -107, 142):add(
 	{'fade', 'quintin',  { {rl1,150*4-0.5}, {rl1,150*4} }, 1,0 }
 )
 
-storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 142):add(
+storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 122):add(
 	{'scale',0 , { {rl1,8*4-0.5}, {rl1,8*4-0.5} }, 0.6675, 0.6675},
 	{'color',0 , { {rl1,8*4-0.5}, {rl1,8*4-0.5} }, {220,220,220},{220,220,220}},
 	{'fade', 1,  { {rl1,8*4-0.5}, {rl1,8*4+0.5} }, 0,1 },
@@ -152,10 +152,17 @@ storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 142):add(
 	{'fade', 'quintIn',  { {rl1,107*4-1}, {rl1,107*4} }, 1,0 },
 
 	{'fade', 1,  { {rl2,9*4-0.5}, {rl2,9*4} }, 0,1 },
-	{'fade', 'out',  { {rl2,41*4+2}, {rl2,43*4} }, 1,0 },
+	{'fade', 1,  { {rl2,17*4+0.5}, {rl2,17*4+0.5} }, 0,0 },
+	--{'fade', 'out',  { {rl2,41*4+2}, {rl2,43*4} }, 1,0 },
 
 	Flash({rl1, 175*4},2400, 0.8, 0.1),
 	Flash({rl2, 5*4},1600, 0.6, 0.1)
+)
+
+storyboard:newObject("sb/EllenK3.jpg", "Background", "TopLeft", -106.7, 122):add(
+	{'scale',0 , { {rl2,17*4-0.5}, {rl2,17*4-0.5} }, 0.6675, 0.6675},
+	{'fade', 1,  { {rl2,17*4-0.5}, {rl2,17*4+0.5} }, 0,1 },
+	{'fade', 'out',  { {rl2,41*4+2}, {rl2,43*4} }, 1,0 }
 )
 
 local count = 1
@@ -176,9 +183,9 @@ end
 
 storyboard:newObject("sb/EllenFlash.png", "Foreground", "TopLeft", -107, 242):add(
 	{'protract', {'parameter', { {rl1, 0}, {rl1, 0} }, value='a'}},
-	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-60}},
-	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-37}},
-	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-3}},
+	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-70}},
+	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-45}},
+	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5}},
 	Flash({rl1, 0},280, 0.5, 0.25),
 	Flash({rl1, 1},800, 0.65, 0.1),
 	Flash({rl1, 8},280, 0.2, 0.25),
@@ -296,23 +303,23 @@ storyboard:newObject("sb/EllenFlash.png", "Foreground", "TopLeft", -107, 242):ad
 	Flash({rl2, 9*4},800, 0.16, 0.1),
 	Flash({rl2, 13*4},800, 0.12, 0.1),
 	Flash({rl2, 15*4},800, 0.12, 0.1),
-	Flash({rl2, 16*4},800, 0.12, 0.1),
+	Flash({rl2, 16*4},800, 0.20, 0.1),
 
-	Flash({rl2, 25*4},800, 0.16, 0.1),
-	Flash({rl2, 29*4},800, 0.12, 0.1),
-	Flash({rl2, 31*4},800, 0.12, 0.1),
+	Flash({rl2, 25*4},800, 0.25, 0.1),
+	Flash({rl2, 29*4},800, 0.18, 0.1),
+	Flash({rl2, 31*4},800, 0.18, 0.1),
 	sb.unpack(flashes_s1)
 )
-storyboard:newObject("sb/EllenFlash2.png", "Foreground", "TopLeft", -107, 142):add(
+storyboard:newObject("sb/EllenFlash2.png", "Foreground", "TopLeft", -107, 122):add(
 	{'protract', {'parameter', { {rl1, 0}, {rl1, 0} }, value='a'}},
 	Flash({rl1, 41*4},800, 0.2, 0.1),
 	Flash({rl1, 83*4},800, 0.2, 0.1),
 	Flash({rl2, 5*4},800, 0.22, 0.1),
 	Flash({rl2, 39*4},800, 0.12, 0.1),
 	Flash({rl2, 40*4},280, 0.18, 0.25),
-	Flash({rl2, 40*4+1.5},280, 0.1, 0.25),
-	Flash({rl2, 40*4+3},280, 0.1, 0.25),
-	Flash({rl2, 41*4+2},1200, 0.18, 0.06)
+	Flash({rl2, 40*4+1.5},280, 0.18, 0.25),
+	Flash({rl2, 40*4+3},650, 0.18, 0.10),
+	Flash({rl2, 41*4+2},1200, 0.25, 0.06)
 )
 
 -- black flashes
@@ -479,7 +486,7 @@ local rl3 = {180.0,338600}
 ---
 ---
 ---
-storyboard:newObject("sb/laplace.jpg", "Background", "TopLeft", -107, 230):add(
+storyboard:newObject("sb/laplace.jpg", "Background", "TopLeft", -107, 210):add(
 	{'scale', 0, { {rl3,0*4-1}, {rl3,0*4-1} }, 0.6675, 0.6675},
 	{'moverel', 1, { {rl3,0*4-1.25}, {rl3,0*4} }, {0,0}, {0,10}},
 	{'moverel', 1, { {rl3,0*4}, {rl3,2*4} }, {0,0}, {0,9}},
@@ -488,7 +495,7 @@ storyboard:newObject("sb/laplace.jpg", "Background", "TopLeft", -107, 230):add(
 	Flash({rl3,225*4}, 600, 0.9, 0.1)
 )
 
-storyboard:newObject("sb/rem1.jpg", "Background", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/rem1.jpg", "Background", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3,8*4}, {rl3,8*4} }, 0.6675, 0.6675},
 	{'fade', 1, { {rl3,7*4}, {rl3,7*4} }, 1, 1},
 	{'fade', 1, { {rl3,17*4}, {rl3,17*4} }, 0, 0},
@@ -502,7 +509,7 @@ storyboard:newObject("sb/rem1.jpg", "Background", "TopLeft", -107, 249):add(
 	{'fade', 'quartIn', { {rl3,224*4}, {rl3,225*4+0.25} }, 1,0 }
 )
 
-storyboard:newObject("sb/rem2.jpg", "Background", "TopLeft", -107, 230):add(
+storyboard:newObject("sb/rem2.jpg", "Background", "TopLeft", -107, 210):add(
 	{'scale', 0, { {rl3,0*4-1}, {rl3,0*4-1} }, 0.6675, 0.6675},
 	{'moverel', 1, { {rl3,0*4-1.25}, {rl3,0*4} }, {0,0}, {0,10}},
 	{'moverel', 1, { {rl3,0*4}, {rl3,2*4} }, {0,0}, {0,9}},
@@ -530,7 +537,7 @@ storyboard:newObject("sb/rem2.jpg", "Background", "TopLeft", -107, 230):add(
 	{'fade',  'In', { {rl3,194*4-0.5}, {rl3,194*4} }, 0.8,1}
 )
 
-storyboard:newObject("sb/rem2high.png", "Background", "TopLeft", -107, 230):add(
+storyboard:newObject("sb/rem2high.png", "Background", "TopLeft", -107, 210):add(
 	{'scale', 0, { {rl3,0*4-1}, {rl3,0*4-1} }, 0.6675, 0.6675},
 	{'moverel', 1, { {rl3,0*4-1.25}, {rl3,0*4} }, {0,0}, {0,10}},
 	{'moverel', 1, { {rl3,0*4}, {rl3,2*4} }, {0,0}, {0,9}},
@@ -538,7 +545,7 @@ storyboard:newObject("sb/rem2high.png", "Background", "TopLeft", -107, 230):add(
 	{'fade', 'quartIn', { {rl3,8*4-0.6}, {rl3,8*4+0.1} }, 0.7, 0}
 )
 
-storyboard:newObject("sb/rem3.jpg", "Background", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/rem3.jpg", "Background", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3,140*4}, {rl3,140*4} }, 0.6675, 0.6675},
 	{'fade', 2, { {rl3,140*4-0.5}, {rl3,140*4} }, 0, 1},
 	{'fade', 2, { {rl3,149*4}, {rl3,149*4} }, 0, 0},
@@ -548,13 +555,13 @@ storyboard:newObject("sb/rem3.jpg", "Background", "TopLeft", -107, 249):add(
 	{'fade', 2, { {rl3,165*4}, {rl3,165*4} }, 0, 0}
 )
 
-storyboard:newObject("sb/rem3.jpg", "Foreground", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/rem3.jpg", "Foreground", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3,156*4}, {rl3,156*4} }, 0.6675, 0.6675},
 	{'protract', {'parameter', { {rl3, 156*4}, {rl3, 156*4} }, value='a'}},
 	Flash({rl3,156*4}, 1600, 0.3, 0.08),
 	Flash({rl3,160*4}, 1600, 0.2, 0.08)
 )
-storyboard:newObject("sb/rem4.jpg", "Background", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/rem4.jpg", "Background", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3,148*4}, {rl3,148*4} }, 0.6675, 0.6675},
 	{'fade', 2, { {rl3,148*4-0.5}, {rl3,148*4} }, 0, 1},
 	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 0},
@@ -564,7 +571,7 @@ storyboard:newObject("sb/rem4.jpg", "Background", "TopLeft", -107, 249):add(
 	{'fade', 2, { {rl3,174*4-0.25}, {rl3,174*4+0.25} }, 0.9, 0}
 )
 
-storyboard:newObject("sb/rem4.jpg", "Foreground", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/rem4.jpg", "Foreground", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3,164*4}, {rl3,164*4} }, 0.6675, 0.6675},
 	{'protract', {'parameter', { {rl3, 164*4}, {rl3, 164*4} }, value='a'}},
 	Flash({rl3,164*4}, 1600, 0.3, 0.08),
@@ -572,7 +579,7 @@ storyboard:newObject("sb/rem4.jpg", "Foreground", "TopLeft", -107, 249):add(
 	Flash({rl3,172*4}, 1600, 0.2, 0.08)
 )
 
-storyboard:newObject("sb/remFlash.jpg", "Foreground", "TopLeft", -107, 230):add(
+storyboard:newObject("sb/remFlash.jpg", "Foreground", "TopLeft", -107, 210):add(
 	{'scale', 0, { {rl3, 8}, {rl3, 8} }, 0.6675, 0.6675},
 	{'moverel', 1, { {rl3,0*4-1.25}, {rl3,0*4} }, {0,0}, {0,10}},
 	{'moverel', 1, { {rl3,0*4}, {rl3,2*4} }, {0,0}, {0,9}},
@@ -634,7 +641,7 @@ storyboard:newObject("sb/remFlash.jpg", "Foreground", "TopLeft", -107, 230):add(
 	Flash({rl3,225*4+0.5}, 1800, 1.0, 0.1)
 )
 
-storyboard:newObject("sb/rem2.jpg", "Foreground", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/rem2.jpg", "Foreground", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3, 12}, {rl3, 12} }, 0.6675, 0.6675},
 	{'color', 0, { {rl3, 12}, {rl3, 12} }, {125,125,125},{125,125,125}},
 	Flash({rl3,12}, 1800, 0.25, 0.2),
@@ -667,7 +674,7 @@ storyboard:newObject("sb/rem2.jpg", "Foreground", "TopLeft", -107, 249):add(
 	Flash({rl3,188*4+7}, 300, 0.20, 0.15)
 )
 
-storyboard:newObject("sb/laplace.jpg", "Foreground", "TopLeft", -107, 249):add(
+storyboard:newObject("sb/laplace.jpg", "Foreground", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3, 127*4}, {rl3, 127*4} }, 0.6675, 0.6675},
 	Flash({rl3,127*4}, 2800, 1.0, 0.05))
 
@@ -695,6 +702,12 @@ storyboard:newObject("sb/eastern_dream.png", "Foreground", "Centre", 385, 347):a
 	{'fade', 0, { {rl3,34.15-2.0}, {rl3,36.15-2.0} }, 1.0,0 }
 )
 
+storyboard:newObject("sb/r0203.png", "Foreground", "Centre", 320, 347):add(
+	{'fade', 1, { {rl3,4*8+0.5}, {rl3,5*8} }, 0   ,1.0 },
+	{'scale',0, { {rl3,4*8}, {rl3,4*8} }, 0.41,0.41 },
+	{'fade',0, { {rl3,11*4+0.5}, {rl3,12*4} }, 1.0, 0 }
+)
+
 storyboard:newObject("sb/eosd_.png", "Foreground", "Centre", 253, 402):add(
 	{'moverel', 1, { {rl3,2+15}, {rl3,3.5+15} }, {0, 0}, {35,0}},
 	{'moverel', 0, { {rl3,3.5+15}, {rl3,5.2+15} }, {0, 0}, {7,0}},
@@ -712,8 +725,267 @@ storyboard:newObject("sb/eosd_.png", "Foreground", "Centre", 253, 402):add(
 
 local rl4={190.0, 643537}
 
+local rl4_moveIn = {
+	{'move', 'linear', { {rl4,0}, {rl4,0} }, {-107,242}, {-107,242}},
+	{'moverel', 'quartOut', { {rl4,0}, {rl4,1.5} }, {0,0}, {0,-30}},
+	{'moverel', 'linear', {{rl4,0.75}, {rl4,8}}, {0,0}, {0,-18}},
+	{'moverel', 'out', {{rl4,8}, {rl4,6*4}}, {0,0}, {0,-12}}
+}
+
+local LLLL = 34
+local rl4_int_move = {
+	{'move', 'linear', { {rl4,LLLL*4}, {rl4,LLLL*4} }, {-107,242}, {-107,183}},
+	{'moverel', 'sineIn',  { {rl4,LLLL*4-1}, {rl4,(LLLL+4)*4} }, {0,0},{0,22} },
+	{'moverel', 'linear',  { {rl4,(LLLL+3)*4}, {rl4,(LLLL+5)*4} }, {0,0},{0,12} },
+	{'moverel', 'out',  { {rl4,(LLLL+4)*4}, {rl4,(LLLL+8)*4} }, {0,0},{0,-4} },
+	{'moverel', 'linear',  { {rl4,(LLLL+8)*4}, {rl4,(LLLL+13)*4} }, {0,0},{0,-16} },
+	{'moverel', 'in',  { {rl4,(LLLL+5)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-24} },
+	{'moverel', 'linear',  { {rl4,(LLLL+12)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-16} },
+}
+
+local LLLL2 = 90
+local rl4_int_move2 = {
+	{'move', 'linear', { {rl4,LLLL2*4}, {rl4,LLLL2*4} }, {-107,242}, {-107,183}},
+	{'moverel', 'sineIn',  { {rl4,LLLL2*4-1}, {rl4,(LLLL2+4)*4} }, {0,0},{0,22} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+3)*4}, {rl4,(LLLL2+5)*4} }, {0,0},{0,12} },
+	{'moverel', 'out',  { {rl4,(LLLL2+4)*4}, {rl4,(LLLL2+8)*4} }, {0,0},{0,-4} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+8)*4}, {rl4,(LLLL2+13)*4} }, {0,0},{0,-16} },
+	{'moverel', 'in',  { {rl4,(LLLL2+5)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-24} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+12)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-16} },
+}
+
+local rl4_flashes = {
+
+}
+for i=10*4+1,16*4-1, 1 do
+	table.insert(rl4_flashes, Flash({rl4, i}, 280, 0.11, 0.1))
+end
+
+for i=75*4+1,83*4-1, 1 do
+	table.insert(rl4_flashes, Flash({rl4, i}, 280, 0.11, 0.1))
+end
 
 
+local rl4_chain_flashes = {}
+	table.insert(rl4_chain_flashes, Flash({rl4, 18*4+1}, 300, 0.14, 0.25))
+for i=18*4+2,26*4-1, 1 do
+	table.insert(rl4_chain_flashes, Flash({rl4, i}, 300, 0.22, 0.25))
+end
 
+for i=51*4+1,67*4-1, 1 do
+	table.insert(rl4_chain_flashes, Flash({rl4, i}, 300, 0.22, 0.25))
+end
+
+local rl4_black_flashes = {}
+for i=26*4+1,32*4-1, 1 do
+	table.insert(rl4_black_flashes, Flash({rl4, i}, 300, 0.15, 0.25))
+end
+
+for i=46*4+0.5,50*4-0.5, 0.5 do
+	table.insert(rl4_black_flashes, Flash({rl4, i}, 140, 0.13, 0.33))
+end
+
+for i=83*4+1,91*4-1, 1 do
+	table.insert(rl4_black_flashes, Flash({rl4, i}, 140, 0.15, 0.25))
+end
+
+for i=103*4+0.5,107*4-0.5, 0.5 do
+	table.insert(rl4_black_flashes, Flash({rl4, i}, 140, 0.13, 0.33))
+end
+
+
+storyboard:newObject("sb/HecatiaS.jpg", "Background", "TopLeft", -107, 242):add(
+	{'scale',0, { {rl4,0},{rl4,0}}, 0.667, 0.667},
+	{'fade',0,  {  {rl4,0},{rl4,0.5}}, 0, 1},
+	{'fade',0,  {  {rl4,9},{rl4,9}}, 0, 0},
+
+	sb.concadd(rl4_moveIn)
+)
+
+storyboard:newObject("sb/Hecatia.jpg", "Background", "TopLeft", -107, 242):add(
+	{'scale',0, { {rl4,0},{rl4,0}}, 0.667, 0.667},
+	{'fade','linear',  {  {rl4,0},{rl4,0}}, 0.3, 0.3},
+	{'fade','out',  {  {rl4,1.5},{rl4,1.5+0.5}}, 0.3, 0.9},
+	{'fade','out',  {  {rl4,2},{rl4,3}}, 0.9, 0.4},
+	{'fade','out',  {  {rl4,3},{rl4,3.5}}, 0.4, 0.8},
+	{'fade','circIn',  {  {rl4,3.5},{rl4,8}}, 0.8, 1},
+	{'color','quartOut',  {  {rl4,8},{rl4,9}}, {255,255,255},{230,230,230}},
+	{'fade',0,  {  {rl4,11*4},{rl4,11*4}}, 0, 0},
+
+	--{'fade' ,'linear', { {rl4,34*4-0.5},{rl4,34*4}}, 1, 1},
+	sb.concadd(rl4_moveIn)
+)
+
+storyboard:newObject("sb/HecatiaInst1.jpg", "Background", "TopLeft", -107, 242):add(
+	{'scale',0, { {rl4,34*4-0.5},{rl4,34*4-0.5}}, 0.667, 0.667},
+	{'fade' ,'linear', { {rl4,34*4-0.5},{rl4,34*4-0.5}}, 1, 1},
+	{'fade' ,'quintOut', { {rl4,50*4-0.5},{rl4,50*4+0.5}}, 1, 0},
+
+
+	{'fade' ,'linear', { {rl4,91*4-0.5},{rl4,91*4-0.5}}, 1, 1},
+	{'fade' ,'quintOut', { {rl4,107*4-0.5},{rl4,107*4+0.5}}, 1, 0},
+	sb.concadd(rl4_int_move, rl4_int_move2)
+)
+storyboard:newObject("sb/Ch1.png", "Background", "TopLeft", -107+37, 182):add(
+	{'fade' ,'in', { {rl4,50*4-0.5},{rl4,50*4}}, 0, 1},
+	{'fade' ,'linear', { {rl4,51*4},{rl4,51*4}}, 0, 0},
+
+	{'fade' ,'in', { {rl4,107*4-0.5},{rl4,107*4}}, 0, 1},
+	{'fade' ,'linear', { {rl4,108*4},{rl4,108*4}}, 0, 0}
+)
+storyboard:newObject("sb/Ch2.png", "Background", "TopLeft", -107+571, 182):add(
+	{'fade' ,'in', { {rl4,50*4-0.5+2},{rl4,50*4+2}}, 0, 1},
+	{'fade' ,'linear', { {rl4,51*4},{rl4,51*4}}, 0, 0},
+
+	{'fade' ,'in', { {rl4,107*4-0.5+2},{rl4,107*4+2}}, 0, 1},
+	{'fade' ,'linear', { {rl4,108*4},{rl4,108*4}}, 0, 0}
+)
+
+storyboard:newObject("sb/HecatiaK.jpg", "Background", "TopLeft", -107, 182):add(
+	{'scale',0, { {rl4,10*4-0.5},{rl4,10*4}}, 0.667, 0.667},
+	{'fade' ,2, { {rl4,10*4-0.5},{rl4,10*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,34*4-0.5},{rl4,34*4}}, 1, 0},
+	{'fade' ,2, { {rl4,51*4-0.5},{rl4,51*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,67*4-0.5},{rl4,67*4}}, 1, 0},
+
+	{'fade' ,2, { {rl4,75*4-0.5},{rl4,75*4}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,91*4-0.5},{rl4,91*4}}, 1, 0},
+
+	{'fade' ,2, { {rl4,108*4-0.5},{rl4,108*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,124*4-0.5},{rl4,124*4}}, 1, 0}
+)
+
+storyboard:newObject("sb/Stars1.jpg", "Background", "Centre", 320, 353):add(
+	{'scale', 'in', {{rl4,71*4}, {rl4,75*4}}, 1, 1.2},
+	{'fade', 'cubicOut', {{rl4,71*4}, {rl4,71*4}}, 1, 1},
+	{'fade', 'cubicOut', {{rl4,75*4-1}, {rl4,75*4}}, 1, 0}
+)
+
+storyboard:newObject("sb/Stars2.jpg", "Background", "Centre", 320, 353):add(
+	{'fade', 'cubicOut', {{rl4,68*4}, {rl4,71*4-0.5}}, 0, 1},
+	{'scale', 'SineOut', {{rl4,68*4}, {rl4,71*4}}, 1.2, 1},
+	{'fade', 'cubicOut', {{rl4,71*4-0.5}, {rl4,71*4+0.5}}, 1, 0}
+)
+
+storyboard:newObject("sb/Moon.png", "Foreground", "Centre", 320, 353):add(
+	{'protract', {'parameter', { {rl4, 75*4}, {rl4, 75*4} }, value='a'}},
+	{'scale', 'in', {{rl4,71*4}, {rl4,75*4}}, 0.528, 0.9},
+	Flash({rl4,71*4}, 600, 1.5, 0.1),
+	Flash({rl4,71*4 + 2*1}, 600, 0.5, 0.1),
+	Flash({rl4,71*4 + 2*2}, 600, 0.5, 0.1),
+	Flash({rl4,71*4 + 2*3}, 600, 0.5, 0.1),
+	Flash({rl4,71*4 + 2*4}, 600, 0.5, 0.1),
+	Flash({rl4,71*4 + 2*5}, 600, 0.5, 0.1),
+	Flash({rl4,71*4 + 2*6}, 600, 0.5, 0.1),
+	Flash({rl4,71*4 + 2*7}, 600, 0.5, 0.1)
+	--{'fade', 'cubicOut', {{rl4,71*4-0.5}, {rl4,71*4+0.5}}, 0, 1},
+	--{'fade', 'cubicOut', {{rl4,75*4}, {rl4,75*4}}, 0, 0}
+)
+
+storyboard:newObject("sb/Moon.png", "Background", "Centre", 320, 353):add(
+	{'color', 'linear', {{rl4,68*4}, {rl4,68*4}}, {255,0,0},{255,0,0}},
+	{'scale', 'in', {{rl4,71*4}, {rl4,75*4}}, 0.528, 0.9},
+	{'fade', 'cubicOut', {{rl4,71*4-0.5}, {rl4,71*4+0.5}}, 0, 1},
+	{'fade', 'cubicOut', {{rl4,75*4-1}, {rl4,75*4}}, 1, 0}
+)
+
+storyboard:newObject("sb/Globe1.png", "Background", "Centre", 320, 353):add(
+	{'fade', 'cubicout', {{rl4,68*4}, {rl4,68*4}}, 1, 1},
+	{'scale', 'sineout', {{rl4,68*4}, {rl4,71*4}}, 0.8, 0.66},
+	{'color', 'cubicIn', {{rl4,68*4}, {rl4,71*4-0.5}}, {0,0,0}, {244,244,244}},
+	{'color', 'linear', {{rl4,71*4-0.5}, {rl4,71*4+0.5}}, {255,255,255}, {255,0,0}},
+	{'fade', 'cubicOut', {{rl4,71*4-0.5}, {rl4,71*4+0.5}}, 1, 0}
+)
+
+
+-- kiak inst1
+storyboard:newObject("sb/HecatiaInst1.jpg", "Background", "TopLeft", -107, 182):add(
+	{'scale',0, { {rl4,57*4-0.5},{rl4,57*4-0.5}}, 0.667, 0.667},
+
+	{'fade' ,'cubicIn', { {rl4,57*4-0.5},{rl4,57*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,59*4-0.5},{rl4,59*4+0.5}}, 1, 0},
+
+	{'fade' ,'cubicIn', { {rl4,65*4-0.5},{rl4,65*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,67*4},{rl4,67*4}}, 1, 0}
+)
+
+storyboard:newObject("sb/Chains2.png", "Background", "TopLeft", -107, 182):add(
+	{'fade' ,2, { {rl4,10*4-1},{rl4,10*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,34*4-0.5},{rl4,34*4}}, 1, 0},
+
+	{'fade' ,2, { {rl4,51*4-0.5},{rl4,51*4}}, 0, 1},
+	{'fade' ,'out', { {rl4,67*4-0.5},{rl4,67*4+1}}, 1, 0},
+
+	{'fade' ,2, { {rl4,108*4-0.5},{rl4,108*4}}, 0, 1},
+	{'fade' ,'out', { {rl4,124*4-0.5},{rl4,124*4+1}}, 1, 0}
+)
+
+storyboard:newObject("sb/HecatiaFlash.png", "Background", "TopLeft", -107, 242):add(
+	{'protract', {'parameter', { {rl1, 0}, {rl1, 0} }, value='a'}},
+
+	Flash({rl4,0}, 500, 0.4, 0.15),
+	Flash({rl4,3}, 350, 0.4, 0.15),
+	Flash({rl4,4.5}, 450, 0.4, 0.15),
+	Flash({rl4,6}, 300, 0.3, 0.1),
+	Flash({rl4,7}, 300, 0.3, 0.1),
+	Flash({rl4,2*4}, 1200, 0.4, 0.1),
+	Flash({rl4,4*4}, 1200, 0.4, 0.1),
+	Flash({rl4,7*4}, 800, 0.1, 0.15),
+	Flash({rl4,8*4}, 800, 0.25, 0.1),
+	Flash({rl4,8*4+3}, 400, 0.25, 0.1),
+	Flash({rl4,9*4+0.5}, 280, 0.18, 0.1),
+	Flash({rl4,9*4+1.5}, 280, 0.18, 0.1),
+	Flash({rl4,10*4}, 300, 0.25, 0.1),
+	Flash({rl4,16*4}, 800, 0.25, 0.1),
+	Flash({rl4,18*4}, 1200, 0.25, 0.1),
+	Flash({rl4,26*4}, 1200, 0.3, 0.1),
+	Flash({rl4,30*4}, 1200, 0.3, 0.1),
+	Flash({rl4,34*4}, 1200, 0.4, 0.1),
+	Flash({rl4,42*4}, 1200, 0.4, 0.1),
+	Flash({rl4,46*4}, 800, 0.25, 0.1),
+
+	{'move', 0, {{rl4,51*4}, {rl4,51*4}}, {-107,182}},
+
+	Flash({rl4,51*4 + 4*2*0}, 1200, 0.35, 0.1),
+	Flash({rl4,51*4 + 4*2*1}, 1200, 0.2, 0.1),
+	Flash({rl4,51*4 + 4*2*2}, 1200, 0.35, 0.1),
+	Flash({rl4,51*4 + 4*2*3}, 1200, 0.35, 0.1),
+	Flash({rl4,51*4 + 4*2*4}, 1200, 0.35, 0.1),
+	Flash({rl4,51*4 + 4*2*5}, 1200, 0.2, 0.1),
+	Flash({rl4,51*4 + 4*2*6}, 1200, 0.2, 0.1),
+	Flash({rl4,51*4 + 4*2*7}, 1200, 0.35, 0.1),
+	Flash({rl4,51*4 + 4*2*8}, 1200, 0.35, 0.1),
+
+	Flash({rl4,75*4}, 300, 0.35, 0.25),
+	Flash({rl4,83*4}, 300, 0.35, 0.25),
+
+	Flash({rl4,91*4}, 1200, 0.4, 0.1),
+	Flash({rl4,95*4}, 1200, 0.4, 0.1),
+	Flash({rl4,99*4}, 1200, 0.4, 0.1),
+	Flash({rl4,103*4}, 1200, 0.4, 0.1),
+
+	sb.concadd(rl4_moveIn, rl4_flashes, rl4_int_move, rl4_int_move2),
+
+	{'move', 0, {{rl4,108*4}, {rl4,108*4}}, {-107,182}},
+
+	Flash({rl4,108*4 + 4*2*0}, 1200, 0.35, 0.1),
+	Flash({rl4,108*4 + 4*2*1}, 1200, 0.2, 0.1),
+	Flash({rl4,108*4 + 4*2*2}, 1200, 0.35, 0.1),
+	Flash({rl4,108*4 + 4*2*3}, 1200, 0.35, 0.1),
+	Flash({rl4,108*4 + 4*2*4}, 1200, 0.35, 0.1),
+	Flash({rl4,108*4 + 4*2*5}, 1200, 0.2, 0.1),
+	Flash({rl4,108*4 + 4*2*6}, 1200, 0.2, 0.1),
+	Flash({rl4,108*4 + 4*2*7}, 1200, 0.35, 0.1),
+	Flash({rl4,108*4 + 4*2*8}, 1200, 0.35, 0.1)
+)
+storyboard:newObject("sb/ChainsFlash.png", "Background", "TopLeft", -107, 182):add(
+	sb.concadd(rl4_chain_flashes)
+)
+
+storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
+	Flash({rl4, 6*4 },2500, 0.42, 0.1),
+	Flash({rl4, 8*4+1.5 },600, 0.19, 0.1),
+	sb.concadd(rl4_black_flashes)
+)
 
 storyboard:writeToFile2()
