@@ -15,8 +15,8 @@ return {
 			return x
 		end,
 	},
-	varargs = false,
-	eval = function(easing, t, vector_a, vector_b, args, varargs)
+	varargs = true,
+	eval = function(easing, t, vector_a, vector_b, args, varargs, self)
 		local results = {sb.evalroot(easing, t, vector_a, vector_b, args, varargs)}
 
 		local inner_loops = sb.verify:extractCommands(results, 'loop')
@@ -24,7 +24,12 @@ return {
 			sb.log:error('Inner loops not yet supported.')
 		end
 
-		return {'loop', t, sb.unpack(results)}
+		--local L = {'loop', t, sb.unpack(results)}
+		--for i,v in pairs(args) do L[i] = v end
+		for i,v in ipairs(results) do
+			self[i+3]=results[i]
+		end
+		return self
 	end,
 	out = function(easing, t, vector_a, vector_b, args, varargs)
 		local inner = {}
