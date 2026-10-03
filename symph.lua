@@ -32,6 +32,63 @@ local function FlashScale(time,dur,strength,peak)
 	end
 end
 
+--
+--
+-- Songe 0
+--
+--
+
+local rl0 = {90.0, 400}
+local rl0_1 = {90.0, 16399}
+
+local rl0_move_in = {
+	{'move', 0, {{rl0,0}}, {-107,242}},
+	--{'moverel','Out',{ {rl0,0}, {rl0,4*4} }, {0,0}, {0,-20}},
+	{'moverel','Out',{ {rl0,0 }, {rl0, 4*3} }, {0,0}, {0,-50}},
+	{'moverel','In',{ {rl0,4*3}, {rl0,8*3} }, {0,0}, {0,-70}},
+	{'moverel','QuintOut',{ {rl0,8*3}, "0:57:222" }, {0,0}, {0,-70}},
+	--{'moverel','linear',{ {rl0,4*4}, {rl0,8*4} }, {0,0}, {0,-12}},
+	--{'moverel','SineOut',{ {rl0,4*4}, {rl0,8*4} }, {0,0}, {0,-25}},
+}
+
+storyboard:newObject("sb/Intro1_S.jpg", "Background", "TopLeft", -107, 242):add(
+	{'fade', 'quartOut', {{rl0,0}, {rl0,2*3}}, 0,0.5},
+	{'fade', 'cubicOut', {{rl0,2*3+1}, {rl0,4*3}}, 0.5,0.7},
+	{'fade', 'cubicOut', {{rl0,4*3}, {rl0,4*3+2}}, 0.7,0.9},
+	{'fade', 'cubicOut', {{rl0,4*3+2}, {rl0,6*3}}, 0.9,0.8},
+	{'fade', 'out', {{rl0,7*3+1}, {rl0,8*3}}, 0.8,0.3},
+	{'fade', 1, {{rl0,8*3+0.25}}, 0,0},
+	sb.concadd(rl0_move_in)
+)
+storyboard:newObject("sb/Intro2.jpg", "Background", "TopLeft", -107, 242):add(
+	{'fade', 'out', {{rl0,8*3-0.25}, {rl0,8*3+0.25}}, 0.0,1.0},
+	{'fade', 1, {"0:53:022", "0:57:222"}, 1,0},
+	sb.concadd(rl0_move_in)
+)
+storyboard:newObject("sb/Intro1.jpg", "Background", "TopLeft", -107, 242):add(
+	{'fade', 'out', {{rl0_1,2*4}, {rl0_1,2*4+0.5}}, 0.0,1.0},
+	{'fade', 1, {"0:53:022", "0:57:222"}, 1,0},
+	sb.concadd(rl0_move_in)
+)
+storyboard:newObject("sb/Intro1_Flash.png", "Background", "TopLeft", -107, 242):add(
+	--{'fade', 1, {{rl0,0}, {rl0,2*4}}, 0,0.4},
+	--{'fade', 1, {"0:53:022", "0:57:222"}, 0,1},
+	{'protract', {'parameter', {{rl0, 0}}, value='a'}},
+	Flash({rl0,2*3+1}, 1200, 0.09, 0.4),
+	{'fade', 'cubicOut', {{rl0,3*3}, {rl0,3*3+0.9}}, 0, 0.22},
+	{'fade', 'quintOut', {{rl0,3*3+2}, {rl0,3*3+8}}, 0.22, 0},
+
+	{'fade', 'cubicOut', {{rl0,6*3+1}, {rl0,7*3}}, 0, 0.4},
+	{'fade', 'out', {{rl0,7*3}, {rl0,8*3}}, 0.4, 0.7},
+	{'fade', 'out', {{rl0,8*3}, {rl0_1,1*3}}, 0.7, 0.3},
+	FlashFloor({rl0_1,1*4-1}, 1200, 0.5, 0.15, 0.5),
+	FlashFloor({rl0_1,1*4+2}, 800, 0.2, 0.15, 0.5),
+	FlashFloor({rl0_1,2*4}, 1200, 0.5, 0.15, 0.5),
+
+	sb.concadd(rl0_move_in)
+)
+
+---
 local rl1 = {190,57822}
 local rl2 = {190,281400}
 
@@ -686,7 +743,7 @@ storyboard:newObject("sb/laplace.jpg", "Foreground", "TopLeft", -107, 229):add(
 	{'scale', 0, { {rl3, 127*4}, {rl3, 127*4} }, 0.6675, 0.6675},
 	Flash({rl3,127*4}, 2800, 1.0, 0.05))
 
-storyboard:newObject("sb/180bpm.png", "Foreground", "Centre", 318, 444):add(
+storyboard:newObject("sb/180bpm.png", "Foreground", "Centre", 318, 446):add(
 	{'fade', 1, { {rl3,2+22}, {rl3,5+22} }, 0   ,1.0 },
 	{'scale',0, { {rl3,2+22}, {rl3,5+22} }, 0.34,0.34 },
 	{'fade', 0, { {rl3,223*4}, {rl3,227*4} }, 1,0 }
@@ -915,6 +972,7 @@ storyboard:newObject("sb/Stars2.jpg", "Background", "Centre", 320, 353):add(
 
 storyboard:newObject("sb/Moon.png", "Foreground", "Centre", 320, 353):add(
 	{'protract', {'parameter', { {rl4, 71*4}, {rl4, 71*4} }, value='a'}},
+	{'move', 'in', {{rl4,71*4}, {rl4,71*4}}, {320,353}},
 	{'fade', 0, {{rl4,71*4}, {rl4,71*4}}, 0,0},
 	{'scale', 'in', {{rl4,71*4}, {rl4,75*4}}, 0.528, 0.9},
 	--Flash({rl4,71*4      }, 600, 1.5, 0.1),
@@ -923,7 +981,10 @@ storyboard:newObject("sb/Moon.png", "Foreground", "Centre", 320, 353):add(
 	--Flash({rl4,71*4 + 2*3}, 600, 0.5, 0.1),
 	Flash({rl4,71*4 + 2*4}, 600, 0.5, 0.1),
 	--Flash({rl4,71*4 + 2*5}, 600, 0.5, 0.1),
-	Flash({rl4,71*4 + 2*6}, 600, 0.5, 0.1)
+	Flash({rl4,71*4 + 2*6}, 600, 0.5, 0.1),
+	{'scale', 'in', {{rl4,126*4}, {rl4,126*4}}, 0.57},
+	{'move', 'in', {{rl4,126*4}, {rl4,126*4}}, {320,339}},
+	Flash({rl4, 126*4}, 1200, 0.9, 0.1)
 	--Flash({rl4,71*4 + 2*7}, 600, 0.5, 0.1)
 	--{'fade', 'cubicOut', {{rl4,71*4-0.5}, {rl4,71*4+0.5}}, 0, 1},
 	--{'fade', 'cubicOut', {{rl4,75*4}, {rl4,75*4}}, 0, 0}
@@ -1089,8 +1150,8 @@ storyboard:newObject("sb/Ch1.png", "Background", "TopLeft", -107+37, 182):add(
 	{'fade' ,'in', { {rl4,107*4-0.5},{rl4,107*4}}, 0, 1},
 	{'fade' ,'linear', { {rl4,108*4},{rl4,108*4}}, 0, 0},
 
-	{'parameter', {{rl4, 126*4}, {rl4, 132*4}}, value='a'},
-	Flash({rl4, 126*4}, 1200, 0.9, 0.1)
+	{'parameter', {{rl4, 128*4}, {rl4, 132*4}}, value='a'},
+	Flash({rl4, 128*4}, 1200, 0.9, 0.1)
 )
 storyboard:newObject("sb/Ch2.png", "Background", "TopLeft", -107+571, 182):add(
 	{'fade' ,'in', { {rl4,50*4-0.5+2},{rl4,50*4+2}}, 0, 1},
@@ -1123,7 +1184,7 @@ storyboard:newObject("sb/pandemonic_planet.png", "Foreground", "Centre", 385, 34
 	{'fade', 0, { {rl4_text,32.15-0.6}, {rl4_text,34.15-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/double.png", "Foreground", "Centre", 253, 386):add(
+storyboard:newObject("sb/lunatic.png", "Foreground", "Centre", 253, 386):add(
 	{'moverel', 1, { {rl4_text,2+15}, {rl4_text,3.5+15} }, {0, 0}, {35,0}},
 	{'moverel', 0, { {rl4_text,3.5+15}, {rl4_text,5.2+15} }, {0, 0}, {7,0}},
 	{'moverel', 1, { {rl4_text,5.2+15}, {rl4_text,23+8} }, {0, 0}, {16,0}},
@@ -1141,7 +1202,7 @@ storyboard:newObject("sb/hecatia.png", "Foreground", "Centre", 395, 405):add(
 	{'fade', 0, { {rl4_text,32.45-0.6}, {rl4_text,34.45-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/180bpm_h.png", "Foreground", "Centre", 320, 446):add(
+storyboard:newObject("sb/190bpm_h.png", "Foreground", "Centre", 320, 446):add(
 	{'fade', 1, { {rl4_text,2+22}, {rl4_text,5+22} }, 0   ,0.9 },
 	{'scale',0, { {rl4_text,0}, {rl4_text,0} }, 0.47,0.47 },
 	{'fade' ,'cubicOut', { {rl4,192*4},{rl4,196*4}}, 0.9, 0}
@@ -1545,5 +1606,22 @@ storyboard:newObject("sb/180bpm_m.png", "Foreground", "Centre", 320, 447):add(
 -- Songe 7
 --
 local rl7 = {240.0, 1448359}
+local interval_1 = sb.time:convert({rl7,1*4}) - sb.time:convert({rl7,0*4})
+
+local rl7_SV = 0.92
+local function rl7_scroller(X,Y, ease)
+	return function(out) out{'move', ease or 0, { {rl7, 4*X}, {rl7, 4*Y} }, {-107,252}, {-2565*0.58*rl7_SV - 107,252}} end
+end
+
+local rl7_scrolls = {}
+for i=-1,15 do
+	table.insert(rl7_scrolls, rl7_scroller(i,i+1,0))
+end
+
+storyboard:newObject("sb/Lines.jpg", "Background", "TopLeft", -107, 252):add(
+	{'vector', 0, { {rl7,0*4-0.8}, {rl7,0*4-0.8} }, {0.58*rl7_SV,0.58}},
+	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0*4+0.5} }, 0, 1},
+	sb.concadd(rl7_scrolls)
+)
 
 storyboard:writeToFile2()
