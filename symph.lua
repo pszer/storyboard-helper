@@ -83,9 +83,9 @@ storyboard:newObject("sb/Intro1_Flash.png", "Background", "TopLeft", -107, 242):
 	{'fade', 'cubicOut', {{rl0,3*3}, {rl0,3*3+0.9}}, 0, 0.22},
 	{'fade', 'quintOut', {{rl0,3*3+2}, {rl0,3*3+8}}, 0.22, 0},
 
-	{'fade', 'cubicOut', {{rl0,6*3+1}, {rl0,7*3}}, 0, 0.4},
-	{'fade', 'out', {{rl0,7*3}, {rl0,8*3}}, 0.4, 0.7},
-	{'fade', 'out', {{rl0,8*3}, {rl0_1,1*3}}, 0.7, 0.3},
+	{'fade', 'cubicOut', {{rl0,6*3+1}, {rl0,7*3}}, 0, 0.32},
+	{'fade', 'out', {{rl0,7*3}, {rl0,8*3}}, 0.32, 0.6},
+	{'fade', 'out', {{rl0,8*3}, {rl0_1,1*3}}, 0.6, 0.3},
 	FlashFloor({rl0_1,1*4-1}, 1200, 0.5, 0.15, 0.5),
 	FlashFloor({rl0_1,1*4+2}, 800, 0.2, 0.15, 0.5),
 	FlashFloor({rl0_1,2*4}, 1200, 0.5, 0.15, 0.5),
@@ -104,7 +104,7 @@ storyboard:newObject("sb/bgFlash.png", "Background", "TopLeft", -107, 242):add(
 	{'scale',0, { {rl0_2,0} }, 0.4956*2*2 },
 	{'moverel',0, { {rl0_2,0} }, {0,0},{1,0} },
 	{'protract', {'parameter', {{rl0_2, 0}}, value='a'}},
-	Flash({rl0_2,0*4}, 1200, 0.6, 0.1),
+	Flash({rl0_2,0*4}, 1200, 0.7, 0.1),
 	Flash({rl0_2,4*4+0.1}, 1200, 0.5, 0.4),
 	Flash({rl0_2,8*4}, 1200, 0.5, 0.1),
 	Flash({rl0_2,10*4}, 1600, 0.08, 0.1),
@@ -125,13 +125,63 @@ storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):ad
 	--Flash({rl0_2,6*4}, 600, 0.15, 0.3)
 )
 
+local rl0_text = {90.0, 400}
+
+storyboard:newObject("sb/90bpm.png", "Foreground", "Centre", 318, 449):add(
+	{'fade', 1, { {rl0_text,2}, {rl0_text,5} }, 0   ,1.0 },
+	{'scale',0, { {rl0_text,2}, {rl0_text,5} }, 0.47,0.47 },
+	{'fade', 'cubicOut', {"0:52:428", "0:54:428"}, 1.0, 0.0}
+)
+
+storyboard:newObject("sb/symphonic.png", "Foreground", "Centre", 242, 306):add(
+	{'moverel', 1, { {rl0_text,3}, {rl0_text,3.5} }, {0, 0}, {33,0}},
+	{'moverel', 0, { {rl0_text,3.5}, {rl0_text,4} }, {0, 0}, {17,0}},
+	{'moverel', 1, { {rl0_text,4}, {rl0_text,25+4} }, {0, 0}, {24,0}},
+
+	{'fade', 1, { {rl0_text,3}, {rl0_text,5} }, 0   ,1.0 },
+	{'scale',0, { {rl0_text,3}, {rl0_text,5} }, 0.49,0.49 },
+	{'fade', 0, { {rl0_text,8*3-1.4}, {rl0_text,8*3+0.5} }, 1.0,0 }
+)
+
+storyboard:newObject("sb/dream_scarlet.png", "Foreground", "Centre", 385, 354):add(
+	{'moverel', 1, { {rl0_text,4+4}, {rl0_text,5.5+4} }, {0, 0}, {-33,0}},
+	{'moverel', 0, { {rl0_text,5.5+4}, {rl0_text,7.2+4} }, {0, 0}, {-16,0}},
+	{'moverel', 1, { {rl0_text,7.2+4}, {rl0_text,29+4} }, {0, 0}, {-28,0}},
+	{'fade', 1, { {rl0_text,4+4}, {rl0_text,7+4} }, 0   ,1.0 },
+	{'scale',0, { {rl0_text,4+4}, {rl0_text,4+4} }, 0.41,0.41 },
+	{'fade', 0, { {rl0_text,8*3-2}, {rl0_text,8*3} }, 1.0,0 }
+)
+
+storyboard:newObject("sb/eosd0.png", "Foreground", "Centre", 253, 394):add(
+	{'moverel', 1, { {rl0_text,1+15}, {rl0_text,2.5+15} }, {0, 0}, {35,0}},
+	{'moverel', 0, { {rl0_text,2.5+15}, {rl0_text,4.2+15} }, {0, 0}, {7,0}},
+	{'moverel', 1, { {rl0_text,4.2+15}, {rl0_text,23+7} }, {0, 0}, {16,0}},
+	{'fade', 1, { {rl0_text,1+15}, {rl0_text,4+15} }, 0   ,1.0 },
+	{'scale',0, { {rl0_text,1+15}, {rl0_text,1+15} }, 0.36,0.36 },
+	{'fade', 0, { {rl0_text,8*3-2.0}, {rl0_text,8*3-0.2} }, 1.0,0 }
+)
+
+
+
+-----
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
 ---
 local rl1 = {190,57822}
 local rl2 = {190,281400}
 
 local s1_bpm_flashes = {}
 
-storyboard:newObject("sb/190bpm.png", "Foreground", "Centre", 320, 447):add(
+storyboard:newObject("sb/190bpm.png", "Foreground", "Centre", 320, 449):add(
 	{'fade', 1, { {rl1,2+22}, {rl1,5+22} }, 0   ,0.8 },
 	{'scale',0, { "0:59:822", "0:59:822" }, 0.33,0.33 },
 	{'fade', 0, { "5:33:663", "5:35:663" }, 0.9,0 },
@@ -252,19 +302,17 @@ storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 122):add(
 	{'color', 1,  { {rl1,91*4-0.5}, {rl1,91*4-0.5} }, {225,225,225},{255,255,255} },
 	{'fade', 1,  { {rl1,91*4-0.5}, {rl1,91*4} }, 0,1 },
 	{'fade', 'quintIn',  { {rl1,107*4-1}, {rl1,107*4} }, 1,0 },
-
-	{'fade', 1,  { {rl2,9*4-0.5}, {rl2,9*4} }, 0,1 },
-	{'fade', 1,  { {rl2,17*4+0.5}, {rl2,17*4+0.5} }, 0,0 },
-	--{'fade', 'out',  { {rl2,41*4+2}, {rl2,43*4} }, 1,0 },
-
-	Flash({rl1, 175*4},2400, 0.8, 0.1),
-	Flash({rl2, 5*4},1600, 0.6, 0.1)
+	{'fade', 'out',  { {rl2,33*4-0.5}, {rl2,33*4-0.5} }, 1,1 },
+	{'fade', 'out',  { {rl2,42*4-2}, {rl2,43*4} }, 1,0 }
 )
 
 storyboard:newObject("sb/EllenK3.jpg", "Background", "TopLeft", -106.7, 122):add(
-	{'scale',0 , { {rl2,17*4-0.5}, {rl2,17*4-0.5} }, 0.6675, 0.6675},
-	{'fade', 1,  { {rl2,17*4-0.5}, {rl2,17*4+0.5} }, 0,1 },
-	{'fade', 'out',  { {rl2,41*4+2}, {rl2,43*4} }, 1,0 }
+	{'scale',0 , { {rl2,9*4-0.5}, {rl2,9*4-0.5} }, 0.6675, 0.6675},
+	{'fade', 1,  { {rl2,9*4-0.5}, {rl2,9*4} }, 0,1 },
+	{'fade', 'out',  { {rl2,33*4-0.5}, {rl2,33*4} }, 1,0 },
+
+	Flash({rl1, 175*4},2400, 0.8, 0.1),
+	Flash({rl2, 5*4},1600, 0.6, 0.1)
 )
 
 local count = 1
@@ -305,14 +353,15 @@ storyboard:newObject("sb/EllenFlash.png", "Foreground", "TopLeft", -107, 242):ad
 	Flash({rl1, 30},350, 0.14, 0.25),
 
 	Flash({rl1, 16*4},350, 0.17, 0.25),
-	Flash({rl1, 17*4},350, 0.08, 0.25),
-	Flash({rl1, 18*4},350, 0.08, 0.25),
+	Flash({rl1, 17*4},350, 0.10, 0.25),
+	Flash({rl1, 18*4},350, 0.10, 0.25),
 	Flash({rl1, 20*4},350, 0.17, 0.25),
-	Flash({rl1, 21*4},350, 0.08, 0.25),
-	Flash({rl1, 22*4},350, 0.08, 0.25),
+	Flash({rl1, 21*4},350, 0.10, 0.25),
+	Flash({rl1, 22*4},350, 0.10, 0.25),
 	Flash({rl1, 23*4},1400, 0.25, 0.1),
-	Flash({rl1, 31*4},1400, 0.13, 0.1),
-	Flash({rl1, 35*4},1400, 0.13, 0.1),
+	Flash({rl1, 27*4},1400, 0.25, 0.1),
+	Flash({rl1, 31*4},1400, 0.15, 0.1),
+	Flash({rl1, 35*4},1400, 0.15, 0.1),
 	Flash({rl1, 39*4},800, 0.18, 0.1),
 	Flash({rl1, 43*4},800, 0.18, 0.1),
 	Flash({rl1, 47*4},800, 0.15, 0.1),
@@ -420,8 +469,8 @@ storyboard:newObject("sb/EllenFlash2.png", "Foreground", "TopLeft", -107, 122):a
 	Flash({rl2, 39*4},800, 0.12, 0.1),
 	Flash({rl2, 40*4},280, 0.18, 0.25),
 	Flash({rl2, 40*4+1.5},280, 0.18, 0.25),
-	Flash({rl2, 40*4+3},650, 0.18, 0.10),
-	Flash({rl2, 41*4+2},1200, 0.25, 0.06)
+	Flash({rl2, 40*4+3},500, 0.18, 0.10),
+	Flash({rl2, 41*4+1.5},1200, 0.25, 0.06)
 )
 
 -- black flashes
