@@ -1274,9 +1274,9 @@ storyboard:newObject("sb/lunatic.png", "Foreground", "Centre", 253, 386):add(
 	{'moverel', 1, { {rl4_text,2+15}, {rl4_text,3.5+15} }, {0, 0}, {35,0}},
 	{'moverel', 0, { {rl4_text,3.5+15}, {rl4_text,5.2+15} }, {0, 0}, {7,0}},
 	{'moverel', 1, { {rl4_text,5.2+15}, {rl4_text,23+8} }, {0, 0}, {16,0}},
-	{'fade', 1, { {rl4_text,2+15}, {rl4_text,5+15} }, 0   ,0.9 },
+	{'fade', 1, { {rl4_text,2+15}, {rl4_text,5+15} }, 0   ,0.8 },
 	{'scale',0, { {rl4_text,2+15}, {rl4_text,2+15} }, 0.32,0.32 },
-	{'fade', 0, { {rl4_text,32.3-0.6}, {rl4_text,34.3-0.6} }, 0.9,0 }
+	{'fade', 0, { {rl4_text,32.3-0.6}, {rl4_text,34.3-0.6} }, 0.8,0 }
 )
 
 storyboard:newObject("sb/hecatia.png", "Foreground", "Centre", 395, 405):add(
@@ -1704,10 +1704,60 @@ for i=-1,15 do
 	table.insert(rl7_scrolls, rl7_scroller(i,i+1,0))
 end
 
+local rl7_move_in = {
+	{'scale', 'cubicOut', {{rl7,0*4-0.8},{rl7,16*4}}, 0.85,0.69}
+}
+
 storyboard:newObject("sb/Lines.jpg", "Background", "TopLeft", -107, 252):add(
 	{'vector', 0, { {rl7,0*4-0.8}, {rl7,0*4-0.8} }, {0.58*rl7_SV,0.58}},
 	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0*4+0.5} }, 0, 1},
+	{'fade', 'quartIn', { {rl7,16*4-4}, {rl7,16*4+0.5} }, 1, 0},
 	sb.concadd(rl7_scrolls)
 )
+
+storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
+	{'color', 'linear', { {rl7,0*4-0.8} }, {220,220,220} },
+	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0.5} }, 0, 1},
+	{'fade', 'quartIn', { {rl7,16*4-4}, {rl7,16*4} }, 1, 0},
+
+	sb.concadd(rl7_move_in)
+)
+
+storyboard:newObject("sb/ReisenDark.png", "Background", "Centre", 320, 366):add(
+	{'color', 'linear', { {rl7,16*4}, {rl7,16*4+4} }, {10,10,10}, {200,200,200} },	
+	{'fade', 'quartOut', { {rl7,16*4}, {rl7,16*4+4} }, 0, 1},
+	{'fade', 'quartOut', { {rl7,24*4-1}, {rl7,24*4} }, 1, 0},
+
+	sb.concadd(rl7_move_in)
+)
+
+local rl7_flashes = {}
+local rl7_red_flashes = {}
+for i=0,15*4-1 do
+	table.insert(rl7_red_flashes, FlashFloor({rl7,i}, 220, 0.05, 0.5, 0.02))
+end
+for i=15*4,16*4-1,0.5 do
+	table.insert(rl7_red_flashes, FlashFloor({rl7,i}, 110, 0.10, 0.5, 0.01))
+end
+for i=1,16*4-1,0.5 do
+	if i~=8*4 and i~=8*4+0.5 then
+		table.insert(rl7_flashes, Flash({rl7,i}, 110, 0.2, 0.33))
+	end
+end
+storyboard:newObject("sb/Flash.jpg", "Background", "BottomLeft", -106.7, 480):add(
+	{'protract', {'parameter', {{rl7, 0}}, value='a'}},
+	{'color', 'linear', { {rl7,0*4-0.8} }, {255,0,0} },
+	sb.concadd(rl7_red_flashes)
+)
+
+storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
+	{'protract', {'parameter', {{rl7, 0}}, value='a'}},
+	Flash({rl7,0}, 220, 1.0, 0.1),
+	Flash({rl7,8*4}, 220, 1.0, 0.1),
+	Flash({rl7,16*4}, 400, 1.0, 0.1),
+
+	sb.concadd(rl7_move_in, rl7_flashes)
+)
+
 
 storyboard:writeToFile2()
