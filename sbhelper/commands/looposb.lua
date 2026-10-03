@@ -27,7 +27,7 @@ return {
 		--local L = {'loop', t, sb.unpack(results)}
 		--for i,v in pairs(args) do L[i] = v end
 		for i,v in ipairs(results) do
-			self[i+3]=results[i]
+			self[i+2]=results[i]
 		end
 		return self
 	end,
@@ -38,6 +38,6 @@ return {
 			table.insert(inner,sb.com:out(v))
 		end
 
-		return sb.ir:newCompound(inner, "L",sb.ir:floorTime(t[1]),math.floor(args.loop_count))
+		return sb.ir:newCompound(inner, "L", sb.ir:floorTime(t[1]),math.floor(args.loop_count))
 	end
 }

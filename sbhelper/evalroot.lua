@@ -24,6 +24,8 @@ return function(easing, t, vector_a, vector_b, args, varargs)
 
 	local status = sb.verify:checkTimeOverlaps(evals)
 	if status then
+		print(#evals)
+
 		sb.log:error(status)
 	end
 

@@ -17,7 +17,8 @@ function sb_ir:new(...)
 end
 
 function sb_ir:newCompound(inner, ...)
-	local t = {..., inner=inner}
+	local t = {...}
+	t.inner = inner
 	setmetatable(t,sb_ir)
 	return t
 end
@@ -130,7 +131,7 @@ function sb_ir:out()
 
 	if self.inner then
 		for i,v in ipairs(self.inner) do
-			result = result..'\n'..v:out()
+			result = result..'\n'..sb_config["whitespace"]..v:out()
 		end
 	end
 
