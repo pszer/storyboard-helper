@@ -1692,11 +1692,15 @@ storyboard:newObject("sb/180bpm_m.png", "Foreground", "Centre", 320, 447):add(
 -- Songe 7
 --
 local rl7 = {240.0, 1448359}
+local rl8 = {240.0, 1472359}
+local rl9 = {240.0, 1496359}
 local interval_1 = sb.time:convert({rl7,1*4}) - sb.time:convert({rl7,0*4})
 
 local rl7_SV = 0.92
-local function rl7_scroller(X,Y, ease)
-	return function(out) out{'move', ease or 0, { {rl7, 4*X}, {rl7, 4*Y} }, {-107,252}, {-2565*0.58*rl7_SV - 107,252}} end
+local function rl7_scroller(X,Y, ease, sig, rl)
+	local sig = sig or 4
+	local rl = rl or rl7
+	return function(out) out{'move', ease or 0, { {rl, sig*X}, {rl, sig*Y} }, {-107,252}, {-2565*0.58*rl7_SV - 107,252}} end
 end
 
 local rl7_scrolls = {}
@@ -1704,14 +1708,23 @@ for i=-1,15 do
 	table.insert(rl7_scrolls, rl7_scroller(i,i+1,0))
 end
 
+for i=8,15 do
+	table.insert(rl7_scrolls, rl7_scroller(i,i+1,0, 6, rl8))
+end
+
 local rl7_move_in = {
 	{'scale', 'cubicOut', {{rl7,0*4-0.8},{rl7,16*4}}, 0.85,0.69}
 }
 
 storyboard:newObject("sb/Lines.jpg", "Background", "TopLeft", -107, 252):add(
+	{'color', 'linear', { {rl7,0*4-0.8} }, {255,0,0} },
 	{'vector', 0, { {rl7,0*4-0.8}, {rl7,0*4-0.8} }, {0.58*rl7_SV,0.58}},
 	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0*4+0.5} }, 0, 1},
 	{'fade', 'quartIn', { {rl7,16*4-4}, {rl7,16*4+0.5} }, 1, 0},
+
+	{'color', 'linear', { {rl8,8*6-0.8} }, {255,255,255} },
+	{'fade', 'quartIn', { {rl8,8*6-0.8}, {rl8,8*6+0.5} }, 0, 1},
+	{'fade', 'quartIn', { {rl8,16*6-4}, {rl8,16*6} }, 1, 0},
 	sb.concadd(rl7_scrolls)
 )
 
@@ -1719,6 +1732,8 @@ storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 	{'color', 'linear', { {rl7,0*4-0.8} }, {220,220,220} },
 	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0.5} }, 0, 1},
 	{'fade', 'quartIn', { {rl7,16*4-4}, {rl7,16*4} }, 1, 0},
+	{'fade', 'quartOut', { {rl8,0*6}, {rl8,0*6+1} }, 0, 1},
+	{'fade', 'quartOut', { {rl8,8*6-1}, {rl8,8*6} }, 1, 0},
 
 	sb.concadd(rl7_move_in)
 )
@@ -1728,6 +1743,15 @@ storyboard:newObject("sb/ReisenDark.png", "Background", "Centre", 320, 366):add(
 	{'fade', 'quartOut', { {rl7,16*4}, {rl7,16*4+4} }, 0, 1},
 	{'fade', 'quartOut', { {rl7,24*4-1}, {rl7,24*4} }, 1, 0},
 
+	{'fade', 'quartOut', { {rl9,0*4}, {rl9,0*4+4} }, 0, 1},
+	{'fade', 'quartOut', { {rl9,16*4-1}, {rl9,16*4} }, 1, 0},
+
+	sb.concadd(rl7_move_in)
+)
+
+storyboard:newObject("sb/Reisen.png", "Background", "Centre", 320, 366):add(
+	{'fade', 'quartOut', { {rl8,8*6}, {rl8,8*6+2} }, 0, 1},
+	{'fade', 'quartOut', { {rl8,16*6}, {rl8,16*6+0.25} }, 1, 0},
 	sb.concadd(rl7_move_in)
 )
 
@@ -1754,9 +1778,69 @@ storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 	{'protract', {'parameter', {{rl7, 0}}, value='a'}},
 	Flash({rl7,0}, 220, 1.0, 0.1),
 	Flash({rl7,8*4}, 220, 1.0, 0.1),
-	Flash({rl7,16*4}, 400, 1.0, 0.1),
+	Flash({rl7,16*4}, 800, 1.0, 0.1),
+
+	Flash({rl8,0*6}, 800, 0.5, 0.1),
+	Flash({rl8,2*6}, 1600, 1.0, 0.1),
+	Flash({rl8,4*6}, 1600, 1.0, 0.1),
+	Flash({rl8,6*6}, 1600, 1.0, 0.1),
+	Flash({rl8,8*6}, 1600, 1.0, 0.1),
+
+	Flash({rl8,16*6}, 800, 1.0, 0.05),
 
 	sb.concadd(rl7_move_in, rl7_flashes)
+)
+
+local function rl7_negative_flash_func(X, str, rl)
+	local rl=rl or rl7
+	return function(out)
+		local X=X*4
+		out{'color',0,{{rl,X}}, {0,0,255}}
+		for i=X,X+0.75,0.25 do
+			out{'fade',0, {{rl,i}}, str}	
+			out{'fade',0, {{rl,i+0.125}}, 0}	
+		end
+		X=X+1
+		out{'color',0, {{rl,X}}, {0,255,0}}
+		for i=X,X+0.75,0.25 do
+			out{'fade',0, {{rl,i}}, str}	
+			out{'fade',0, {{rl,i+0.125}}, 0}	
+		end
+		X=X+1
+		out{'color',0, {{rl,X}}, {255,0,0}}
+		for i=X,X+0.75,0.25 do
+			out{'fade',0, {{rl,i}}, str}	
+			out{'fade',0, {{rl,i+0.125}}, 0}	
+		end
+		X=X+1
+		out{'color',0, {{rl,X}}, {0,0,255}}
+		for i=X,X+0.75,0.25 do
+			out{'fade',0, {{rl,i}}, str}	
+			out{'fade',0, {{rl,i+0.125}}, 0}	
+		end
+	end
+end
+storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):add(
+	--{'protract', {'parameter', {{rl7, 0}}, value='a'}},
+	{'fade',0,{{rl7,19}}, 0},
+	rl7_negative_flash_func(19,0.3),
+	rl7_negative_flash_func(23,0.3),
+	rl7_negative_flash_func(3,0.3,rl9),
+	rl7_negative_flash_func(7,0.3,rl9),
+	rl7_negative_flash_func(11,0.4,rl9),
+	rl7_negative_flash_func(15,0.4,rl9),
+	sb.concadd(rl7_move_in)
+)
+
+local rl7_black_flashes = {}
+for i=16*4+1,19*4-1 do
+	table.insert(rl7_black_flashes, Flash({rl7,i}, 220, 0.1, 0.5))
+end
+for i=20*4+1,23*4-1 do
+	table.insert(rl7_black_flashes, Flash({rl7,i}, 220, 0.1, 0.5))
+end
+storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
+	sb.concadd(rl7_black_flashes)
 )
 
 
