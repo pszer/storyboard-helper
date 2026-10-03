@@ -40,13 +40,14 @@ end
 
 local rl0 = {90.0, 400}
 local rl0_1 = {90.0, 16399}
+local rl0_2 = {130.0, 27045}
 
 local rl0_move_in = {
 	{'move', 0, {{rl0,0}}, {-107,242}},
 	--{'moverel','Out',{ {rl0,0}, {rl0,4*4} }, {0,0}, {0,-20}},
-	{'moverel','Out',{ {rl0,0 }, {rl0, 4*3} }, {0,0}, {0,-50}},
-	{'moverel','In',{ {rl0,4*3}, {rl0,8*3} }, {0,0}, {0,-70}},
-	{'moverel','QuintOut',{ {rl0,8*3}, "0:57:222" }, {0,0}, {0,-70}},
+	{'moverel','Out',{ {rl0,0 }, {rl0, 4*3} }, {0,0}, {0,-35}},
+	{'moverel','In',{ {rl0,4*3}, {rl0,8*3} }, {0,0}, {0,-50}},
+	{'moverel','QuintOut',{ {rl0,8*3}, "0:57:222" }, {0,0}, {0,-150}},
 	--{'moverel','linear',{ {rl0,4*4}, {rl0,8*4} }, {0,0}, {0,-12}},
 	--{'moverel','SineOut',{ {rl0,4*4}, {rl0,8*4} }, {0,0}, {0,-25}},
 }
@@ -62,12 +63,16 @@ storyboard:newObject("sb/Intro1_S.jpg", "Background", "TopLeft", -107, 242):add(
 )
 storyboard:newObject("sb/Intro2.jpg", "Background", "TopLeft", -107, 242):add(
 	{'fade', 'out', {{rl0,8*3-0.25}, {rl0,8*3+0.25}}, 0.0,1.0},
-	{'fade', 1, {"0:53:022", "0:57:222"}, 1,0},
+	{'fade', 'out', {{rl0_2,0*4+0.5}, {rl0_2,0*4+0.5}}, 0},
 	sb.concadd(rl0_move_in)
 )
-storyboard:newObject("sb/Intro1.jpg", "Background", "TopLeft", -107, 242):add(
-	{'fade', 'out', {{rl0_1,2*4}, {rl0_1,2*4+0.5}}, 0.0,1.0},
+storyboard:newObject("bg.jpg", "Background", "TopLeft", -107, 242):add(
+	{'scale',0, { {rl0_2,0} }, 0.495 },
+	{'fade', 'out', {{rl0_2,0*4}, {rl0_2,0*4+0.5}}, 0.0,1.0},
 	{'fade', 1, {"0:53:022", "0:57:222"}, 1,0},
+	{'color', 'quintOut', {{rl0_2, 7*4}, {rl0_2, 7*4+2}}, {255,255,255}, {190,190,190}},
+	{'color', 'quintIn', {{rl0_2, 7*4+2}, {rl0_2, 8*4}}, {190,190,190}, {255,255,255}},
+	{'color', 'cubicOut', {{rl0_2, 12*4}, "0:54:428"}, {255,255,255}, {50,50,50}},
 	sb.concadd(rl0_move_in)
 )
 storyboard:newObject("sb/Intro1_Flash.png", "Background", "TopLeft", -107, 242):add(
@@ -85,7 +90,39 @@ storyboard:newObject("sb/Intro1_Flash.png", "Background", "TopLeft", -107, 242):
 	FlashFloor({rl0_1,1*4+2}, 800, 0.2, 0.15, 0.5),
 	FlashFloor({rl0_1,2*4}, 1200, 0.5, 0.15, 0.5),
 
+	{'fade', 'in', {{rl0_2,0-3},{rl0_2,0}}, 0.5, 0},
+	--Flash({rl0_2,0*4}, 1200, 0.2, 0.15),
+	Flash({rl0_2,3*4}, 1200, 0.4, 0.1),
+	Flash({rl0_2,7*4}, 1200, 0.3, 0.1),
+	Flash({rl0_2,8*4}, 1600, 0.5, 0.1),
+	Flash({rl0_2,9*4}, 900, 0.1, 0.4),
+	Flash({rl0_2,9*4+2}, 900, 0.15, 0.25),
+
 	sb.concadd(rl0_move_in)
+)
+storyboard:newObject("sb/bgFlash.png", "Background", "TopLeft", -107, 242):add(
+	{'scale',0, { {rl0_2,0} }, 0.4956*2*2 },
+	{'moverel',0, { {rl0_2,0} }, {0,0},{1,0} },
+	{'protract', {'parameter', {{rl0_2, 0}}, value='a'}},
+	Flash({rl0_2,0*4}, 1200, 0.6, 0.1),
+	Flash({rl0_2,4*4+0.1}, 1200, 0.5, 0.4),
+	Flash({rl0_2,8*4}, 1200, 0.5, 0.1),
+	Flash({rl0_2,10*4}, 1600, 0.08, 0.1),
+	{'fade', 'cubicOut', {{rl0_2, 12*4}, {rl0_2, 13*4}}, 0, 0.6},
+	{'fade', 'in', {{rl0_2, 13*4}, {rl0_2, 13*4+1}}, 0.6, 1.0},
+	{'fade', 'in', {{rl0_2, 13*4+1}, {rl0_2, 13*4+2}}, 1.0, 0.6},
+	{'fade', 'cubicOut', {"0:52:428", "0:54:428"}, 0.6, 0.0},
+	--Flash({rl0_2,12*4}, 4000, 0.4, 0.3),
+	sb.concadd(rl0_move_in)
+)
+
+storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
+	Flash({rl0_2,0*4}, 800, 0.1, 0.25),
+	Flash({rl0_2,4*4}, 600, 0.15, 0.3)
+	--Flash({rl0_2,4*4+1}, 450, 0.1, 0.25),
+	--Flash({rl0_2,4*4+2}, 450, 0.1, 0.25),
+	--Flash({rl0_2,5*4}, 600, 0.15, 0.3),
+	--Flash({rl0_2,6*4}, 600, 0.15, 0.3)
 )
 
 ---
