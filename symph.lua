@@ -1695,7 +1695,10 @@ storyboard:newObject("sb/180bpm_m.png", "Foreground", "Centre", 320, 447):add(
 local rl7 = {240.0, 1448359}
 local rl8 = {240.0, 1472359}
 local rl9 = {240.0, 1496359}
+local rl10 = {240.0, 1563359}
+local rl11 = {240.0, 1575359}
 local interval_1 = sb.time:convert({rl7,1*4}) - sb.time:convert({rl7,0*4})
+local rl11_comp = { 240.0, sb.time:convert('26:48:359') }
 
 local rl7_SV = 0.92
 local function rl7_scroller(X,Y, ease, sig, rl)
@@ -1736,6 +1739,9 @@ storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 	{'fade', 'quartOut', { {rl8,0*6}, {rl8,0*6+1} }, 0, 1},
 	{'fade', 'quartOut', { {rl8,8*6-1}, {rl8,8*6} }, 1, 0},
 
+	{'fade', 'quartOut', { {rl10,0*6}, {rl10,0*6+1} }, 0, 1},
+	{'fade', 'quartOut', { {rl10,8*6-1}, {rl10,8*6} }, 1, 0},
+
 	sb.concadd(rl7_move_in)
 )
 
@@ -1746,6 +1752,20 @@ storyboard:newObject("sb/ReisenDark.png", "Background", "Centre", 320, 366):add(
 
 	{'fade', 'quartOut', { {rl9,0*4}, {rl9,0*4+4} }, 0, 1},
 	{'fade', 'quartOut', { {rl9,16*4-1}, {rl9,16*4} }, 1, 0},
+	{'color', 'linear', { {rl9,12*4} }, {200,200,200}, {255,255,255} },	
+
+	{'fade', 'cubicOut', {{rl9,31*4}, {rl9,32*4}}, 0, 0.7},
+	{'fade', 'cubicOut', {{rl9,32*4}, {rl9,32*4}}, 0, 0},
+
+	{'fade', 'quartOut', { {rl9,51*4}, {rl9,51*4+4} }, 0, 1},
+	{'fade', 'quartOut', { {rl9,67*4-1}, {rl9,67*4} }, 1, 0},
+	{'color', 'linear', { {rl9,53*4} }, {200,200,200}, {255,255,255} },	--]]
+
+	{'fade', 'cubicOut', {{rl11,15*4}, {rl11,16*4}}, 0, 0.7},
+	{'fade', 'cubicOut', {{rl11,16*4}, {rl11,16*4}}, 0, 0},
+
+	{'fade', 'cubicOut', {{rl11,64*4}, {rl11,65*4}}, 0, 0.7},
+	{'fade', 'cubicOut', {{rl11,65*4}, {rl11,65*4}}, 0, 0},
 
 	sb.concadd(rl7_move_in)
 )
@@ -1753,6 +1773,17 @@ storyboard:newObject("sb/ReisenDark.png", "Background", "Centre", 320, 366):add(
 storyboard:newObject("sb/Reisen.png", "Background", "Centre", 320, 366):add(
 	{'fade', 'quartOut', { {rl8,8*6}, {rl8,8*6+2} }, 0, 1},
 	{'fade', 'quartOut', { {rl8,16*6}, {rl8,16*6+0.25} }, 1, 0},
+	{'fade', 'cubicOut', {{rl9,32*4-1}, {rl9,32*4}}, 0,1},
+	{'fade', 'cubicOut', {{rl9,49*4-1}, {rl9,49*4}}, 1,0},
+	{'fade', 'cubicOut', {{rl11,16*4-1}, {rl11,16*4}}, 0,1},
+	{'fade', 'cubicOut', {{rl11,32*4+2}, {rl11,33*4-1.5}}, 1,0.6},
+	{'fade', 'cubicOut', {{rl11,33*4-1}, {rl11,33*4}}, 0.6,0},
+
+	{'fade', 'cubicOut', {{rl11,65*4-1}, {rl11,65*4}}, 0,1},
+	{'fade', 'cubicOut', {{rl11,97*4+2}, {rl11,98*4-1.5}}, 1,0.6},
+	--{'fade', 'cubicIn', {{rl11,99*4-1}, {rl11,99*4}}, 0.6,1},
+	{'fade', 'cubicIn', {{rl11,99*4-1}}, 0},
+	--{'fade', 'cubicOut', {{rl11,100*4}, {rl11,101*4}}, 1,0.0},
 	sb.concadd(rl7_move_in)
 )
 
@@ -1791,6 +1822,37 @@ storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 	Flash({rl8,8*6}, 1600, 1.0, 0.1),
 
 	Flash({rl8,16*6}, 800, 1.0, 0.05),
+
+	Flash({rl9,8*4}, 800, 0.7, 0.05),
+	Flash({rl9,30*4}, 800, 0.8, 0.05),
+
+	Flash({rl9,59*4}, 800, 0.7, 0.05),
+
+	Flash({rl10,0*4}, 1600, 1.0, 0.025),
+
+	Flash({rl10,2*6}, 1600, 0.75, 0.1),
+	{'color', 0, {{rl10,4*6}}, {255,0,0}},
+	Flash({rl10,4*6}, 1600, 1.0, 0.1),
+	{'color', 0, {{rl10,6*6}}, {255,255,255}},
+	Flash({rl10,6*6}, 1600, 0.75, 0.1),
+	Flash({rl10,8*6}, 800, 1.0, 0.1),
+
+	Flash({rl11,14*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,32*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,49*4}, 800, 0.8, 0.05),
+
+	--Flash({rl11,37*4}, 400, 0.6, 0.05),
+
+	--Flash({rl11,0*4}, 800, 0.5, 0.1),
+	Flash({rl11,57*4}, 800, 1.0, 0.1),
+
+	Flash({rl11,63*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,97*4}, 800, 0.8, 0.05),
+	Flash({rl11,98*4}, 800, 0.8, 0.05),
+	Flash({rl11,99*4}, 1600, 1.0, 0.05),
 
 	sb.concadd(rl7_move_in, rl7_flashes)
 )
@@ -1832,6 +1894,24 @@ local function rl7_negative_flash_func(X, str, rl)
 		end
 	end
 end
+
+local function rl9_color_transitions(X, rl)
+	return {
+	{'fade', 'cubicOut', {{rl,(X+16)*4}, {rl,(X+16)*4+1}}, 0, 0.7},
+	{'color', 'cubicOut', {{rl,(X+16)*4}, {rl,(X+16)*4+1}}, {0,0,255},{0,0,255}},
+
+	{'fade', 'cubicOut', {{rl,(X+18)*4}, {rl,(X+18)*4+1}}, 0.7, 0.55},
+	{'fade', 'cubicOut', {{rl,(X+20)*4}, {rl,(X+20)*4+1}}, 0.55, 0.7},
+	{'color', 'cubicOut', {{rl,(X+20)*4}, {rl,(X+20)*4+1}}, {0,0,255},{0,255,0}},
+	{'fade', 'cubicOut', {{rl,(X+22)*4}, {rl,(X+22)*4+1}}, 0.7, 0.55},
+	{'fade', 'cubicOut', {{rl,(X+24)*4}, {rl,(X+24)*4+1}}, 0.55, 0.7},
+	{'color', 'cubicOut', {{rl,(X+24)*4}, {rl,(X+24)*4+1}}, {0,255,0},{0,0,255}},
+	{'fade', 'cubicOut', {{rl,(X+28)*4}, {rl,(X+28)*4+1}}, 0.7, 0.4},
+	{'color', 'cubicOut', {{rl,(X+28)*4}, {rl,(X+28)*4+1}}, {0,0,255},{255,0,0}},
+	{'fade', 'cubicOut', {{rl,(X+28)*4+1}, {rl,(X+30)*4+1}}, 0.4, 0.6},
+
+	{'fade', 'cubicOut', {{rl,(X+31)*4-0.5}, {rl,(X+31)*4+4}}, 0.6,0},}
+end
 storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):add(
 	--{'protract', {'parameter', {{rl7, 0}}, value='a'}},
 	{'fade',0,{{rl7,19}}, 0},
@@ -1842,21 +1922,12 @@ storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):
 	rl7_negative_flash_func(11,0.6,rl9),
 	rl7_negative_flash_func(15,0.6,rl9),
 
-	{'fade', 'cubicOut', {{rl9,16*4}, {rl9,16*4+1}}, 0, 0.7},
-	{'color', 'cubicOut', {{rl9,16*4}, {rl9,16*4+1}}, {0,0,255},{0,0,255}},
+	rl7_negative_flash_func(51+3,0.4,rl9),
+	rl7_negative_flash_func(51+7,0.4,rl9),
+	rl7_negative_flash_func(51+11,0.6,rl9),
+	rl7_negative_flash_func(51+15,0.6,rl9),
 
-	{'fade', 'cubicOut', {{rl9,18*4}, {rl9,18*4+1}}, 0.7, 0.4},
-	{'fade', 'cubicOut', {{rl9,20*4}, {rl9,20*4+1}}, 0.4, 0.7},
-	{'color', 'cubicOut', {{rl9,20*4}, {rl9,20*4+1}}, {0,0,255},{0,255,0}},
-	{'fade', 'cubicOut', {{rl9,22*4}, {rl9,22*4+1}}, 0.7, 0.4},
-	{'fade', 'cubicOut', {{rl9,24*4}, {rl9,24*4+1}}, 0.4, 0.6},
-	{'color', 'cubicOut', {{rl9,24*4}, {rl9,24*4+1}}, {0,255,0},{0,0,255}},
-	{'fade', 'cubicOut', {{rl9,28*4}, {rl9,28*4+1}}, 0.6, 0.4},
-	{'color', 'cubicOut', {{rl9,28*4}, {rl9,28*4+1}}, {0,0,255},{255,0,0}},
-	{'fade', 'cubicOut', {{rl9,28*4+1}, {rl9,30*4+1}}, 0.4, 0.6},
-
-	{'fade', 'cubicOut', {{rl9,31*4-0.5}, {rl9,31*4+4}}, 0.7,0},
-	sb.concadd(rl7_move_in)
+	sb.concadd(rl7_move_in, rl9_color_transitions(0,rl9), rl9_color_transitions(-16,rl11), rl9_color_transitions(49-16,rl11))
 )
 
 local rl7_black_flashes = {}
@@ -1866,9 +1937,231 @@ end
 for i=20*4+1,23*4-1 do
 	table.insert(rl7_black_flashes, Flash({rl7,i}, 220, 0.1, 0.5))
 end
+
+local function rl7_black_flashes_func(X, rl)
+	for i=X*4+1,(X+3)*4-1 ,1 do
+		table.insert(rl7_black_flashes, Flash({rl,i}, 220, 0.1, 0.5)) end
+	X=X+4
+	for i=X*4,(X+3)*4-1 ,1 do
+		table.insert(rl7_black_flashes, Flash({rl,i}, 220, 0.1, 0.5)) end
+	X=X+4
+	for i=X*4+1,(X+3)*4-1 ,1 do
+		table.insert(rl7_black_flashes, Flash({rl,i}, 220, 0.1, 0.5)) end
+	X=X+4
+	for i=X*4,(X+3)*4-1,0.333333 do
+		table.insert(rl7_black_flashes, Flash({rl,i}, 110*(2/3), 0.2, 0.5)) end
+	X=X+16
+	--for i=X*4,(X+2)*4-1,1 do
+	--	table.insert(rl7_black_flashes, Flash({rl,i}, 220, 0.1, 0.5)) end
+end
+
+for i=0*4,12*4-1 do
+	local j=i/4+16
+	if (not ((j>=18 and j<20) or (j >=22))) then
+		table.insert(rl7_black_flashes, Flash({rl11,i}, 220, 0.05, 0.5))
+	end
+end
+for i=12*4,14*4-1, 0.5 do
+	table.insert(rl7_black_flashes, Flash({rl11,i}, 110*(1/2), 0.15, 0.5))
+end
+
+for i=16*4,28*4-1 do
+	local j=i/4
+	if (not ((j>=18 and j<20) or (j >=22))) then
+		table.insert(rl7_black_flashes, Flash({rl9,i}, 220, 0.05, 0.5))
+	end
+end
+for i=28*4,30*4-1, 0.5 do
+	table.insert(rl7_black_flashes, Flash({rl9,i}, 110*(1/2), 0.15, 0.5))
+end
+
+for i=49*4,57*4-1 do
+	local j=i/4
+	if (not ((j>=51 and j<53) or (j >=55))) then
+		table.insert(rl7_black_flashes, Flash({rl11,i}, 220, 0.05, 0.5))
+	end
+end
+for i=61*4,63*4-1, 0.5 do
+	table.insert(rl7_black_flashes, Flash({rl11,i}, 110*(1/2), 0.15, 0.5))
+end
+
+rl7_black_flashes_func(0, rl9)
+rl7_black_flashes_func(51, rl9)
+
+for i=7*6+2,7*6+5,0.3333 do
+	table.insert(rl7_black_flashes, Flash({rl10,i}, 110*(2/3), 0.6, 0.25))
+end
+
 storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
 	sb.concadd(rl7_black_flashes)
 )
 
+local rl9_post_kiai_flashes = function(X, rl)
+	local rl=rl or rl9
+	return {
+		Flash({rl,X*4}, 600, 0.2, 0.1),
+		Flash({rl,(X+8)*4}, 400, 0.5, 0.05),
+		Flash({rl,(X+12)*4}, 200, 0.8, 0.05),
+		Flash({rl,(X+16)*4}, 800, 0.8, 0.05),
+		Flash({rl,(X+30)*4}, 800, 0.8, 0.05),
+	}
+end
+local rl9_kiai_negative = function(X, rl)
+	local rl=rl or rl9
+	return {
+		{'color', 0, {{rl,X}}, {0,255,0}},
+		{'fade', 'cubicOut', {{rl,X}, {rl,X+1}}, 0,0.8},
+		{'color', 0, {{rl,X+8*4}, {rl,X+8*4+1}}, {0,255,0},{235,0,255}},
+		{'fade', 'cubicOut', {{rl,X+16*4}, {rl,X+16*4+1}}, 0.8,0}
+	}
+end
+storyboard:newObject("sb/ReisenNegative2.png", "Foreground", "Centre", 320, 366):add(
+	Flash({rl9,51*4}, 600, 0.2, 0.1),
+	Flash({rl9,(51+8)*4}, 400, 0.5, 0.05),
+	Flash({rl9,(51+12)*4}, 200, 0.8, 0.05),
+	Flash({rl9,(51+16)*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,0*4}, 600, 0.2, 0.1),
+	Flash({rl11,8*4}, 600, 0.2, 0.1),
+	Flash({rl11,14*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,32*4}, 400, 0.8, 0.05),
+	Flash({rl11,32*4+2}, 400, 0.3, 0.05),
+	Flash({rl11,33*4}, 800, 0.8, 0.05),
+	Flash({rl11,37*4}, 400, 0.25, 0.05),
+	Flash({rl11,41*4}, 400, 0.25, 0.05),
+
+	Flash({rl11,49*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,57*4}, 600, 0.2, 0.1),
+	Flash({rl11,63*4}, 800, 0.8, 0.05),
+
+	Flash({rl11,97*4}, 400, 0.8, 0.05),
+	Flash({rl11,97*4+2}, 400, 0.3, 0.05),
+
+	sb.concadd(rl7_move_in,
+		rl9_post_kiai_flashes(0, rl9))
+)
+storyboard:newObject("sb/ReisenNegative2.png", "Foreground", "Centre", 320, 366):add(
+	{'protract', {'parameter', {{rl9, 0}}, value='a'}},
+
+	{'color', 0, {{rl11,65*4}}, {0,255,0}},
+	{'fade', 'cubicOut', {{rl11,65*4}, {rl11,65*4+1}}, 0,0.8},
+	{'color', 0, {{rl11,65*4+8*4}, {rl11,65*4+8*4+1}}, {0,255,0},{0,0,255}},
+	{'color', 0, {{rl11,81*4}, {rl11,81*4+1}}, {0,0,255},{0,255,0}},
+	{'color', 0, {{rl11,89*4}, {rl11,89*4+1}}, {0,255,0},{230,0,255}},
+	{'color', 0, {{rl11,93*4}, {rl11,93*4+1}}, {230,0,0},{255,0,0}},
+	{'fade', 'cubicOut', {{rl11,97*4}, {rl11,97*4+1}}, 0.8,0},
+
+	sb.concadd(rl7_move_in,
+		rl9_kiai_negative(32*4,rl9), rl9_kiai_negative(16*4,rl11))
+)
+
+local function rl11_noisefunc(X)
+	local R ={}
+	local S = 1.5
+	for i= (X-1)/S,15*4+3,6/S do
+		table.insert(R, {'fade', 'linear', {{rl11_comp,i},{rl11_comp,i+1.5/S}}, 0,0.66 })
+		table.insert(R, {'fade', 'linear', {{rl11_comp,i+1.5/S},{rl11_comp,i+3/S}}, 0.66,0 })
+	end
+	return R
+end
+local function rl11_noisefunc2(X)
+	local R ={}
+	local S = 2.5
+	for i= 99*4+(X-1)/S,99*4+3,6/S do
+		table.insert(R, {'fade', 'linear', {{rl11,i},{rl11,i+1.5/S}}, 0,0.8 })
+
+		if i==99*4+3 then
+			table.insert(R, {'fade', 'linear', {{rl11,i+1.5/S},{rl11,i+4.5/S}}, 0.8,0 })
+		else
+			table.insert(R, {'fade', 'linear', {{rl11,i+1.5/S},{rl11,i+3/S}}, 0.8,0 })
+		end
+	end
+	return R
+end
+local rl9_kiai_flashes = function(X, rl, str)
+	local R = {}
+	local rl=rl or rl9
+	for i = X+1,X+8*4-1, 1 do
+		if i~=X+4*4 then
+			table.insert(R, Flash({rl,i}, 220, str, 0.25))
+		else
+			table.insert(R, Flash({rl,i}, 220, str*2.0, 0.25))
+		end
+	end
+	table.insert(R, Flash({rl,X}, 220, str*2.0, 0.25))
+	return R
+end
+storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):add(
+	{'protract', {'parameter', {{rl9, 0}}, value='a'}},
+	sb.concadd(rl7_move_in, rl9_kiai_flashes(32*4,rl9,0.06),rl9_kiai_flashes(40*4,rl9,0.08),
+	rl9_kiai_flashes(16*4,rl11,0.08),rl9_kiai_flashes(24*4,rl11,0.10),
+	rl9_kiai_flashes(65*4,rl11,0.08),rl9_kiai_flashes(73*4,rl11,0.10),
+	rl9_kiai_flashes(81*4,rl11,0.09),rl9_kiai_flashes(89*4,rl11,0.11)
+)
+)
+
+local BGN={
+	{'scale',0,{{rl11_comp,0}},2.1},
+	{'color',0,{{rl11_comp,0}},{50,50,230}},
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{50,50,230},{50*1.3,50*1.2,230*1.12}},
+	{'color','cubicout',{{rl11_comp,8*4},{rl11_comp,9*4}},{50*1.3,50*1.2,230*1.12}, {82,44,222}},
+	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
+}
+storyboard:newObject("sb/BGN1.jpg", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(1), BGN, rl11_noisefunc2(1)))
+storyboard:newObject("sb/BGN2.jpg", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(2),BGN, rl11_noisefunc2(2)))
+storyboard:newObject("sb/BGN3.jpg", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(3), BGN, rl11_noisefunc2(3)))
+storyboard:newObject("sb/BGN4.jpg", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(4), BGN, rl11_noisefunc2(4)))
+storyboard:newObject("sb/BGN5.jpg", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(5), BGN, rl11_noisefunc2(5)))
+storyboard:newObject("sb/BGN6.jpg", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(6), BGN, rl11_noisefunc2(6)))
+
+storyboard:newObject("sb/ReisenComposite1.png", "Background", "Centre", 320, 366):add(
+	{'fade', 'cubicOut', {{rl11_comp,0},{rl11_comp,1*4}}, 0, 1},
+	{'fade', 'cubicOut', {{rl11_comp,16*4},{rl11_comp,16*4}}, 0, 0}
+)
+storyboard:newObject("sb/ReisenComposite2.png", "Background", "Centre", 320, 366):add(
+	{'fade', 'cubicOut', {{rl11_comp,0},{rl11_comp,1*4}}, 0, 1},
+	{'color', 'linear', {{rl11_comp,0},{rl11_comp,0}}, {170*0.5,0,255*0.5}},
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{170*0.5,0,255*0.5},{170*0.8,0,255*0.8}},
+	{'color','cubicOut',{{rl11_comp,8*4},{rl11_comp,9*4}},{170*0.8,0,255*0.8}, {190*0.5,0,255*0.5}},
+	{'fade', 'cubicOut', {{rl11_comp,16*4-1},{rl11_comp,16*4}}, 1, 0}
+)
+
+local rl11_noise_cols = {
+	{'color',0,{{rl11_comp,0}},{120,0,50}},
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{120,0,50},{120*1.5,0,50*1.5}},
+	{'color','cubicOut',{{rl11_comp,8*4},{rl11_comp,9*4}},{120*1.5,0,50*1.5}, {102,0,21}},
+	{'color','cubicOut',{{rl11_comp,15*4+2},{rl11_comp,16*4}},{102,0,21}, {194,0,95}},
+}
+
+storyboard:newObject("sb/Noise1.png", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(1), rl11_noise_cols))
+storyboard:newObject("sb/Noise2.png", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(2), rl11_noise_cols))
+storyboard:newObject("sb/Noise3.png", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(3), rl11_noise_cols))
+storyboard:newObject("sb/Noise4.png", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(4), rl11_noise_cols))
+storyboard:newObject("sb/Noise5.png", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(5), rl11_noise_cols))
+storyboard:newObject("sb/Noise6.png", "Background", "Centre", 320, 366):add(
+	sb.concadd(rl11_noisefunc(6), rl11_noise_cols))
+
+storyboard:newObject("sb/ReisenComposite1.png", "Background", "Centre", 320, 366):add(
+	{'fade', 'cubicOut', {{rl11,100*4-1}}, 0.0},
+	{'fade', 'cubicOut', {{rl11,100*4-1}, {rl11,103*4}}, 1,0.0})
+storyboard:newObject("sb/Reisen.png", "Background", "Centre", 320, 366):add(
+	{'fade', 'cubicOut', {{rl11,99*4-1}}, 0.0},
+	{'fade', 'cubicIn', {{rl11,99*4-1}, {rl11,99*4}}, 0.6,1},
+	{'fade', 'cubicOut', {{rl11,100*4-1}, {rl11,101*4}}, 1,0.0},
+	sb.concadd(rl7_move_in)
+)
 
 storyboard:writeToFile2()
