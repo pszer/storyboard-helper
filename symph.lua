@@ -229,11 +229,15 @@ storyboard:newObject("sb/ellen.png", "Foreground", "Centre", 395, 405):add(
 	{'fade', 0, { {rl1,32.45-0.6}, {rl1,34.45-0.6} }, 0.9,0 }
 )
 
+local rl1_move_in = {
+	{'move', 'linear', {{rl1,0}}, {-107,242}},
+	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-50}},
+	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-25}},
+	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5}},
+}
+
 storyboard:newObject("sb/Ellen.jpg", "Background", "TopLeft", -107, 242):add(
 	{'scale',0, { "0:57:722", "0:57:882"}, 0.667, 0.667},
-	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-70}},
-	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-45}},
-	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5}},
 	{'color',0, { "0:57:722", "0:57:882"}, {225,225,225}, {225,225,225}},
 	{'fade', 1, { "0:57:822", "0:59:053" }, 0,0.85 },
 	{'fade', 0, { "0:59:053", "1:01:453" }, 0.85,1 },
@@ -252,10 +256,12 @@ storyboard:newObject("sb/Ellen.jpg", "Background", "TopLeft", -107, 242):add(
 	{'fade', 1,  { {rl2,9*4}, {rl2,9*4} }, 0,0 },
 
 	{'color','out', { "04:40:137", {rl2,2} }, {225,225,225}, {160,160,160}},
-	{'color','in', { {rl2,3},{rl2,4}}, {160,160,160}, {235,235,235}}
+	{'color','in', { {rl2,3},{rl2,4}}, {160,160,160}, {235,235,235}},
+
+	sb.concadd(rl1_move_in)
 )
 
-storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 122):add(
+storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 162):add(
 	{'scale',0, { {rl1,107*4-1}, {rl1,107*4-1} }, 0.667, 0.667},
 	{'fade', 'out',  { {rl1,107*4-1}, {rl1,107*4-1} }, 1,1 },
 	{'moverel', 'sineIn',  { {rl1,107*4-1}, {rl1,111*4} }, {0,0},{0,22} },
@@ -270,7 +276,7 @@ storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 122):add(
 	{'fade', 'out',  { {rl1,166*4-1.0}, {rl1,166*4} }, 1,0 }
 )
 
-storyboard:newObject("sb/EllenI2.jpg", "Background", "TopLeft", -107, 122):add(
+storyboard:newObject("sb/EllenI2.jpg", "Background", "TopLeft", -107, 162):add(
 	{'scale',0, { {rl1,126*4-0.5}, {rl1,126*4-0.5} }, 0.667, 0.667},
 	{'fade', 'in',  { {rl1,126*4-0.5}, {rl1,126*4} }, 0,1 },
 	--{'moverel', 'sineIn',  { {rl1,107*4-1}, {rl1,111*4} }, {0,0},{0,22} },
@@ -304,10 +310,11 @@ storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 122):add(
 	{'fade', 1,  { {rl1,91*4-0.5}, {rl1,91*4} }, 0,1 },
 	{'fade', 'quintIn',  { {rl1,107*4-1}, {rl1,107*4} }, 1,0 },
 	{'fade', 'out',  { {rl2,33*4-0.5}, {rl2,33*4-0.5} }, 1,1 },
-	{'fade', 'out',  { {rl2,42*4-2}, {rl2,43*4} }, 1,0 }
+	{'fade', 'out',  { {rl2,42*4-2}, {rl2,43*4} }, 1,0 },
+	sb.concadd(rl1_move_in)
 )
 
-storyboard:newObject("sb/EllenK3.jpg", "Background", "TopLeft", -106.7, 122):add(
+storyboard:newObject("sb/EllenK2.jpg", "Background", "TopLeft", -106.7, 162):add(
 	{'scale',0 , { {rl2,9*4-0.5}, {rl2,9*4-0.5} }, 0.6675, 0.6675},
 	{'fade', 1,  { {rl2,9*4-0.5}, {rl2,9*4} }, 0,1 },
 	{'fade', 'out',  { {rl2,33*4-0.5}, {rl2,33*4} }, 1,0 },
@@ -334,9 +341,6 @@ end
 
 storyboard:newObject("sb/EllenFlash.png", "Foreground", "TopLeft", -107, 242):add(
 	{'protract', {'parameter', { {rl1, 0}, {rl1, 0} }, value='a'}},
-	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-70}},
-	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-45}},
-	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5}},
 	Flash({rl1, 0},280, 0.5, 0.25),
 	Flash({rl1, 1},800, 0.65, 0.1),
 	Flash({rl1, 8},280, 0.2, 0.25),
@@ -460,9 +464,9 @@ storyboard:newObject("sb/EllenFlash.png", "Foreground", "TopLeft", -107, 242):ad
 	Flash({rl2, 25*4},800, 0.25, 0.1),
 	Flash({rl2, 29*4},800, 0.18, 0.1),
 	Flash({rl2, 31*4},800, 0.18, 0.1),
-	sb.unpack(flashes_s1)
+	sb.concadd(rl1_move_in, flashes_s1)
 )
-storyboard:newObject("sb/EllenFlash2.png", "Foreground", "TopLeft", -107, 122):add(
+storyboard:newObject("sb/EllenFlash2.png", "Foreground", "TopLeft", -107, 162):add(
 	{'protract', {'parameter', { {rl1, 0}, {rl1, 0} }, value='a'}},
 	Flash({rl1, 41*4},800, 0.2, 0.1),
 	Flash({rl1, 83*4},800, 0.2, 0.1),
@@ -1678,7 +1682,7 @@ storyboard:newObject("sb/mima.png", "Foreground", "Centre", 395, 407):add(
 	{'fade', 0, { {rl5_text,32.45-0.6}, {rl5_text,34.45-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/180bpm_m.png", "Foreground", "Centre", 320, 447):add(
+storyboard:newObject("sb/180bpm_m.png", "Foreground", "Centre", 320, 446):add(
 	{'fade', 1, { {rl5_text,2+22}, {rl5_text,5+22} }, 0   ,0.9 },
 	{'scale',0, { {rl5_text,0}, {rl5_text,0} }, 0.47,0.47 },
 	{'fade' ,'cubicOut', { {rl5,204*4},{rl5,206*4}}, 0.9, 0}
@@ -2193,6 +2197,14 @@ local function rl9_text_color_transitions(X, rl)
 		{'color', 'cubicOut', {{rl,(X+28)*4}, {rl,(X+28)*4+1}}, {0,0,255},{255,0,0}}
 	}
 end
+local rl9_text_kiai_negative = function(X, rl)
+	local rl=rl or rl9
+	return {
+		{'color', 0, {{rl,X}}, {0,255,0}},
+		{'color', 0, {{rl,X+8*4}, {rl,X+8*4+1}}, {0,255,0},{235,0,255}},
+		{'color', 0, {{rl,X+16*4}, {rl,X+16*4+1}}, {235,0,255},{235,0,0}},
+	}
+end
 local rl7_text = {240.0, sb.time:convert('24:24:359')}
 storyboard:newObject("sb/m_a_d.png", "Foreground", "Centre", 242, 294):add(
 	{'moverel', 1, { {rl7_text,3}, {rl7_text,3.5} }, {0, 0}, {33,0}},
@@ -2245,7 +2257,7 @@ storyboard:newObject("sb/reisen.png", "Foreground", "Centre", 395, 407):add(
 	rl7_text_flash_func(19,0.4),
 	rl7_text_flash_func(23,0.4)
 )
-storyboard:newObject("sb/240bpm.png", "Foreground", "Centre", 320, 447):add(
+storyboard:newObject("sb/240bpm.png", "Foreground", "Centre", 320, 444):add(
 	{'fade', 1, { {rl7,1*4}, {rl7,2*4} }, 0   ,0.8 },
 	{'color', 0, { {rl7,1*4} }, {255,0,0} },
 	{'scale',0, { {rl7,0}, {rl7,0} }, 0.47,0.47 },
@@ -2264,9 +2276,9 @@ storyboard:newObject("sb/240bpm.png", "Foreground", "Centre", 320, 447):add(
 	rl7_text_flash_func(51+11,0.6,rl9),
 	rl7_text_flash_func(51+15,0.6,rl9),
 
-	{'color', 'linear', {{rl11_comp,0},{rl11_comp,0}}, {170*0.8,0,255*0.8}},
-	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{170*0.8,0,255*0.8},{170*0.8,0,255*1.0}},
-	{'color','cubicOut',{{rl11_comp,8*4},{rl11_comp,9*4}},{170*1.0,0,255*1.0}, {190*0.5,0,255*0.8}},
+	{'color', 'linear', {{rl11_comp,0},{rl11_comp,0}}, {140,10,255}},
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{140,10,255},{190,20,255}},
+	{'color','cubicOut',{{rl11_comp,8*4},{rl11_comp,9*4}},{190,20,255}, {190,20,255}},
 	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
 
 	{'color', 0, {{rl11,65*4}}, {0,255,0}},
@@ -2275,13 +2287,12 @@ storyboard:newObject("sb/240bpm.png", "Foreground", "Centre", 320, 447):add(
 	{'color', 0, {{rl11,89*4}, {rl11,89*4+1}}, {255,0,0},{230,0,255}},
 	{'color', 0, {{rl11,93*4}, {rl11,93*4+1}}, {230,0,255},{0,255,0}},
 
-
 	sb.concadd(
 		rl9_text_color_transitions(0,rl9),
 		rl9_text_color_transitions(-16,rl11),
 		rl9_text_color_transitions(49-16,rl11),
-		rl9_kiai_negative(32*4,rl9),
-		rl9_kiai_negative(16*4,rl11)
+		rl9_text_kiai_negative(32*4,rl9),
+		rl9_text_kiai_negative(16*4,rl11)
 	)
 )
 --
@@ -2345,42 +2356,42 @@ storyboard:newObject("sb/RaikoFlash.png", "Background", "TopLeft", -107, 50):add
 
 local rl20_text = {180.0, 1167774}
 storyboard:newObject("sb/v_h.png", "Foreground", "Centre", 242, 294):add(
-	{'moverel', 1, { {rl5_text,3}, {rl5_text,3.5} }, {0, 0}, {33,0}},
-	{'moverel', 0, { {rl5_text,3.5}, {rl5_text,4} }, {0, 0}, {17,0}},
-	{'moverel', 1, { {rl5_text,4}, {rl5_text,25+4} }, {0, 0}, {24,0}},
-	{'fade', 1, { {rl5_text,3}, {rl5_text,5} }, 0   ,0.9 },
-	{'scale',0, { {rl5_text,3}, {rl5_text,3} }, 0.58,0.58 },
-	{'fade', 0, { {rl5_text,32-0.5}, {rl5_text,34-0.5} }, 0.9,0 }
+	{'moverel', 1, { {rl20_text,3}, {rl20_text,3.5} }, {0, 0}, {33,0}},
+	{'moverel', 0, { {rl20_text,3.5}, {rl20_text,4} }, {0, 0}, {17,0}},
+	{'moverel', 1, { {rl20_text,4}, {rl20_text,25+4} }, {0, 0}, {24,0}},
+	{'fade', 1, { {rl20_text,3}, {rl20_text,5} }, 0   ,0.9 },
+	{'scale',0, { {rl20_text,3}, {rl20_text,3} }, 0.58,0.58 },
+	{'fade', 0, { {rl20_text,32-0.5}, {rl20_text,34-0.5} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/pristine.png", "Foreground", "Centre", 385, 328):add(
-	{'moverel', 1, { {rl5_text,2+8}, {rl5_text,3.5+8} }, {0, 0}, {-43,0}},
-	{'moverel', 0, { {rl5_text,3.5+8}, {rl5_text,5.2+8} }, {0, 0}, {-9,0}},
-	{'moverel', 1, { {rl5_text,5.2+8}, {rl5_text,26+8} }, {0, 0}, {-18,0}},
-	{'fade', 1, { {rl5_text,2+8}, {rl5_text,5+8} }, 0   ,0.9 },
-	{'scale',0, { {rl5_text,2+8}, {rl5_text,2+8} }, 0.54,0.54 },
-	{'fade', 0, { {rl5_text,32.15-0.6}, {rl5_text,34.15-0.6} }, 0.9,0 }
+storyboard:newObject("sb/pristine.png", "Foreground", "Centre", 385, 344):add(
+	{'moverel', 1, { {rl20_text,2+8}, {rl20_text,3.5+8} }, {0, 0}, {-43,0}},
+	{'moverel', 0, { {rl20_text,3.5+8}, {rl20_text,5.2+8} }, {0, 0}, {-9,0}},
+	{'moverel', 1, { {rl20_text,5.2+8}, {rl20_text,26+8} }, {0, 0}, {-18,0}},
+	{'fade', 1, { {rl20_text,2+8}, {rl20_text,5+8} }, 0   ,0.9 },
+	{'scale',0, { {rl20_text,2+8}, {rl20_text,2+8} }, 0.51,0.51 },
+	{'fade', 0, { {rl20_text,32.15-0.6}, {rl20_text,34.15-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/double.png", "Foreground", "Centre", 253, 375):add(
-	{'moverel', 1, { {rl5_text,2+15}, {rl5_text,3.5+15} }, {0, 0}, {35,0}},
-	{'moverel', 0, { {rl5_text,3.5+15}, {rl5_text,5.2+15} }, {0, 0}, {7,0}},
-	{'moverel', 1, { {rl5_text,5.2+15}, {rl5_text,23+8} }, {0, 0}, {16,0}},
-	{'fade', 1, { {rl5_text,2+15}, {rl5_text,5+15} }, 0   ,0.9 },
-	{'scale',0, { {rl5_text,2+15}, {rl5_text,2+15} }, 0.38,0.38 },
-	{'fade', 0, { {rl5_text,32.3-0.6}, {rl5_text,34.3-0.6} }, 0.9,0 }
+storyboard:newObject("sb/double.png", "Foreground", "Centre", 253, 393):add(
+	{'moverel', 1, { {rl20_text,2+15}, {rl20_text,3.5+15} }, {0, 0}, {35,0}},
+	{'moverel', 0, { {rl20_text,3.5+15}, {rl20_text,5.2+15} }, {0, 0}, {7,0}},
+	{'moverel', 1, { {rl20_text,5.2+15}, {rl20_text,23+8} }, {0, 0}, {16,0}},
+	{'fade', 1, { {rl20_text,2+15}, {rl20_text,5+15} }, 0   ,0.9 },
+	{'scale',0, { {rl20_text,2+15}, {rl20_text,2+15} }, 0.40,0.40 },
+	{'fade', 0, { {rl20_text,32.3-0.6}, {rl20_text,34.3-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/raikohorikawa.png", "Foreground", "Centre", 395, 407):add(
-	{'moverel', 1, { {rl5_text,2+22-0.5}, {rl5_text,3.5+22-0.5} }, {0, 0}, {-59,0}},
-	{'moverel', 0, { {rl5_text,3.5+22-0.5}, {rl5_text,4.5+22-0.5} }, {0, 0}, {-07,0}},
-	{'moverel', 1, { {rl5_text,4.5+22-0.5}, {rl5_text,34-0.5} }, {0, 0}, {-09,0}},
-	{'fade', 1, { {rl5_text,2+22}, {rl5_text,5+22} }, 0   ,0.9 },
-	{'scale',0, { {rl5_text,2+22}, {rl5_text,2+22} }, 0.34,0.34 },
-	{'fade', 0, { {rl5_text,32.45-0.6}, {rl5_text,34.45-0.6} }, 0.9,0 }
+storyboard:newObject("sb/raikohorikawa.png", "Foreground", "Centre", 395, 424):add(
+	{'moverel', 1, { {rl20_text,2+22-0.5}, {rl20_text,3.5+22-0.5} }, {0, 0}, {-59,0}},
+	{'moverel', 0, { {rl20_text,3.5+22-0.5}, {rl20_text,4.5+22-0.5} }, {0, 0}, {-07,0}},
+	{'moverel', 1, { {rl20_text,4.5+22-0.5}, {rl20_text,34-0.5} }, {0, 0}, {-09,0}},
+	{'fade', 1, { {rl20_text,2+22}, {rl20_text,5+22} }, 0   ,0.9 },
+	{'scale',0, { {rl20_text,2+22}, {rl20_text,2+22} }, 0.34,0.34 },
+	{'fade', 0, { {rl20_text,32.45-0.6}, {rl20_text,34.45-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/180bpm_r.png", "Foreground", "Centre", 320, 447):add(
+storyboard:newObject("sb/180bpm_r.png", "Foreground", "Centre", 320, 443):add(
 	{'fade', 1, { {rl20_text,2+22}, {rl20_text,5+22} }, 0   ,0.9 },
 	{'scale',0, { {rl20_text,0}, {rl20_text,0} }, 0.47,0.47 },
 	{'fade' ,'cubicOut', { {rl20,206*4},{rl20,208*4}}, 0.9, 0}
