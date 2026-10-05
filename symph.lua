@@ -2055,9 +2055,9 @@ storyboard:newObject("sb/ReisenNegative2.png", "Foreground", "Centre", 320, 366)
 	{'color', 0, {{rl11,65*4}}, {0,255,0}},
 	{'fade', 'cubicOut', {{rl11,65*4}, {rl11,65*4+1}}, 0,0.8},
 	{'color', 0, {{rl11,65*4+8*4}, {rl11,65*4+8*4+1}}, {0,255,0},{0,0,255}},
-	{'color', 0, {{rl11,81*4}, {rl11,81*4+1}}, {0,0,255},{0,255,0}},
-	{'color', 0, {{rl11,89*4}, {rl11,89*4+1}}, {0,255,0},{230,0,255}},
-	{'color', 0, {{rl11,93*4}, {rl11,93*4+1}}, {230,0,0},{255,0,0}},
+	{'color', 0, {{rl11,81*4}, {rl11,81*4+1}}, {0,0,255},{255,0,0}},
+	{'color', 0, {{rl11,89*4}, {rl11,89*4+1}}, {255,0,0},{230,0,255}},
+	{'color', 0, {{rl11,93*4}, {rl11,93*4+1}}, {230,0,255},{0,255,0}},
 	{'fade', 'cubicOut', {{rl11,97*4}, {rl11,97*4+1}}, 0.8,0},
 
 	sb.concadd(rl7_move_in,
@@ -2185,6 +2185,14 @@ local function rl7_text_flash_func(X, str, rl)
 		out{'color',0, {{rl,X}}, {255,0,0}}
 	end
 end
+local function rl9_text_color_transitions(X, rl)
+	return {
+		{'color', 'cubicOut', {{rl,(X+16)*4}, {rl,(X+16)*4+1}}, {0,0,255},{0,0,255}},
+		{'color', 'cubicOut', {{rl,(X+20)*4}, {rl,(X+20)*4+1}}, {0,0,255},{0,255,0}},
+		{'color', 'cubicOut', {{rl,(X+24)*4}, {rl,(X+24)*4+1}}, {0,255,0},{0,0,255}},
+		{'color', 'cubicOut', {{rl,(X+28)*4}, {rl,(X+28)*4+1}}, {0,0,255},{255,0,0}}
+	}
+end
 local rl7_text = {240.0, sb.time:convert('24:24:359')}
 storyboard:newObject("sb/m_a_d.png", "Foreground", "Centre", 242, 294):add(
 	{'moverel', 1, { {rl7_text,3}, {rl7_text,3.5} }, {0, 0}, {33,0}},
@@ -2237,6 +2245,45 @@ storyboard:newObject("sb/reisen.png", "Foreground", "Centre", 395, 407):add(
 	rl7_text_flash_func(19,0.4),
 	rl7_text_flash_func(23,0.4)
 )
+storyboard:newObject("sb/240bpm.png", "Foreground", "Centre", 320, 447):add(
+	{'fade', 1, { {rl7,1*4}, {rl7,2*4} }, 0   ,0.8 },
+	{'color', 0, { {rl7,1*4} }, {255,0,0} },
+	{'scale',0, { {rl7,0}, {rl7,0} }, 0.47,0.47 },
+	{'fade' ,'cubicOut', { {rl11,99*4+2},{rl11,101*4}}, 0.8, 0},
+
+	rl7_text_flash_func(19,0.4),
+	rl7_text_flash_func(23,0.4),
+
+	rl7_text_flash_func(3,0.4,rl9),
+	rl7_text_flash_func(7,0.4,rl9),
+	rl7_text_flash_func(11,0.6,rl9),
+	rl7_text_flash_func(15,0.6,rl9),
+
+	rl7_text_flash_func(51+3,0.4,rl9),
+	rl7_text_flash_func(51+7,0.4,rl9),
+	rl7_text_flash_func(51+11,0.6,rl9),
+	rl7_text_flash_func(51+15,0.6,rl9),
+
+	{'color', 'linear', {{rl11_comp,0},{rl11_comp,0}}, {170*0.8,0,255*0.8}},
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{170*0.8,0,255*0.8},{170*0.8,0,255*1.0}},
+	{'color','cubicOut',{{rl11_comp,8*4},{rl11_comp,9*4}},{170*1.0,0,255*1.0}, {190*0.5,0,255*0.8}},
+	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
+
+	{'color', 0, {{rl11,65*4}}, {0,255,0}},
+	{'color', 0, {{rl11,65*4+8*4}, {rl11,65*4+8*4+1}}, {0,255,0},{0,0,255}},
+	{'color', 0, {{rl11,81*4}, {rl11,81*4+1}}, {0,0,255},{255,0,0}},
+	{'color', 0, {{rl11,89*4}, {rl11,89*4+1}}, {255,0,0},{230,0,255}},
+	{'color', 0, {{rl11,93*4}, {rl11,93*4+1}}, {230,0,255},{0,255,0}},
+
+
+	sb.concadd(
+		rl9_text_color_transitions(0,rl9),
+		rl9_text_color_transitions(-16,rl11),
+		rl9_text_color_transitions(49-16,rl11),
+		rl9_kiai_negative(32*4,rl9),
+		rl9_kiai_negative(16*4,rl11)
+	)
+)
 --
 --
 --
@@ -2259,7 +2306,84 @@ storyboard:newObject("sb/reisen.png", "Foreground", "Centre", 395, 407):add(
 --
 --
 --
+-- Songe 5558485
 --
---
+
+local rl20 = {180.0, 1167774}
+
+local rl20_move_in = {
+	{'move', 'linear', {{rl20,0}}, {-107,50}},
+	{'moverel', 'cubicout', {{rl20,0}, {rl20,1*4}}, {0,0}, {0,50}},
+	{'moverel', 'cubicout', {{rl20,0}, {rl20,8*4}}, {0,0}, {0,119}}
+}
+
+storyboard:newObject("sb/RaikoS.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,0},{rl20,0.5}}, 0,0.6},
+	{'fade','cubicout', {{rl20,0.5},{rl20,4*4}}, 0.6,0.7},
+	{'fade','quintOut', {{rl20,4*4},{rl20,4*6}}, 0.7,1.0},
+	{'fade','cubicout', {{rl20,8*4},{rl20,8*4}}, 0},
+	sb.concadd(rl20_move_in)
+)
+
+storyboard:newObject("sb/Raiko1.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,8*4-0.5},{rl20,8*4}}, 0,1},
+	{'fade','cubicout', {{rl20,44*4-0.5},{rl20,44*4}}, 1,0},
+	sb.concadd(rl20_move_in)
+)
+
+storyboard:newObject("sb/RaikoFlash.png", "Background", "TopLeft", -107, 50):add(
+	Flash({rl20,0}, 800, 0.9, 0.1),
+	Flash({rl20,2*4}, 500, 0.4, 0.3),
+	Flash({rl20,6*4}, 500, 0.3, 0.3),
+	Flash({rl20,7*4}, 500, 0.2, 0.3),
+	Flash({rl20,8*4}, 800, 0.9, 0.1),
+	Flash({rl20,16*4}, 1600, 0.9, 0.1),
+	sb.concadd(rl20_move_in)
+)
+
+local rl20_text = {180.0, 1167774}
+storyboard:newObject("sb/v_h.png", "Foreground", "Centre", 242, 294):add(
+	{'moverel', 1, { {rl5_text,3}, {rl5_text,3.5} }, {0, 0}, {33,0}},
+	{'moverel', 0, { {rl5_text,3.5}, {rl5_text,4} }, {0, 0}, {17,0}},
+	{'moverel', 1, { {rl5_text,4}, {rl5_text,25+4} }, {0, 0}, {24,0}},
+	{'fade', 1, { {rl5_text,3}, {rl5_text,5} }, 0   ,0.9 },
+	{'scale',0, { {rl5_text,3}, {rl5_text,3} }, 0.58,0.58 },
+	{'fade', 0, { {rl5_text,32-0.5}, {rl5_text,34-0.5} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/pristine.png", "Foreground", "Centre", 385, 328):add(
+	{'moverel', 1, { {rl5_text,2+8}, {rl5_text,3.5+8} }, {0, 0}, {-43,0}},
+	{'moverel', 0, { {rl5_text,3.5+8}, {rl5_text,5.2+8} }, {0, 0}, {-9,0}},
+	{'moverel', 1, { {rl5_text,5.2+8}, {rl5_text,26+8} }, {0, 0}, {-18,0}},
+	{'fade', 1, { {rl5_text,2+8}, {rl5_text,5+8} }, 0   ,0.9 },
+	{'scale',0, { {rl5_text,2+8}, {rl5_text,2+8} }, 0.54,0.54 },
+	{'fade', 0, { {rl5_text,32.15-0.6}, {rl5_text,34.15-0.6} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/double.png", "Foreground", "Centre", 253, 375):add(
+	{'moverel', 1, { {rl5_text,2+15}, {rl5_text,3.5+15} }, {0, 0}, {35,0}},
+	{'moverel', 0, { {rl5_text,3.5+15}, {rl5_text,5.2+15} }, {0, 0}, {7,0}},
+	{'moverel', 1, { {rl5_text,5.2+15}, {rl5_text,23+8} }, {0, 0}, {16,0}},
+	{'fade', 1, { {rl5_text,2+15}, {rl5_text,5+15} }, 0   ,0.9 },
+	{'scale',0, { {rl5_text,2+15}, {rl5_text,2+15} }, 0.38,0.38 },
+	{'fade', 0, { {rl5_text,32.3-0.6}, {rl5_text,34.3-0.6} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/raikohorikawa.png", "Foreground", "Centre", 395, 407):add(
+	{'moverel', 1, { {rl5_text,2+22-0.5}, {rl5_text,3.5+22-0.5} }, {0, 0}, {-59,0}},
+	{'moverel', 0, { {rl5_text,3.5+22-0.5}, {rl5_text,4.5+22-0.5} }, {0, 0}, {-07,0}},
+	{'moverel', 1, { {rl5_text,4.5+22-0.5}, {rl5_text,34-0.5} }, {0, 0}, {-09,0}},
+	{'fade', 1, { {rl5_text,2+22}, {rl5_text,5+22} }, 0   ,0.9 },
+	{'scale',0, { {rl5_text,2+22}, {rl5_text,2+22} }, 0.34,0.34 },
+	{'fade', 0, { {rl5_text,32.45-0.6}, {rl5_text,34.45-0.6} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/180bpm_r.png", "Foreground", "Centre", 320, 447):add(
+	{'fade', 1, { {rl20_text,2+22}, {rl20_text,5+22} }, 0   ,0.9 },
+	{'scale',0, { {rl20_text,0}, {rl20_text,0} }, 0.47,0.47 },
+	{'fade' ,'cubicOut', { {rl20,206*4},{rl20,208*4}}, 0.9, 0}
+)
 
 storyboard:writeToFile2()
