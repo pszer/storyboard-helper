@@ -1732,6 +1732,13 @@ storyboard:newObject("sb/Lines.jpg", "Background", "TopLeft", -107, 252):add(
 	sb.concadd(rl7_scrolls)
 )
 
+storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):add(
+	{'protract', {'parameter', {{rl8, 0}}, value='a'}},
+	{'color', 0, {{rl8, 0}}, {255,0,240}},
+	{'fade', 'quartOut', { {rl8,0}, {rl8,0.1} }, 0, 0.5},
+	{'fade', 'quartOut', { {rl8,0.1}, {rl8,1.5} }, 0.5, 0},
+	sb.concadd(rl7_move_in)
+)
 storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 	{'color', 'linear', { {rl7,0*4-0.8} }, {220,220,220} },
 	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0.5} }, 0, 1},
@@ -2099,8 +2106,7 @@ storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):
 	rl9_kiai_flashes(16*4,rl11,0.08),rl9_kiai_flashes(24*4,rl11,0.10),
 	rl9_kiai_flashes(65*4,rl11,0.08),rl9_kiai_flashes(73*4,rl11,0.10),
 	rl9_kiai_flashes(81*4,rl11,0.09),rl9_kiai_flashes(89*4,rl11,0.11)
-)
-)
+))
 
 local BGN={
 	{'scale',0,{{rl11_comp,0}},2.1},
@@ -2163,5 +2169,97 @@ storyboard:newObject("sb/Reisen.png", "Background", "Centre", 320, 366):add(
 	{'fade', 'cubicOut', {{rl11,100*4-1}, {rl11,101*4}}, 1,0.0},
 	sb.concadd(rl7_move_in)
 )
+
+local function rl7_text_flash_func(X, str, rl)
+	local rl=rl or rl7
+	return function(out)
+		local X=X*4
+		out{'color',0,{{rl,X}}, {0,0,255}}
+		X=X+1
+		out{'color',0, {{rl,X}}, {0,255,0}}
+		X=X+1
+		out{'color',0, {{rl,X}}, {255,0,0}}
+		X=X+1
+		out{'color',0, {{rl,X}}, {0,0,255}}
+		X=X+1
+		out{'color',0, {{rl,X}}, {255,0,0}}
+	end
+end
+local rl7_text = {240.0, sb.time:convert('24:24:359')}
+storyboard:newObject("sb/m_a_d.png", "Foreground", "Centre", 242, 294):add(
+	{'moverel', 1, { {rl7_text,3}, {rl7_text,3.5} }, {0, 0}, {33,0}},
+	{'moverel', 0, { {rl7_text,3.5}, {rl7_text,4} }, {0, 0}, {17,0}},
+	{'moverel', 1, { {rl7_text,4}, {rl7_text,25+4} }, {0, 0}, {24,0}},
+	{'color', 0, { {rl7_text,3} }, {255,0,0} },
+	{'fade', 1, { {rl7_text,3}, {rl7_text,5} }, 0   ,0.7 },
+	{'scale',0, { {rl7_text,3}, {rl7_text,3} }, 0.58,0.58 },
+	{'fade', 0, { {rl7_text,32-0.5}, {rl7_text,34-0.5} }, 0.7,0 },
+
+	rl7_text_flash_func(19,0.4),
+	rl7_text_flash_func(23,0.4)
+)
+
+storyboard:newObject("sb/invismoon.png", "Foreground", "Centre", 385, 330):add(
+	{'moverel', 1, { {rl7_text,2+8}, {rl7_text,3.5+8} }, {0, 0}, {-43,0}},
+	{'moverel', 0, { {rl7_text,3.5+8}, {rl7_text,5.2+8} }, {0, 0}, {-9,0}},
+	{'moverel', 1, { {rl7_text,5.2+8}, {rl7_text,26+8} }, {0, 0}, {-18,0}},
+	{'color', 0, { {rl7_text,2+8} }, {255,0,0} },
+	{'fade', 1, { {rl7_text,2+8}, {rl7_text,5+8} }, 0   ,0.7 },
+	{'scale',0, { {rl7_text,2+8}, {rl7_text,2+8} }, 0.54,0.54 },
+	{'fade', 0, { {rl7_text,32.15-0.6}, {rl7_text,34.15-0.6} }, 0.7,0 },
+
+	rl7_text_flash_func(19,0.4),
+	rl7_text_flash_func(23,0.4)
+)
+
+storyboard:newObject("sb/imperishable_night.png", "Foreground", "Centre", 253, 375):add(
+	{'moverel', 1, { {rl7_text,2+15}, {rl7_text,3.5+15} }, {0, 0}, {35,0}},
+	{'moverel', 0, { {rl7_text,3.5+15}, {rl7_text,5.2+15} }, {0, 0}, {7,0}},
+	{'moverel', 1, { {rl7_text,5.2+15}, {rl7_text,23+8} }, {0, 0}, {16,0}},
+	{'color', 0, { {rl7_text,2+15} }, {255,0,0} },
+	{'fade', 1, { {rl7_text,2+15}, {rl7_text,5+15} }, 0   ,0.7 },
+	{'scale',0, { {rl7_text,2+15}, {rl7_text,2+15} }, 0.38,0.38 },
+	{'fade', 0, { {rl7_text,32.3-0.6}, {rl7_text,34.3-0.6} }, 0.7,0 },
+
+	rl7_text_flash_func(19,0.4),
+	rl7_text_flash_func(23,0.4)
+)
+storyboard:newObject("sb/reisen.png", "Foreground", "Centre", 395, 407):add(
+	{'move', 0, { {rl7_text,2+22} }, {395,407} },
+	{'moverel', 1, { {rl7_text,2+22-0.5}, {rl7_text,3.5+22-0.5} }, {0, 0}, {-59,0}},
+	{'moverel', 0, { {rl7_text,3.5+22-0.5}, {rl7_text,4.5+22-0.5} }, {0, 0}, {-07,0}},
+	{'moverel', 1, { {rl7_text,4.5+22-0.5}, {rl7_text,34-0.5} }, {0, 0}, {-09,0}},
+	{'color', 0, { {rl7_text,2+22} }, {255,0,0} },
+	{'fade', 1, { {rl7_text,2+22}, {rl7_text,5+22} }, 0   ,0.7 },
+	{'scale',0, { {rl7_text,2+22}, {rl7_text,2+22} }, 0.34,0.34 },
+	{'fade', 0, { {rl7_text,32.45-0.6}, {rl7_text,34.45-0.6} }, 0.7,0 },
+
+	rl7_text_flash_func(19,0.4),
+	rl7_text_flash_func(23,0.4)
+)
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
 
 storyboard:writeToFile2()
