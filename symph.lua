@@ -169,7 +169,30 @@ local rl0_text = {90.0, 400}
 storyboard:newObject("sb/90bpm.png", "Foreground", "Centre", 318, 449):add(
 	{'fade', 1, { {rl0_text,2}, {rl0_text,5} }, 0   ,1.0 },
 	{'scale',0, { {rl0_text,2}, {rl0_text,5} }, 0.47,0.47 },
-	{'fade', 'cubicOut', {"0:52:428", "0:54:428"}, 1.0, 0.0}
+
+	{'fade', 'cubicout', {'0:27:045', '0:27:275'}, 1,0}
+	--{'fade', 'cubicOut', {"0:52:428", "0:54:428"}, 1.0, 0.0}
+)
+storyboard:newObject("sb/130bpm.png", "Foreground", "Centre", 312, 449):add(
+	{'fade', 1, {'0:27:045', '0:27:275'}, 0   ,1.0 },
+	{'scale',0, {'0:27:045'}, 0.47 },
+
+	{'fade', 'cubicout', {'00:51:045', '0:51:375'}, 1,0}
+)
+storyboard:newObject("sb/125bpm.png", "Foreground", "Centre", 312, 449):add(
+	{'fade', 1, {'00:51:045', '0:51:275'}, 0   ,1.0 },
+	{'scale',0, {'00:51:045' }, 0.47 },
+	{'fade', 'cubicout', {"0:52:006", '0:52:275'}, 1,0}
+)
+storyboard:newObject("sb/118bpm.png", "Foreground", "Centre", 312, 449):add(
+	{'fade', 1, {"0:52:006", '0:52:275'}, 0   ,1.0 },
+	{'scale',0, {"0:52:006"}, 0.47 },
+	{'fade', 'cubicout', {"00:53:022",'00:53:252'}, 1,0}
+)
+storyboard:newObject("sb/100bpm.png", "Foreground", "Centre", 312, 449):add(
+	{'fade', 1, {"0:53:022", '0:53:252'}, 0   ,1.0 },
+	{'scale',0, {"0:52:022"}, 0.47 },
+	{'fade', 'cubicout', {"00:53:422",'00:53:722'}, 1,0}
 )
 
 storyboard:newObject("sb/symphonic.png", "Foreground", "Centre", 242, 306):add(
@@ -888,7 +911,7 @@ storyboard:newObject("sb/rem3top.jpg", "Foreground", "TopLeft", -107, -6):add(
 	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 1},
 	{'fade', 2, { {rl3,165*4}, {rl3,165*4} }, 0, 0}
 )
-storyboard:newObject("sb/rem4top.jpg", "Background", "TopLeft", -107, -6):add(
+storyboard:newObject("sb/rem4top.jpg", "Foreground", "TopLeft", -107, -6):add(
 	{'scale', 0, { {rl3,148*4}, {rl3,148*4} }, 0.6675, 0.6675},
 	{'fade', 2, { {rl3,148*4-0.5}, {rl3,148*4} }, 0, 1},
 	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 0},
@@ -3212,25 +3235,25 @@ storyboard:newObject("sb/pristine.png", "Foreground", "Centre", 385, 344):add(
 	{'fade', 0, { {rl20_text,32.15-0.6}, {rl20_text,34.15-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/double.png", "Foreground", "Centre", 253, 393):add(
+storyboard:newObject("sb/double.png", "Foreground", "Centre", 253, 392):add(
 	{'moverel', 1, { {rl20_text,2+15}, {rl20_text,3.5+15} }, {0, 0}, {35,0}},
 	{'moverel', 0, { {rl20_text,3.5+15}, {rl20_text,5.2+15} }, {0, 0}, {7,0}},
 	{'moverel', 1, { {rl20_text,5.2+15}, {rl20_text,23+8} }, {0, 0}, {16,0}},
 	{'fade', 1, { {rl20_text,2+15}, {rl20_text,5+15} }, 0   ,0.9 },
-	{'scale',0, { {rl20_text,2+15}, {rl20_text,2+15} }, 0.40,0.40 },
+	{'scale',0, { {rl20_text,2+15}, {rl20_text,2+15} }, 0.37,0.37 },
 	{'fade', 0, { {rl20_text,32.3-0.6}, {rl20_text,34.3-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/raikohorikawa.png", "Foreground", "Centre", 395, 424):add(
+storyboard:newObject("sb/raikohorikawa.png", "Foreground", "Centre", 395, 415):add(
 	{'moverel', 1, { {rl20_text,2+22-0.5}, {rl20_text,3.5+22-0.5} }, {0, 0}, {-59,0}},
 	{'moverel', 0, { {rl20_text,3.5+22-0.5}, {rl20_text,4.5+22-0.5} }, {0, 0}, {-07,0}},
 	{'moverel', 1, { {rl20_text,4.5+22-0.5}, {rl20_text,34-0.5} }, {0, 0}, {-09,0}},
 	{'fade', 1, { {rl20_text,2+22}, {rl20_text,5+22} }, 0   ,0.9 },
-	{'scale',0, { {rl20_text,2+22}, {rl20_text,2+22} }, 0.34,0.34 },
+	{'scale',0, { {rl20_text,2+22}, {rl20_text,2+22} }, 0.33,0.33 },
 	{'fade', 0, { {rl20_text,32.45-0.6}, {rl20_text,34.45-0.6} }, 0.9,0 }
 )
 
-storyboard:newObject("sb/180bpm_r.png", "Foreground", "Centre", 320, 443):add(
+storyboard:newObject("sb/180bpm_r.png", "Foreground", "Centre", 320, 444):add(
 	{'fade', 1, { {rl20_text,2+22}, {rl20_text,5+22} }, 0   ,0.9 },
 	{'scale',0, { {rl20_text,0}, {rl20_text,0} }, 0.47,0.47 },
 	{'fade' ,'cubicOut', { {rl20,206*4},{rl20,208*4}}, 0.9, 0}
@@ -3595,6 +3618,15 @@ storyboard:newObject("sb/165bpm.png", "Foreground", "Centre", 320, 443):add(
 	{'fade', 1, { {rl30_text,2+22}, {rl30_text,5+22} }, 0   ,0.9 },
 	{'scale',0, { {rl30_text,0}, {rl30_text,0} }, 0.47,0.47 },
 	{'fade' ,'cubicOut', { {rl30,206*4},{rl30,208*4}}, 0.9, 0}
+)
+
+-- bar in case of transparent skins
+--
+
+storyboard:newObject('sb/Black.jpg', 'Foreground', 'TopLeft', -107,141):add(
+	{'fade', 0, { '0:00:000' }, 1 },
+	{'vector',0, { '0:00:000' }, {1,0.37} },
+	{'fade', 0, { '33:06:137' }, 0 }
 )
 
 storyboard:writeToFile2()
