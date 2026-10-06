@@ -8,11 +8,12 @@ storyboard:newObject("bg.jpg", "Background", "Center", 320, 240):add(
 	{'fade', 0, { -500, -500 }, 0,0 }
 )
 
-local function Flash(time,dur,strength,peak)
+local function Flash(time,dur,strength,peak, ease)
+	ease = ease or 1
 	local T = sb.time:convert(time)
 	return function (out)
-		out{'fade',1,{T,T+dur*peak},0,strength}
-		out{'fade',1,{T+dur*peak,T+dur},strength,0}
+		out{'fade',ease,{T,T+dur*peak},0,strength}
+		out{'fade',ease,{T+dur*peak,T+dur},strength,0}
 	end
 end
 
@@ -44,13 +45,29 @@ local rl0_2 = {130.0, 27045}
 
 local rl0_move_in = {
 	{'move', 0, {{rl0,0}}, {-107,242}},
-	--{'moverel','Out',{ {rl0,0}, {rl0,4*4} }, {0,0}, {0,-20}},
 	{'moverel','Out',{ {rl0,0 }, {rl0, 4*3} }, {0,0}, {0,-35}},
 	{'moverel','In',{ {rl0,4*3}, {rl0,8*3} }, {0,0}, {0,-50}},
 	{'moverel','QuintOut',{ {rl0,8*3}, "0:57:222" }, {0,0}, {0,-150}},
-	--{'moverel','linear',{ {rl0,4*4}, {rl0,8*4} }, {0,0}, {0,-12}},
-	--{'moverel','SineOut',{ {rl0,4*4}, {rl0,8*4} }, {0,0}, {0,-25}},
 }
+
+local rl0_move_in_top = {
+	{'move', 0, {{rl0,0}}, {-107,0}},
+	{'moverel','Out',{ {rl0,0 }, {rl0, 4*3} }, {0,0}, {0,-35*0.2}},
+	{'moverel','In',{ {rl0,4*3}, {rl0,8*3} }, {0,0}, {0,-50*0.7}},
+	{'moverel','QuintOut',{ {rl0,8*3}, "0:57:222" }, {0,0}, {0,-150*0.8}},
+}
+
+
+-- TOP
+storyboard:newObject("sb/Intro1_STop_.jpg", "Background", "TopLeft", -107, 242):add(
+	{'fade', 'quartOut', {{rl0,0}, {rl0,2*3}}, 0,0.5},
+	{'fade', 'cubicOut', {{rl0,2*3+1}, {rl0,4*3}}, 0.5,0.7},
+	{'fade', 'cubicOut', {{rl0,4*3}, {rl0,4*3+2}}, 0.7,0.9},
+	{'fade', 'cubicOut', {{rl0,4*3+2}, {rl0,6*3}}, 0.9,0.8},
+	{'fade', 'out', {{rl0,7*3+1}, {rl0,8*3}}, 0.8,0.3},
+	{'fade', 1, {{rl0,8*3+0.25}}, 0,0},
+	sb.concadd(rl0_move_in_top)
+)
 
 storyboard:newObject("sb/Intro1_S.jpg", "Background", "TopLeft", -107, 242):add(
 	{'fade', 'quartOut', {{rl0,0}, {rl0,2*3}}, 0,0.5},
@@ -61,12 +78,16 @@ storyboard:newObject("sb/Intro1_S.jpg", "Background", "TopLeft", -107, 242):add(
 	{'fade', 1, {{rl0,8*3+0.25}}, 0,0},
 	sb.concadd(rl0_move_in)
 )
+
 storyboard:newObject("sb/Intro2.jpg", "Background", "TopLeft", -107, 242):add(
 	{'fade', 'out', {{rl0,8*3-0.25}, {rl0,8*3+0.25}}, 0.0,1.0},
 	{'fade', 'out', {{rl0_2,0*4-2.5}, {rl0_2,0*4+0.5}}, 1, 0.8},
 	{'fade', 'out', {{rl0_2,0*4+0.5}}, 0},
 	sb.concadd(rl0_move_in)
 )
+
+
+
 storyboard:newObject("bg.jpg", "Background", "TopLeft", -107, 242):add(
 	{'scale',0, { {rl0_2,0} }, 0.495 },
 	{'fade', 'out', {{rl0_2,0*4}, {rl0_2,0*4+0.5}}, 0.0,1.0},
@@ -115,6 +136,23 @@ storyboard:newObject("sb/bgFlash.png", "Background", "TopLeft", -107, 242):add(
 	{'fade', 'cubicOut', {"0:52:428", "0:54:428"}, 0.6, 0.0},
 	--Flash({rl0_2,12*4}, 4000, 0.4, 0.3),
 	sb.concadd(rl0_move_in)
+)
+
+storyboard:newObject("sb/Intro1_STop_3.jpg", "Foreground", "TopLeft", -107, 242):add(
+	{'fade', 'out', {{rl0,8*3-0.25}}, 0.0,1.0},
+	{'color', 'out', {{rl0,8*3-0.25}, {rl0,8*3+0.25}}, {0,0,0},{1*255,255,255}},
+	{'color', 'out', {{rl0_2,0*4-2.5}, {rl0_2,0*4+0.5}}, {255,255,255}, {0.8*255,0.8*255,0.8*255}},
+	{'fade', 'out', {{rl0_2,0*4+0.5}}, 0},
+	sb.concadd(rl0_move_in_top)
+)
+
+storyboard:newObject("sb/Intro1_STop_4.jpg", "Foreground", "TopLeft", -107, 242):add(
+	{'fade', 'out', {{rl0_2,0*4}, {rl0_2,0*4+0.5}}, 0.0,1.0},
+	{'fade', 1, {"0:53:022", "0:57:222"}, 1,0},
+	{'color', 'quintOut', {{rl0_2, 7*4}, {rl0_2, 7*4+2}}, {255,255,255}, {190,190,190}},
+	{'color', 'quintIn', {{rl0_2, 7*4+2}, {rl0_2, 8*4}}, {190,190,190}, {255,255,255}},
+	{'color', 'cubicOut', {{rl0_2, 12*4}, "0:54:428"}, {255,255,255}, {50,50,50}},
+	sb.concadd(rl0_move_in_top)
 )
 
 storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
@@ -235,6 +273,12 @@ local rl1_move_in = {
 	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-25}},
 	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5}},
 }
+local rl1_move_in_top = {
+	{'move', 'linear', {{rl1,0}}, {-107,-5}},
+	{'moverel','Out',{ {rl1,0}, {rl1,16}}, {0,0}, {0,-50*0.8}},
+	{'moverel','linear',{ {rl1,14}, {rl1,29}}, {0,0}, {0,-25*0.5}},
+	{'moverel','linear',{ {rl1,29}, {rl1,31}}, {0,0}, {0,-5*0.4}},
+}
 
 storyboard:newObject("sb/Ellen.jpg", "Background", "TopLeft", -107, 242):add(
 	{'scale',0, { "0:57:722", "0:57:882"}, 0.667, 0.667},
@@ -261,6 +305,30 @@ storyboard:newObject("sb/Ellen.jpg", "Background", "TopLeft", -107, 242):add(
 	sb.concadd(rl1_move_in)
 )
 
+storyboard:newObject("sb/EllenTop.jpg", "Foreground", "TopLeft", -107, 242):add(
+	{'color',0, { "0:57:722", "0:57:882"}, {225,225,225}, {225,225,225}},
+	{'fade', 1, { "0:57:822", "0:59:053" }, 0,0.85 },
+	{'fade', 0, { "0:59:053", "1:01:453" }, 0.85,1 },
+	{'fade', 'quintIn', { {rl1,32-0.5}, {rl1,32+0.5} }, 1,0 },
+	{'fade', 1,  { {rl1,22*4}, {rl1,22*4} }, 1,1 },
+	{'fade', 1,  { {rl1,49*4}, {rl1,49*4} }, 0,0 },
+
+	{'color',0, { {rl1,72*4}, {rl1,72*4} }, {180,180,180}, {180,180,180}},
+	{'fade', 1,  { {rl1,72*4}, {rl1,72*4} }, 1,1 },
+	{'fade', 1,  { {rl1,92*4}, {rl1,92*4} }, 0,0 },
+	{'color',0, { {rl1,74*4-0.5}, {rl1,74*4} }, {180,180,180}, {225,225,225}},
+	{'fade', 1,  { {rl1,146*4-0.5}, {rl1,146*4-0.5} }, 1,1 },
+	{'fade', 1,  { {rl1,148*4}, {rl1,148*4} }, 0,0 },
+
+	{'fade', 1,  { {rl1,166*4-1}, {rl1,166*4-1} }, 1,1 },
+	{'fade', 1,  { {rl2,9*4}, {rl2,9*4} }, 0,0 },
+
+	{'color','out', { "04:40:137", {rl2,2} }, {225,225,225}, {160,160,160}},
+	{'color','in', { {rl2,3},{rl2,4}}, {160,160,160}, {235,235,235}},
+
+	sb.concadd(rl1_move_in_top)
+)
+
 storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 162):add(
 	{'scale',0, { {rl1,107*4-1}, {rl1,107*4-1} }, 0.667, 0.667},
 	{'fade', 'out',  { {rl1,107*4-1}, {rl1,107*4-1} }, 1,1 },
@@ -275,20 +343,35 @@ storyboard:newObject("sb/EllenI1.jpg", "Background", "TopLeft", -107, 162):add(
 	{'fade', 'linear',  { {rl1,150*4-0.5}, {rl1,150*4-0.5} }, 1,1 },
 	{'fade', 'out',  { {rl1,166*4-1.0}, {rl1,166*4} }, 1,0 }
 )
+storyboard:newObject("sb/EllenI1Top.jpg", "Foreground", "TopLeft", -107, 162):add(
+	{'scale',0, { {rl1,107*4-1}, {rl1,107*4-1} }, 0.667, 0.667},
+	{'fade', 'out',  { {rl1,107*4-1}, {rl1,107*4-1} }, 0,1 },
+	{'color'  , 'out', { {rl1,123*4}, {rl1,125*4}}, {255,255,255}, {180,180,180}},
+	{'fade', 'out',  { {rl1,126*4}, {rl1,126*4} }, 0,0 },
+	{'color'  , 'linear', { {rl1,150*4-0.5}, {rl1,150*4-0.5}}, {255,255,255}, {255,255,255}},
+	{'fade', 'linear',  { {rl1,150*4-0.5}, {rl1,150*4-0.5} }, 1,1 },
+	{'fade', 'out',  { {rl1,166*4-1.0}, {rl1,166*4} }, 1,0 },
+	sb.concadd(rl1_move_in_top)
+)
 
 storyboard:newObject("sb/EllenI2.jpg", "Background", "TopLeft", -107, 162):add(
 	{'scale',0, { {rl1,126*4-0.5}, {rl1,126*4-0.5} }, 0.667, 0.667},
 	{'fade', 'in',  { {rl1,126*4-0.5}, {rl1,126*4} }, 0,1 },
-	--{'moverel', 'sineIn',  { {rl1,107*4-1}, {rl1,111*4} }, {0,0},{0,22} },
-	--{'moverel', 'linear',  { {rl1,110*4}, {rl1,113*4} }, {0,0},{0,12} },
-	--{'moverel', 'out',  { {rl1,111*4}, {rl1,115*4} }, {0,0},{0,-4} },
-	--{'moverel', 'linear',  { {rl1,115*4}, {rl1,120*4} }, {0,0},{0,-5} },
-	--{'moverel', 'in',  { {rl1,112*4}, {rl1,123*4} }, {0,0},{0,-28} },
-	--{'color'  , 'out', { {rl1,123*4}, {rl1,125*4}}, {255,255,255}, {180,180,180}},
+
 	{'fade', 'out',  { {rl1,146*4-0.5}, {rl1,146*4+0.5} }, 1,0 },
 	{'fade', 'out',  { {rl1,148*4-0.5}, {rl1,148*4} }, 0,1 },
 	{'color'  , 'linear', { {rl1,148*4-0.5}, {rl1,148*4-0.5}}, {230,230,230}, {230,230,230}},
 	{'fade', 'quintin',  { {rl1,150*4-0.5}, {rl1,150*4} }, 1,0 }
+)
+storyboard:newObject("sb/EllenI2Top.jpg", "Foreground", "TopLeft", -107, 162):add(
+	{'scale',0, { {rl1,126*4-0.5}, {rl1,126*4-0.5} }, 0.667, 0.667},
+	{'fade', 'in',  { {rl1,126*4-0.5}, {rl1,126*4} }, 0,1 },
+
+	{'fade', 'out',  { {rl1,146*4-0.5}, {rl1,146*4+0.5} }, 1,0 },
+	{'fade', 'out',  { {rl1,148*4-0.5}, {rl1,148*4} }, 0,1 },
+	{'color'  , 'linear', { {rl1,148*4-0.5}, {rl1,148*4-0.5}}, {230,230,230}, {230,230,230}},
+	{'fade', 'quintin',  { {rl1,150*4-0.5}, {rl1,150*4} }, 1,0 },
+	sb.concadd(rl1_move_in_top)
 )
 
 storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 122):add(
@@ -313,6 +396,27 @@ storyboard:newObject("sb/EllenK.jpg", "Background", "TopLeft", -106.7, 122):add(
 	{'fade', 'out',  { {rl2,42*4-2}, {rl2,43*4} }, 1,0 },
 	sb.concadd(rl1_move_in)
 )
+storyboard:newObject("sb/EllenTopK.jpg", "Foreground", "TopLeft", -106.7, 122):add(
+	{'color',0 , { {rl1,8*4-0.5}, {rl1,8*4-0.5} }, {220,220,220},{220,220,220}},
+	{'fade', 1,  { {rl1,8*4-0.5}, {rl1,8*4+0.5} }, 0,1 },
+	{'color', 1,  { {rl1,16*4-0.5}, {rl1,16*4} }, {220,220,220},{255,255,255} },
+	{'fade', 1,  { {rl1,23*4-0.5}, {rl1,23*4} }, 1,0 },
+	{'fade', 1,  { {rl1,49*4-0.5}, {rl1,49*4} }, 0,1 },
+	{'fade', 'out',  { {rl1,73*4-1}, {rl1,73*4} }, 1,0 },
+	{'color', 1,  { {rl1,65*4-0.5}, {rl1,65*4} }, {255,255,255},{220,220,220} },
+	Flash({rl1, 39*4},1400, 0.8, 0.1),
+	Flash({rl1, 47*4},1400, 0.8, 0.1),
+	{'fade', 'in',  { {rl1,74*4-3}, {rl1,74*4} }, 0,0.8 },
+	{'fade', 'out',  { {rl1,74*4}, {rl1,76*4} }, 0.8,0 },
+	Flash({rl1, 81*4},1400, 0.8, 0.1),
+	--
+	{'color', 1,  { {rl1,91*4-0.5}, {rl1,91*4-0.5} }, {225,225,225},{255,255,255} },
+	{'fade', 1,  { {rl1,91*4-0.5}, {rl1,91*4} }, 0,1 },
+	{'fade', 'quintIn',  { {rl1,107*4-1}, {rl1,107*4} }, 1,0 },
+	{'fade', 'out',  { {rl2,33*4-0.5}, {rl2,33*4-0.5} }, 1,1 },
+	{'fade', 'out',  { {rl2,42*4-2}, {rl2,43*4} }, 1,0 },
+	sb.concadd(rl1_move_in_top)
+)
 
 storyboard:newObject("sb/EllenK2.jpg", "Background", "TopLeft", -106.7, 162):add(
 	{'scale',0 , { {rl2,9*4-0.5}, {rl2,9*4-0.5} }, 0.6675, 0.6675},
@@ -321,6 +425,14 @@ storyboard:newObject("sb/EllenK2.jpg", "Background", "TopLeft", -106.7, 162):add
 
 	Flash({rl1, 175*4},2400, 0.8, 0.1),
 	Flash({rl2, 5*4},1600, 0.6, 0.1)
+)
+storyboard:newObject("sb/EllenK2Top.jpg", "Foreground", "TopLeft", -106.7, 162):add(
+	{'fade', 1,  { {rl2,9*4-0.5}, {rl2,9*4} }, 0,1 },
+	{'fade', 'out',  { {rl2,33*4-0.5}, {rl2,33*4} }, 1,0 },
+
+	Flash({rl1, 175*4},2400, 0.8, 0.1),
+	Flash({rl2, 5*4},1600, 0.6, 0.1),
+	sb.concadd(rl1_move_in_top)
 )
 
 local count = 1
@@ -665,6 +777,21 @@ storyboard:newObject("sb/rem1.jpg", "Background", "TopLeft", -107, 229):add(
 	{'fade', 'quartIn', { {rl3,224*4}, {rl3,225*4+0.25} }, 1,0 }
 )
 
+storyboard:newObject("sb/rem1Top.jpg", "Background", "TopLeft", -107, -25+19):add(
+	{'scale', 0, { {rl3,8*4}, {rl3,8*4} }, 0.6675, 0.6675},
+	{'color', 0, { {rl3,8*4}, {rl3,8*4} }, {230,230,230}},
+	{'fade', 1, { {rl3,7*4}, {rl3,7*4} }, 1, 1},
+	{'fade', 1, { {rl3,17*4}, {rl3,17*4} }, 0, 0},
+	{'fade', 1, { {rl3,47*4}, {rl3,47*4} }, 1, 1},
+	{'fade', 1, { {rl3,75*4}, {rl3,75*4} }, 0, 0},
+	{'fade', 1, { {rl3,105*4}, {rl3,105*4} }, 1, 1},
+	{'fade', 1, { {rl3,126*4}, {rl3,126*4} }, 0, 0},
+	{'fade', 1, { {rl3,131*4}, {rl3,131*4} }, 1, 1},
+	{'fade', 1, { {rl3,142*4}, {rl3,142*4} }, 0,0},
+	{'fade', 1, { {rl3,194*4-0.5}, {rl3,194*4} }, 0, 1},
+	{'fade', 'quartIn', { {rl3,224*4}, {rl3,225*4+0.25} }, 1,0 }
+)
+
 storyboard:newObject("sb/rem2.jpg", "Background", "TopLeft", -107, 210):add(
 	{'scale', 0, { {rl3,0*4-1}, {rl3,0*4-1} }, 0.6675, 0.6675},
 	{'moverel', 1, { {rl3,0*4-1.25}, {rl3,0*4} }, {0,0}, {0,10}},
@@ -686,6 +813,34 @@ storyboard:newObject("sb/rem2.jpg", "Background", "TopLeft", -107, 210):add(
 	{'color', 1, { {rl3,128*4}, {rl3,128*4+0.5} }, {130,130,130},{150,150,150}},
 	{'color', 1, { {rl3,130*4}, {rl3,130*4+0.5} }, {150,150,150},{200,200,200}},
 	{'color', 2, { {rl3,131*4+2}, {rl3,132*4} }, {200,200,200},{235,235,235}},
+	{'fade', 'quartIn', { {rl3,132*4-0.5}, {rl3,132*4} }, 1, 0},
+
+	{'fade',  1, { {rl3,174*4-0.25}, {rl3,174*4} }, 0, 1},
+	{'fade',  'quartIn', { {rl3,190*4}, {rl3,191*4} }, 1,0.8},
+	{'fade',  'In', { {rl3,194*4-0.5}, {rl3,194*4} }, 0.8,1}
+)
+storyboard:newObject("sb/rem2Top.jpg", "Background", "TopLeft", -107, -25):add(
+	{'scale', 0, { {rl3,0*4-1}, {rl3,0*4-1} }, 0.6675, 0.6675},
+	{'color', 0, { {rl3,0*4-1}, {rl3,0*4-1} }, {230,230,230}},
+	{'moverel', 1, { {rl3,0*4-1.25}, {rl3,0*4} }, {0,0}, {0,10}},
+	{'moverel', 1, { {rl3,0*4}, {rl3,2*4} }, {0,0}, {0,9}},
+	{'fade', 'quartIn', { {rl3,0*4-0.75}, {rl3,0.5} }, 0, 0.9},
+	{'color', 'linear', { {rl3,0*4-0.75}, {rl3,4*2} }, {140*0.8,140*0.8,140*0.8}, {170*0.8,170*0.8,170*0.8}},
+	{'color', 'linear', { {rl3,8}, {rl3,9} }, {170*0.8,170*0.8,170*0.8}, {215*0.8,215*0.8,215*0.8}},
+	{'color', 'linear', { {rl3,16}, {rl3,17} }, {215*0.8,215*0.8,215*0.8}, {230*0.8,230*0.8,230*0.8}},
+	{'fade', 'quartIn', { {rl3,8*4-0.6}, {rl3,8*4+0.1} }, 1, 0},
+	{'fade', 1, { {rl3,16*4}, {rl3,16*4+4} }, 0, 1},
+	{'fade', 'quartIn', { {rl3,48*4-0.5}, {rl3,48*4} }, 1, 0},
+	{'fade', 1, { {rl3,74*4}, {rl3,74*4+2} }, 0, 1},
+	{'fade', 'quartIn', { {rl3,106*4-0.5}, {rl3,106*4} }, 1, 0},
+
+
+	{'fade',  1, { {rl3,124*4}, {rl3,124*4+2} }, 0, 1},
+	{'color', 1, { {rl3,124*4}, {rl3,124*4+2} }, {180*0.8,180*0.8,180*0.8},{180*0.8,180*0.8,180*0.8}},
+	{'color', 1, { {rl3,127*4+0.5}, {rl3,127*4+0.5} }, {130*0.8,130*0.8,130*0.8},{130*0.8,130*0.8,130*0.8}},
+	{'color', 1, { {rl3,128*4}, {rl3,128*4+0.5} }, {130*0.8,130*0.8,130*0.8},{150*0.8,150*0.8,150*0.8}},
+	{'color', 1, { {rl3,130*4}, {rl3,130*4+0.5} }, {150*0.8,150*0.8,150*0.8},{200*0.8,200*0.8,200*0.8}},
+	{'color', 2, { {rl3,131*4+2}, {rl3,132*4} }, {200*0.8,200*0.8,200*0.8},{235*0.8,235*0.8,235*0.8}},
 	{'fade', 'quartIn', { {rl3,132*4-0.5}, {rl3,132*4} }, 1, 0},
 
 	{'fade',  1, { {rl3,174*4-0.25}, {rl3,174*4} }, 0, 1},
@@ -718,6 +873,21 @@ storyboard:newObject("sb/rem3.jpg", "Foreground", "TopLeft", -107, 229):add(
 	Flash({rl3,160*4}, 1600, 0.2, 0.08)
 )
 storyboard:newObject("sb/rem4.jpg", "Background", "TopLeft", -107, 229):add(
+	{'scale', 0, { {rl3,148*4}, {rl3,148*4} }, 0.6675, 0.6675},
+	{'fade', 2, { {rl3,148*4-0.5}, {rl3,148*4} }, 0, 1},
+	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 0},
+	{'fade', 2, { {rl3,164*4-0.5}, {rl3,164*4} }, 0, 1},
+
+	{'fade', 0, { {rl3,173*4}, {rl3,174*4-0.25} }, 1, 0.9},
+	{'fade', 2, { {rl3,174*4-0.25}, {rl3,174*4+0.25} }, 0.9, 0}
+)
+storyboard:newObject("sb/rem3top.jpg", "Foreground", "TopLeft", -107, -6):add(
+	{'scale', 0, { {rl3,156*4}, {rl3,156*4} }, 0.6675, 0.6675},
+	{'protract', {'parameter', { {rl3, 156*4}, {rl3, 156*4} }, value='a'}},
+	Flash({rl3,156*4}, 1600, 0.3, 0.08),
+	Flash({rl3,160*4}, 1600, 0.2, 0.08)
+)
+storyboard:newObject("sb/rem4top.jpg", "Background", "TopLeft", -107, -6):add(
 	{'scale', 0, { {rl3,148*4}, {rl3,148*4} }, 0.6675, 0.6675},
 	{'fade', 2, { {rl3,148*4-0.5}, {rl3,148*4} }, 0, 1},
 	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 0},
@@ -887,6 +1057,12 @@ local rl4_moveIn = {
 	{'moverel', 'linear', {{rl4,0.75}, {rl4,8}}, {0,0}, {0,-18}},
 	{'moverel', 'out', {{rl4,8}, {rl4,6*4}}, {0,0}, {0,-12}}
 }
+local rl4_moveInTop = {
+	{'move', 'linear', { {rl4,0}, {rl4,0} }, {-107,0}, {-107,0}},
+	{'moverel', 'quartOut', { {rl4,0}, {rl4,1.5} }, {0,0}, {0,-30*0.25}},
+	{'moverel', 'linear', {{rl4,0.75}, {rl4,8}}, {0,0}, {0,-18*0.25}},
+	{'moverel', 'out', {{rl4,8}, {rl4,6*4}}, {0,0}, {0,-12*0.25}}
+}
 
 local LLLL = 34
 local rl4_int_move = {
@@ -898,6 +1074,15 @@ local rl4_int_move = {
 	{'moverel', 'in',  { {rl4,(LLLL+5)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-24} },
 	{'moverel', 'linear',  { {rl4,(LLLL+12)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-16} },
 }
+local rl4_int_move_top = {
+	{'move', 'linear', { {rl4,LLLL*4}, {rl4,LLLL*4} }, {-107,242-242}, {-107,183-242}},
+	{'moverel', 'sineIn',  { {rl4,LLLL*4-1}, {rl4,(LLLL+4)*4} }, {0,0},{0,22*0.4} },
+	{'moverel', 'linear',  { {rl4,(LLLL+3)*4}, {rl4,(LLLL+5)*4} }, {0,0},{0,12*0.4} },
+	{'moverel', 'out',  { {rl4,(LLLL+4)*4}, {rl4,(LLLL+8)*4} }, {0,0},{0,-4*0.4} },
+	{'moverel', 'linear',  { {rl4,(LLLL+8)*4}, {rl4,(LLLL+13)*4} }, {0,0},{0,-16*0.4} },
+	{'moverel', 'in',  { {rl4,(LLLL+5)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-24*0.4} },
+	{'moverel', 'linear',  { {rl4,(LLLL+12)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-16*0.4} },
+}
 
 local LLLL2 = 90
 local rl4_int_move2 = {
@@ -908,6 +1093,15 @@ local rl4_int_move2 = {
 	{'moverel', 'linear',  { {rl4,(LLLL2+8)*4}, {rl4,(LLLL2+13)*4} }, {0,0},{0,-16} },
 	{'moverel', 'in',  { {rl4,(LLLL2+5)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-24} },
 	{'moverel', 'linear',  { {rl4,(LLLL2+12)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-16} },
+}
+local rl4_int_move_top2 = {
+	{'move', 'linear', { {rl4,LLLL2*4}, {rl4,LLLL2*4} }, {-107,242-242}, {-107,183-242}},
+	{'moverel', 'sineIn',  { {rl4,LLLL2*4-1}, {rl4,(LLLL2+4)*4} }, {0,0},{0,22*0.4} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+3)*4}, {rl4,(LLLL2+5)*4} }, {0,0},{0,12*0.4} },
+	{'moverel', 'out',  { {rl4,(LLLL2+4)*4}, {rl4,(LLLL2+8)*4} }, {0,0},{0,-4*0.4} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+8)*4}, {rl4,(LLLL2+13)*4} }, {0,0},{0,-16*0.4} },
+	{'moverel', 'in',  { {rl4,(LLLL2+5)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-24*0.4} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+12)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-16*0.4} },
 }
 
 local rl4_flashes = {
@@ -996,6 +1190,13 @@ storyboard:newObject("sb/HecatiaS.jpg", "Background", "TopLeft", -107, 242):add(
 
 	sb.concadd(rl4_moveIn)
 )
+storyboard:newObject("sb/hecatiaTop.jpg", "Background", "TopLeft", -107, 0):add(
+	{'scale',0, { {rl4,0},{rl4,0}}, 0.667, 0.667},
+	{'color',0, { {rl4,0},{rl4,0}}, {90,90,90}},
+	{'fade',0,  {  {rl4,0},{rl4,0.5}}, 0, 1},
+	{'fade',0,  {  {rl4,9},{rl4,9}}, 0, 0},
+	sb.concadd(rl4_moveInTop)
+)
 
 storyboard:newObject("sb/Hecatia.jpg", "Background", "TopLeft", -107, 242):add(
 	{'scale',0, { {rl4,0},{rl4,0}}, 0.667, 0.667},
@@ -1012,9 +1213,24 @@ storyboard:newObject("sb/Hecatia.jpg", "Background", "TopLeft", -107, 242):add(
 	{'color',0,  {  {rl4,140*4-0.5},{rl4,140*4-0.5}}, {220,220,230},{220,220,220}},
 	{'color',0,  {  {rl4,142*4-0.5},{rl4,142*4}}, {220,220,220},{255,255,255}},
 	{'fade',0,  {  {rl4,150*4},{rl4,150*4}}, 0, 0},
-
-	--{'fade' ,'linear', { {rl4,34*4-0.5},{rl4,34*4}}, 1, 1},
 	sb.concadd(rl4_moveIn)
+)
+storyboard:newObject("sb/hecatiaTop.jpg", "Background", "TopLeft", -107, 0):add(
+	{'scale',0, { {rl4,0},{rl4,0}}, 0.667, 0.667},
+	{'fade','linear',  {  {rl4,0},{rl4,0}}, 0.3, 0.3},
+	{'fade','out',  {  {rl4,1.5},{rl4,1.5+0.5}}, 0.3, 0.9},
+	{'fade','out',  {  {rl4,2},{rl4,3}}, 0.9, 0.4},
+	{'fade','out',  {  {rl4,3},{rl4,3.5}}, 0.4, 0.8},
+	{'fade','circIn',  {  {rl4,3.5},{rl4,8}}, 0.8, 1},
+	{'color','quartOut',  {  {rl4,8},{rl4,9}}, {255,255,255},{230,230,230}},
+	{'fade',0,  {  {rl4,11*4},{rl4,11*4}}, 0, 0},
+
+
+	{'fade',0,  {  {rl4,140*4-0.5},{rl4,140*4-0.5}}, 1, 1},
+	{'color',0,  {  {rl4,140*4-0.5},{rl4,140*4-0.5}}, {220,220,230},{220,220,220}},
+	{'color',0,  {  {rl4,142*4-0.5},{rl4,142*4}}, {220,220,220},{255,255,255}},
+	{'fade',0,  {  {rl4,150*4},{rl4,150*4}}, 0, 0},
+	sb.concadd(rl4_moveInTop)
 )
 
 storyboard:newObject("sb/HecatiaInst1.jpg", "Background", "TopLeft", -107, 242):add(
@@ -1025,6 +1241,16 @@ storyboard:newObject("sb/HecatiaInst1.jpg", "Background", "TopLeft", -107, 242):
 	{'fade' ,'linear', { {rl4,91*4-0.5},{rl4,91*4-0.5}}, 1, 1},
 	{'fade' ,'quintOut', { {rl4,107*4-0.5},{rl4,107*4+0.5}}, 1, 0},
 	sb.concadd(rl4_int_move, rl4_int_move2)
+)
+
+storyboard:newObject("sb/hecatiaInst1Top.jpg", "Background", "TopLeft", -107, -15):add(
+	{'scale',0, { {rl4,34*4-0.5},{rl4,34*4-0.5}}, 0.667, 0.667},
+	{'fade' ,'linear', { {rl4,34*4-0.5},{rl4,34*4-0.5}}, 1, 1},
+	{'fade' ,'quintOut', { {rl4,50*4-0.5},{rl4,50*4+0.5}}, 1, 0},
+
+	{'fade' ,'linear', { {rl4,91*4-0.5},{rl4,91*4-0.5}}, 1, 1},
+	{'fade' ,'quintOut', { {rl4,107*4-0.5},{rl4,107*4+0.5}}, 1, 0},
+	sb.concadd(rl4_int_move_top, rl4_int_move_top2)
 )
 
 storyboard:newObject("sb/HecatiaK.jpg", "Background", "TopLeft", -107, 182):add(
@@ -1041,7 +1267,51 @@ storyboard:newObject("sb/HecatiaK.jpg", "Background", "TopLeft", -107, 182):add(
 	{'fade' ,'quintIn', { {rl4,124*4-0.5},{rl4,124*4}}, 1, 0},
 
 	{'fade' ,2, { {rl4,150*4-0.5},{rl4,150*4}}, 0, 1},
-	{'fade' ,'cubicOut', { {rl4,192*4},{rl4,196*4}}, 1, 0}
+	{'fade' ,'cubicOut', { {rl4,192*4},{rl4,196*4}}, 1, 0},
+
+	-- fade underneath Inst1
+	{'fade' ,'cubicIn', { {rl4,57*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,59*4-0.5},{rl4,59*4+0.5}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,65*4+0.5}}, 0, 0},
+	--{'fade' ,'quintOut', { {rl4,67*4},{rl4,67*4}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,114*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,116*4-0.5},{rl4,116*4+0.5}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,122*4+0.5}}, 0, 0},
+	--{'fade' ,'quintOut', { {rl4,124*4},{rl4,124*4}}, 0, 0},
+	{'fade' ,'cubicIn', { {rl4,180*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,182*4-0.5},{rl4,182*4+0.5}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,188*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,190*4-0.5},{rl4,190*4+0.5}}, 0, 1}
+)
+storyboard:newObject("sb/hecatiaTopK.jpg", "Background", "TopLeft", -107, -15):add(
+	{'scale',0, { {rl4,10*4-0.5},{rl4,10*4}}, 0.667, 0.667},
+	{'fade' ,2, { {rl4,10*4-0.5},{rl4,10*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,34*4-0.5},{rl4,34*4}}, 1, 0},
+	{'fade' ,2, { {rl4,51*4-0.5},{rl4,51*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,67*4-0.5},{rl4,67*4}}, 1, 0},
+
+	{'fade' ,2, { {rl4,75*4-0.5},{rl4,75*4}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,91*4-0.5},{rl4,91*4}}, 1, 0},
+
+	{'fade' ,2, { {rl4,108*4-0.5},{rl4,108*4}}, 0, 1},
+	{'fade' ,'quintIn', { {rl4,124*4-0.5},{rl4,124*4}}, 1, 0},
+
+	{'fade' ,2, { {rl4,150*4-0.5},{rl4,150*4}}, 0, 1},
+	{'fade' ,'cubicOut', { {rl4,192*4},{rl4,196*4}}, 1, 0},
+
+	-- fade under inst1
+	{'fade' ,'cubicIn', { {rl4,57*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,59*4-0.5},{rl4,59*4+0.5}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,65*4+0.5}}, 0, 0},
+	--{'fade' ,'quintOut', { {rl4,67*4},{rl4,67*4}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,114*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,116*4-0.5},{rl4,116*4+0.5}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,122*4+0.5}}, 0, 0},
+	--{'fade' ,'quintOut', { {rl4,124*4},{rl4,124*4}}, 0, 0},
+	{'fade' ,'cubicIn', { {rl4,180*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,182*4-0.5},{rl4,182*4+0.5}}, 0, 1},
+	{'fade' ,'cubicIn', { {rl4,188*4+0.5}}, 0, 0},
+	{'fade' ,'quintOut', { {rl4,190*4-0.5},{rl4,190*4+0.5}}, 0, 1}
 )
 
 storyboard:newObject("sb/Stars1.jpg", "Background", "Centre", 320, 353):add(
@@ -1101,9 +1371,43 @@ storyboard:newObject("sb/HecatiaInst2.jpg", "Background", "TopLeft", -107, 182):
 	{'fade' ,'cubicOut', { {rl4,132*4-0.5},{rl4,132*4+2.5}}, 0, 1},
 	{'fade' ,'cubicOut', { {rl4,140*4-0.5},{rl4,140*4}}, 1, 0}
 )
+storyboard:newObject("sb/hecatiaInst2Top.jpg", "Background", "TopLeft", -107, -15):add(
+	{'scale',0, { {rl4,132*4-0.5},{rl4,132*4-0.5}}, 0.667, 0.667},
+	{'fade' ,'cubicOut', { {rl4,132*4-0.5},{rl4,132*4+2.5}}, 0, 1},
+	{'fade' ,'cubicOut', { {rl4,140*4-0.5},{rl4,140*4}}, 1, 0}
+)
 
 -- kiai inst1
 storyboard:newObject("sb/HecatiaInst1.jpg", "Background", "TopLeft", -107, 182):add(
+	{'scale',0, { {rl4,57*4-0.5},{rl4,57*4-0.5}}, 0.667, 0.667},
+
+	{'fade' ,'cubicIn', { {rl4,57*4-0.5},{rl4,57*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,59*4-0.5},{rl4,59*4+0.5}}, 1, 0},
+
+	{'fade' ,'cubicIn', { {rl4,65*4-0.5},{rl4,65*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,67*4},{rl4,67*4}}, 1, 0},
+
+
+	{'fade' ,'cubicIn', { {rl4,114*4-0.5},{rl4,114*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,116*4-0.5},{rl4,116*4+0.5}}, 1, 0},
+
+	{'fade' ,'cubicIn', { {rl4,122*4-0.5},{rl4,122*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,124*4},{rl4,124*4}}, 1, 0},
+
+	{'fade' ,'cubicIn', { {rl4,180*4-0.5},{rl4,180*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,182*4-0.5},{rl4,182*4+0.5}}, 1, 0},
+	
+	{'fade' ,'cubicIn', { {rl4,188*4-0.5},{rl4,188*4+0.5}}, 0, 1},
+	{'fade' ,'quintOut', { {rl4,190*4-0.5},{rl4,190*4+0.5}}, 1, 0},
+
+
+
+	--
+	--
+
+	sb.concadd(rl4_inst_f)
+)
+storyboard:newObject("sb/hecatiaInst1Top.jpg", "Background", "TopLeft", -107, -15):add(
 	{'scale',0, { {rl4,57*4-0.5},{rl4,57*4-0.5}}, 0.667, 0.667},
 
 	{'fade' ,'cubicIn', { {rl4,57*4-0.5},{rl4,57*4+0.5}}, 0, 1},
@@ -1361,6 +1665,15 @@ local rl5_inst_move = function(X)
 		{'moverel', 'sineOut', {{rl5,X+11*4}, {rl5,X+16*4}}, {0,0}, {0,31}}
 	}
 end
+local rl5_inst_move_top = function(X)
+	local X=X*4
+	return {
+		{'moverel', 'sineIn', {{rl5,X}, {rl5,X+3*4}}, {0,0}, {0,-13}},
+		{'moverel', 'sineOut', {{rl5,X+3*4}, {rl5,X+8*4}}, {0,0}, {0,-13}},
+		{'moverel', 'sineIn', {{rl5,X+8*4}, {rl5,X+11*4}}, {0,0}, {0,13}},
+		{'moverel', 'sineOut', {{rl5,X+11*4}, {rl5,X+16*4}}, {0,0}, {0,13}}
+	}
+end
 
 local rl5_black_flashes = {}
 for i=22*4, 24*4-1 do
@@ -1371,7 +1684,13 @@ local rl5_move_in = function(X) return {
 	{'moverel', 'sineOut', {{rl5,X}, {rl5,X+6*4}}, {0,0}, {0,70}},
 	{'moverel', 'sineOut', {{rl5,X+4*4}, {rl5,X+8*4-0.25}}, {0,0}, {0,63}},
 	{'moverel', 'out', {{rl5,X+4.5*4}, {rl5,X+8*4-0.25}}, {0,0}, {0,28}},
-	--{'moverel', 'sineOut', {{rl5,X+7*4}, {rl5,X+8*4-0.5}}, {0,0}, {0,16}}
+} end
+
+local rl5_move_in_top = function(X) return {
+	{'move', 0, {{rl5,X}, {rl5,X}}, {320, -65-60}},
+	{'moverel', 'sineOut', {{rl5,X}, {rl5,X+6*4}}, {0,0}, {0,29+30}},
+	{'moverel', 'sineOut', {{rl5,X+4*4}, {rl5,X+8*4-0.25}}, {0,0}, {0,26+25}},
+	{'moverel', 'out', {{rl5,X+4.5*4}, {rl5,X+8*4-0.25}}, {0,0}, {0,8+5}},
 } end
 
 storyboard:newObject("sb/Mima.jpg", "Background", "TopCentre", 320, 160):add(
@@ -1383,9 +1702,11 @@ storyboard:newObject("sb/Mima.jpg", "Background", "TopCentre", 320, 160):add(
 
 	{'fade', 'cubicOut',  {  {rl5,24*4-1},{rl5,24*4-0.5}}, 0, 1},
 	{'fade',0,  {  {rl5,48*4},{rl5,49*4}}, 1, 0.5},
+	{'fade',0,  {  {rl5,49*4},{rl5,49*4}}, 0},
 
 	{'fade', 'cubicOut',  {  {rl5,73*4-1},{rl5,73*4-0.5}}, 0, 1},
 	{'fade',0,  {  {rl5,89*4},{rl5,90*4}}, 1, 0.5},
+	{'fade',0,  {  {rl5,90*4},{rl5,90*4}}, 0},
 
 	{'fade', 'cubicOut',  {  {rl5,106*4-1},{rl5,107*4}}, 0, 0.8},
 	{'fade',0,  {  {rl5,114*4-0.5},{rl5,114*4}}, 0.8, 0},
@@ -1394,10 +1715,48 @@ storyboard:newObject("sb/Mima.jpg", "Background", "TopCentre", 320, 160):add(
 	{'fade', 'cubicOut',  {  {rl5,154*4},{rl5,155*4-0.25}}, 1, 0.5},
 	{'fade', 'cubicOut',  {  {rl5,155*4-0.25},{rl5,155*4}}, 0.5, 0.8},
 	{'fade', 'cubicOut',  {  {rl5,159*4-0.5},{rl5,159*4}}, 0.8, 1},
-	{'fade',0,  {  {rl5,163*4},{rl5,163*4}}, 1, 0.5},
+	{'fade',0,  {  {rl5,163*4},{rl5,163*4}}, 1, 0.0},
 
 	sb.concadd(rl5_move_in(0))
 )
+local function GRAY(x)
+	return {255*x,255*x,255*x}
+end
+storyboard:newObject("sb/MimaTop1.jpg", "Background", "TopCentre", 320, 160):add(
+	{'scale',0, { {rl5,0},{rl5,0}}, 0.667, 0.667},
+	{'fade',0, { {rl5,0}}, 1},
+
+	{'color',0,  {  {rl5,0},{rl5,0.5}}, GRAY(0), GRAY(0.6)},
+	{'fade',0, { {rl5,4.0*4}}, 0},
+	sb.concadd(rl5_move_in_top(0))
+)
+
+storyboard:newObject("sb/MimaTop.jpg", "Background", "TopCentre", 320, 160):add(
+	{'scale',0, { {rl5,0},{rl5,0}}, 0.667, 0.667},
+	{'fade',0, { {rl5,4.0*4}}, 1},
+
+	{'color',0,  {  {rl5,4*4-0.5},{rl5,4*4}}, GRAY(0.6), GRAY(0.85)},
+	{'color',0,  {  {rl5,4*4},{rl5,8*4}}, GRAY(0.6), GRAY(1.0)},
+	{'fade',0,  {  {rl5,8*4},{rl5,8*4}}, 0, 0},
+
+	{'fade', 'cubicOut',  {  {rl5,24*4-1},{rl5,24*4-0.5}}, 0, 1},
+	{'fade',0,  {  {rl5,48*4},{rl5,49*4}}, 1, 0.5},
+	{'fade',0,  {  {rl5,49*4},{rl5,49*4}}, 0},
+	{'fade', 'cubicOut',  {  {rl5,73*4-1},{rl5,73*4-0.5}}, 0, 1},
+	{'fade',0,  {  {rl5,89*4},{rl5,90*4}}, 1, 0.5},
+	{'fade',0,  {  {rl5,90*4},{rl5,90*4}}, 0},
+	{'fade', 'cubicOut',  {  {rl5,106*4-1},{rl5,107*4}}, 0, 0.8},
+	{'fade',0,  {  {rl5,114*4-0.5},{rl5,114*4}}, 0.8, 0},
+	{'fade', 'cubicOut',  {  {rl5,146*4-1},{rl5,146*4-0.5}}, 0, 1},
+	{'fade', 'cubicOut',  {  {rl5,154*4},{rl5,155*4-0.25}}, 1, 0.5},
+	{'fade', 'cubicOut',  {  {rl5,155*4-0.25},{rl5,155*4}}, 0.5, 0.8},
+	{'fade', 'cubicOut',  {  {rl5,159*4-0.5},{rl5,159*4}}, 0.8, 1},
+	{'fade',0,  {  {rl5,163*4},{rl5,163*4}}, 1, 0.0},
+
+	sb.concadd(rl5_move_in_top(0))
+)
+
+--
 
 storyboard:newObject("sb/MimaK4.jpg", "Background", "TopCentre", 320, 251):add(
 	{'scale',0, { {rl5,16*4-0.5},{rl5,16*4-0.5}}, 0.667, 0.667},
@@ -1409,8 +1768,19 @@ storyboard:newObject("sb/MimaK4.jpg", "Background", "TopCentre", 320, 251):add(
 	{'fade', 'cubicOut',  {  {rl5,106*4-0.5},{rl5,106*4}}, 1, 0},
 
 	{'fade', 'in',  {  {rl5,163*4-0.5},{rl5,163*4}}, 0, 1},
-	{'fade', 'cubicOut',  {  {rl5,187*4-0.5},{rl5,187*4}}, 1, 0}
+	{'fade', 'cubicOut',  {  {rl5,179*4-0.5},{rl5,179*4}}, 1, 0}
 )
+storyboard:newObject("sb/MimaTopK3.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,16*4-0.5},{rl5,16*4-0.5}}, 0.667, 0.667},
+	{'fade', 'in',  {  {rl5,49*4-0.5},{rl5,49*4}}, 0, 1},
+	{'fade', 'cubicOut',  {  {rl5,65*4-0.5},{rl5,65*4}}, 1, 0},
+	{'fade', 'in',  {  {rl5,90*4-0.5},{rl5,90*4}}, 0, 1},
+	{'fade', 'cubicOut',  {  {rl5,106*4-0.5},{rl5,106*4}}, 1, 0},
+	{'fade', 'in',  {  {rl5,163*4-0.5},{rl5,163*4}}, 0, 1},
+	{'fade', 'cubicOut',  {  {rl5,179*4-0.5},{rl5,179*4}}, 1, 0}
+)
+
+--
 storyboard:newObject("sb/MimaK.jpg", "Background", "TopCentre", 320, 252):add(
 	{'scale',0, { {rl5,8*4-0.5},{rl5,8*4-0.5}}, 0.667, 0.667},
 	{'fade', 'in',  {  {rl5,8*4-0.5},{rl5,8*4}}, 0, 1},
@@ -1427,47 +1797,89 @@ storyboard:newObject("sb/MimaK.jpg", "Background", "TopCentre", 320, 252):add(
 
 	sb.concadd(rl5_move_in(0))
 )
+storyboard:newObject("sb/MimaTopK.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,8*4-0.5},{rl5,8*4-0.5}}, 0.667, 0.667},
+	{'fade', 'in',  {  {rl5,8*4-0.5},{rl5,8*4}}, 0, 1},
+	{'fade', 'quartOut',  {  {rl5,24*4-1},{rl5,24*4}}, 1, 0},
+	Flash({rl5,40*4}, 2500, 0.5, 0.15),
+
+	{'fade', 'in',  {  {rl5,65*4-0.5},{rl5,65*4}}, 0, 1},
+	{'fade', 'quartOut',  {  {rl5,73*4-1},{rl5,73*4}}, 1,0},
+
+	{'fade', 'quartOut',  {  {rl5,179*4-0.5},{rl5,179*4}}, 1, 0},
+
+	{'fade', 'in',  {  {rl5,187*4-0.5},{rl5,187*4-0.5}}, 1, 1},
+	{'fade', 'quartOut',  {  {rl5,204*4},{rl5,205*4}}, 1, 0},
+
+	sb.concadd(rl5_move_in_top(0))
+)
 
 storyboard:newObject("sb/MimaInst2.jpg", "Background", "TopCentre", 320, 251):add(
 	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
-
 	{'fade', 'in',  {  {rl5,114*4-0.5},{rl5,114*4}}, 0, 1},
 	{'fade', 'in',  {  {rl5,122*4-0.5},{rl5,122*4}}, 1, 0},
 	sb.concadd(rl5_inst_move(114))
 )
 storyboard:newObject("sb/MimaInst1.jpg", "Background", "TopCentre", 320, 251):add(
 	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
-
 	{'fade', 'in',  {  {rl5,122*4-0.5},{rl5,122*4}}, 0, 1},
 	{'fade', 'in',  {  {rl5,130*4-0.5},{rl5,130*4}}, 1, 0},
 	sb.concadd(rl5_inst_move(114))
 )
 storyboard:newObject("sb/MimaInst3.jpg", "Background", "TopCentre", 320, 251):add(
 	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
-
 	{'fade', 'in',  {  {rl5,130*4-0.5},{rl5,130*4}}, 0, 1},
 	{'fade', 'in',  {  {rl5,138*4-0.5},{rl5,138*4}}, 1, 0},
-
 	{'fade', 'in',  {  {rl5,179*4-0.5},{rl5,179*4}}, 0, 1},
 	{'fade', 'in',  {  {rl5,183*4-0.5},{rl5,183*4}}, 1, 0},
-
 	sb.concadd(rl5_inst_move(130))
 )
 storyboard:newObject("sb/MimaInst4.jpg", "Background", "TopCentre", 320, 251):add(
 	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
-
 	{'fade', 'in',  {  {rl5,138*4-0.5},{rl5,138*4}}, 0, 1},
 	{'fade', 'in',  {  {rl5,146*4-0.5},{rl5,146*4}}, 1, 0},
-
 	{'fade', 'in',  {  {rl5,183*4-0.5},{rl5,183*4}}, 0, 1},
 	{'fade', 'in',  {  {rl5,187*4-0.5},{rl5,187*4}}, 1, 0},
-
 	sb.concadd(rl5_inst_move(130))
+)
+
+storyboard:newObject("sb/MimaTopInst2.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
+	{'fade', 'in',  {  {rl5,114*4-0.5},{rl5,114*4}}, 0, 1},
+	{'fade', 'in',  {  {rl5,122*4-0.5},{rl5,122*4}}, 1, 0},
+	sb.concadd(rl5_inst_move_top(114))
+)
+storyboard:newObject("sb/MimaTopInst1.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
+	{'fade', 'in',  {  {rl5,122*4-0.5},{rl5,122*4}}, 0, 1},
+	{'fade', 'in',  {  {rl5,130*4-0.5},{rl5,130*4}}, 1, 0},
+	sb.concadd(rl5_inst_move_top(114))
+)
+storyboard:newObject("sb/MimaTopInst3.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
+	{'fade', 'in',  {  {rl5,130*4-0.5},{rl5,130*4}}, 0, 1},
+	{'fade', 'in',  {  {rl5,138*4-0.5},{rl5,138*4}}, 1, 0},
+	{'fade', 'in',  {  {rl5,179*4-0.5},{rl5,179*4}}, 0, 1},
+	{'fade', 'in',  {  {rl5,183*4-0.5},{rl5,183*4}}, 1, 0},
+	sb.concadd(rl5_inst_move_top(130))
+)
+storyboard:newObject("sb/MimaTopInst4.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,114*4-0.5},{rl5,114*4-0.5}}, 0.667, 0.667},
+	{'fade', 'in',  {  {rl5,138*4-0.5},{rl5,138*4}}, 0, 1},
+	{'fade', 'in',  {  {rl5,146*4-0.5},{rl5,146*4}}, 1, 0},
+	{'fade', 'in',  {  {rl5,183*4-0.5},{rl5,183*4}}, 0, 1},
+	{'fade', 'in',  {  {rl5,187*4-0.5},{rl5,187*4}}, 1, 0},
+	sb.concadd(rl5_inst_move_top(130))
 )
 
 storyboard:newObject("sb/MimaEnd.jpg", "Background", "TopCentre", 320, 251):add(
 	{'scale',0, { {rl5,203*4-0.5},{rl5,203*4-0.5}}, 0.667, 0.667},
 
+	{'fade', 'in',  {  {rl5,203*4-0.5},{rl5,203*4}}, 0, 1},
+	{'fade', 'quartOut',  {  {rl5,204*4+4},{rl5,206*4}}, 1, 0}
+)
+storyboard:newObject("sb/MimaTopEnd.jpg", "Background", "TopCentre", 320, 0):add(
+	{'scale',0, { {rl5,203*4-0.5},{rl5,203*4-0.5}}, 0.667, 0.667},
 	{'fade', 'in',  {  {rl5,203*4-0.5},{rl5,203*4}}, 0, 1},
 	{'fade', 'quartOut',  {  {rl5,204*4+4},{rl5,206*4}}, 1, 0}
 )
@@ -1743,9 +2155,17 @@ storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):
 	{'fade', 'quartOut', { {rl8,0.1}, {rl8,1.5} }, 0.5, 0},
 	sb.concadd(rl7_move_in)
 )
+storyboard:newObject("sb/ReisenTop.jpg", "Foreground", "TopLeft", -107, 0):add(
+	{'protract', {'parameter', {{rl8, 0}}, value='a'}},
+	{'color', 0, {{rl8, 0}}, {255,0,240}},
+	{'fade', 'quartOut', { {rl8,0}, {rl8,0.1} }, 0, 0.5},
+	{'fade', 'quartOut', { {rl8,0.1}, {rl8,1.5} }, 0.5, 0}
+)
+
+
 storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 	{'color', 'linear', { {rl7,0*4-0.8} }, {220,220,220} },
-	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0.5} }, 0, 1},
+	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0.6} }, 0, 1},
 	{'fade', 'quartIn', { {rl7,16*4-4}, {rl7,16*4} }, 1, 0},
 	{'fade', 'quartOut', { {rl8,0*6}, {rl8,0*6+1} }, 0, 1},
 	{'fade', 'quartOut', { {rl8,8*6-1}, {rl8,8*6} }, 1, 0},
@@ -1940,6 +2360,22 @@ storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):
 
 	sb.concadd(rl7_move_in, rl9_color_transitions(0,rl9), rl9_color_transitions(-16,rl11), rl9_color_transitions(49-16,rl11))
 )
+storyboard:newObject("sb/ReisenTop.jpg", "Foreground", "TopLeft", -107, 0):add(
+	{'fade',0,{{rl7,19}}, 0},
+	rl7_negative_flash_func(19,0.4),
+	rl7_negative_flash_func(23,0.4),
+	rl7_negative_flash_func(3,0.4,rl9),
+	rl7_negative_flash_func(7,0.4,rl9),
+	rl7_negative_flash_func(11,0.6,rl9),
+	rl7_negative_flash_func(15,0.6,rl9),
+
+	rl7_negative_flash_func(51+3,0.4,rl9),
+	rl7_negative_flash_func(51+7,0.4,rl9),
+	rl7_negative_flash_func(51+11,0.6,rl9),
+	rl7_negative_flash_func(51+15,0.6,rl9),
+
+	sb.concadd(rl9_color_transitions(0,rl9), rl9_color_transitions(-16,rl11), rl9_color_transitions(49-16,rl11))
+)
 
 local rl7_black_flashes = {}
 for i=16*4+1,19*4-1 do
@@ -2053,7 +2489,7 @@ storyboard:newObject("sb/ReisenNegative2.png", "Foreground", "Centre", 320, 366)
 	sb.concadd(rl7_move_in,
 		rl9_post_kiai_flashes(0, rl9))
 )
-storyboard:newObject("sb/ReisenNegative2.png", "Foreground", "Centre", 320, 366):add(
+storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):add(
 	{'protract', {'parameter', {{rl9, 0}}, value='a'}},
 
 	{'color', 0, {{rl11,65*4}}, {0,255,0}},
@@ -2066,6 +2502,17 @@ storyboard:newObject("sb/ReisenNegative2.png", "Foreground", "Centre", 320, 366)
 
 	sb.concadd(rl7_move_in,
 		rl9_kiai_negative(32*4,rl9), rl9_kiai_negative(16*4,rl11))
+)
+storyboard:newObject("sb/ReisenTop.jpg", "Foreground", "TopLeft", -107, 0):add(
+	{'protract', {'parameter', {{rl9, 0}}, value='a'}},
+	{'color', 0, {{rl11,65*4}}, {0,255,0}},
+	{'fade', 'cubicOut', {{rl11,65*4}, {rl11,65*4+1}}, 0,0.8},
+	{'color', 0, {{rl11,65*4+8*4}, {rl11,65*4+8*4+1}}, {0,255,0},{0,0,255}},
+	{'color', 0, {{rl11,81*4}, {rl11,81*4+1}}, {0,0,255},{255,0,0}},
+	{'color', 0, {{rl11,89*4}, {rl11,89*4+1}}, {255,0,0},{230,0,255}},
+	{'color', 0, {{rl11,93*4}, {rl11,93*4+1}}, {230,0,255},{0,255,0}},
+	{'fade', 'cubicOut', {{rl11,97*4}, {rl11,97*4+1}}, 0.8,0},
+	sb.concadd(rl9_kiai_negative(32*4,rl9), rl9_kiai_negative(16*4,rl11))
 )
 
 local function rl11_noisefunc(X)
@@ -2119,6 +2566,17 @@ local BGN={
 	{'color','cubicout',{{rl11_comp,8*4},{rl11_comp,9*4}},{50*1.3,50*1.2,230*1.12}, {82,44,222}},
 	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
 }
+storyboard:newObject("sb/ReisenTop.jpg", "Foreground", "TopLeft", -107, 0):add(
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{50,50,230},{50*1.3,50*1.2,230*1.12}},
+	{'color','cubicout',{{rl11_comp,8*4},{rl11_comp,9*4}},{50*1.3,50*1.2,230*1.12}, {82,44,222}},
+	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
+
+	{'fade','cubicIn',{{rl11_comp,0*4},{rl11_comp,1*4}},0,1},
+	{'fade','cubicout',{{rl11_comp,15*4+2},{rl11_comp,16*4}},1,0},
+
+	{'fade','cubicIn',{{rl11,99*4},{rl11,99*4+0.3}},0,1},
+	{'fade','cubicout',{{rl11,99*4+3},{rl11,99*4+4}},1,0}
+)
 storyboard:newObject("sb/BGN1.jpg", "Background", "Centre", 320, 366):add(
 	sb.concadd(rl11_noisefunc(1), BGN, rl11_noisefunc2(1)))
 storyboard:newObject("sb/BGN2.jpg", "Background", "Centre", 320, 366):add(
@@ -2317,41 +2775,417 @@ storyboard:newObject("sb/240bpm.png", "Foreground", "Centre", 320, 444):add(
 --
 --
 --
--- Songe 5558485
+-- Songe 6
 --
 
 local rl20 = {180.0, 1167774}
 
 local rl20_move_in = {
 	{'move', 'linear', {{rl20,0}}, {-107,50}},
-	{'moverel', 'cubicout', {{rl20,0}, {rl20,1*4}}, {0,0}, {0,50}},
-	{'moverel', 'cubicout', {{rl20,0}, {rl20,8*4}}, {0,0}, {0,119}}
+	{'moverel', 'cubicout', {{rl20,0}, {rl20,1*4}}, {0,0}, {0,80}},
+	{'moverel', 'cubicout', {{rl20,0}, {rl20,8*4}}, {0,0}, {0,119-30}},
+
+	{'move', 'linear', {{rl20,36*4}}, {-107,219}},
+	{'moverel', 'cubicout', {{rl20,36*4}, {rl20,39*4}}, {0,0}, {0,-10}},
+	{'moverel', 'cubicin', {{rl20,39*4}, {rl20,40*4}}, {0,0}, {0,15}},
+	{'moverel', 'cubicout', {{rl20,40*4}, {rl20,41*4}}, {0,0}, {0,15}},
+	{'moverel', 'in', {{rl20,41*4}, {rl20,44*4}}, {0,0}, {0,-20}},
+
+	{'move', 'linear', {{rl20,92*4}}, {-107,219}},
+	{'moverel', 'cubicout', {{rl20,92*4}, {rl20,93*4}}, {0,0}, {0,-10}},
+	{'moverel', 'cubicin', {{rl20,93*4}, {rl20,96*4}}, {0,0}, {0,15}},
+	{'moverel', 'cubicout', {{rl20,96*4}, {rl20,97*4}}, {0,0}, {0,15}},
+	{'moverel', 'in', {{rl20,97*4}, {rl20,100*4}}, {0,0}, {0,-20}},
+
+	{'move', 'linear', {{rl20,158*4}}, {-107,219}},
+	{'moverel', 'cubicout', {{rl20,158*4}, {rl20,159*4}}, {0,0}, {0,-10}},
+	{'moverel', 'cubicin', {{rl20,159*4}, {rl20,162*4}}, {0,0}, {0,15}},
+	{'moverel', 'cubicout', {{rl20,162*4}, {rl20,163*4}}, {0,0}, {0,15}},
+	{'moverel', 'in', {{rl20,163*4}, {rl20,166*4}}, {0,0}, {0,-20}},
+
+	{'move', 'linear', {{rl20,124*4+1}}, {-107,170}},
+	{'moverel', 'cubicout', {{rl20,124*4+1.5}, {rl20,124*4+1.5*4}}, {0,0}, {0,15}},
+	{'moverel', 'cubicout', {{rl20,124*4}, {rl20,124*4+8*4}}, {0,0}, {0,34}},
+
+	{'move', 'linear', {{rl20,198*4+2}}, {-107,170}},
+	{'moverel', 'cubicout', {{rl20,198*4+2}, {rl20,198*4+2*4}}, {0,0}, {0,15}},
+	{'moverel', 'cubicout', {{rl20,198*4}, {rl20,198*4+8*4}}, {0,0}, {0,34}},
 }
+
+local rl20_move_in_text = {
+	{'move', 'linear', {{rl20,0}}, {-107,-35}},
+	{'moverel', 'cubicout', {{rl20,0}, {rl20,1*4}}, {0,0}, {0,25}},
+	{'moverel', 'cubicout', {{rl20,0}, {rl20,8*4}}, {0,0}, {0,10}},
+
+	{'move', 'linear', {{rl20,35*4}}, {-107,0}},
+	{'moverel', 'cubicout', {{rl20,36*4}, {rl20,39*4}}, {0,0}, {0,-7}},
+	{'moverel', 'cubicin', {{rl20,39*4}, {rl20,40*4}}, {0,0}, {0,3.5}},
+	{'moverel', 'cubicout', {{rl20,40*4}, {rl20,41*4}}, {0,0}, {0,3.5}},
+	{'moverel', 'in', {{rl20,41*4}, {rl20,44*4}}, {0,0}, {0,-0}}
+	,
+	{'move', 'linear', {{rl20,91*4}}, {-107,0}},
+	{'moverel', 'cubicout', {{rl20,92*4}, {rl20,93*4}}, {0,0}, {0,-7}},
+	{'moverel', 'cubicin', {{rl20,93*4}, {rl20,96*4}}, {0,0}, {0,3.5}},
+	{'moverel', 'cubicout', {{rl20,96*4}, {rl20,97*4}}, {0,0}, {0,3.5}},
+	{'moverel', 'in', {{rl20,97*4}, {rl20,100*4}}, {0,0}, {0,-0}},
+
+	{'move', 'linear', {{rl20,157*4}}, {-107,0}},
+	{'moverel', 'cubicout', {{rl20,158*4}, {rl20,159*4}}, {0,0}, {0,-7}},
+	{'moverel', 'cubicin', {{rl20,159*4}, {rl20,162*4}}, {0,0}, {0,3.5}},
+	{'moverel', 'cubicout', {{rl20,162*4}, {rl20,163*4}}, {0,0}, {0,3.5}},
+	{'moverel', 'in', {{rl20,163*4}, {rl20,166*4}}, {0,0}, {0,-0}},
+
+	{'move', 'linear', {{rl20,124*4+1}}, {-107,-30}},
+	{'moverel', 'cubicout', {{rl20,124*4+1.5}, {rl20,124*4+1.5*4}}, {0,0}, {0,5}},
+	{'moverel', 'cubicout', {{rl20,124*4}, {rl20,124*4+8*4}}, {0,0}, {0,25}},
+
+	{'move', 'linear', {{rl20,198*4+2}}, {-107,-30}},
+	{'moverel', 'cubicout', {{rl20,198*4+2}, {rl20,198*4+2*4}}, {0,0}, {0,5}},
+	{'moverel', 'cubicout', {{rl20,198*4}, {rl20,198*4+8*4}}, {0,0}, {0,25}},
+}
+
+storyboard:newObject("sb/RaikoSTop.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade', 'linear', {{rl20,0}}, 1},
+	{'color','cubicout', {{rl20,0},{rl20,0.5}}, GRAY(0),GRAY(0.6)},
+	{'color','cubicout', {{rl20,0.5},{rl20,4*4}}, GRAY(0.6),GRAY(0.7)},
+	{'fade','cubicout', {{rl20,4*4}}, 0},
+	sb.concadd(rl20_move_in_text)
+)
 
 storyboard:newObject("sb/RaikoS.jpg", "Background", "TopLeft", -107, 50):add(
 	{'scale', 'linear', {{rl20,0}}, 0.667},
 	{'fade','cubicout', {{rl20,0},{rl20,0.5}}, 0,0.6},
-	{'fade','cubicout', {{rl20,0.5},{rl20,4*4}}, 0.6,0.7},
-	{'fade','quintOut', {{rl20,4*4},{rl20,4*6}}, 0.7,1.0},
+
+
+	{'fade','cubicin', {{rl20,0.5},{rl20,1}}, 0.6,1},
+
+	{'color','cubicout', {{rl20,0.5},{rl20,4*4}}, GRAY(0.6),GRAY(0.7)},
+	{'color','quintOut', {{rl20,4*4},{rl20,4*6}}, GRAY(0.7),GRAY(1.0)},
+
 	{'fade','cubicout', {{rl20,8*4},{rl20,8*4}}, 0},
+	{'fade','cubicout', {{rl20,16*4},{rl20,16*4}}, 1},
+	{'fade','cubicout', {{rl20,20*4-1},{rl20,20*4+1}}, 1,0.7},
+	{'fade','cubicout', {{rl20,20*4+1}}, 0},
+	--
+	--
+	{'fade','cubicout', {{rl20,35*4+2},{rl20,36*4}}, 1},
+	{'fade','cubicout', {{rl20,44*4+1},{rl20,44*4+1}}, 0},
+	--
+	--
+	--
+	{'fade','cubicout', {{rl20,91*4+2},{rl20,92*4}}, 1},
+	{'fade','cubicout', {{rl20,100*4+1},{rl20,100*4+1}}, 0},
+	--
+	--
+	--
+	{'fade','cubicout', {{rl20,124*4+1.5},{rl20,124*4+2.5}}, 0,0.5},
+	{'fade','cubicout', {{rl20,124*4+2.5},{rl20,124*4+4*4}}, 0.5,0.8},
+	{'fade','quintOut', {{rl20,124*4+4*4},{rl20,124*4+4*6}}, 0.8,1.0},
+	{'fade','cubicout', {{rl20,124*4+8*4+1},{rl20,124*4+8*4+1}}, 0},
+	--
+	{'fade','cubicout', {{rl20,157*4+2},{rl20,158*4}}, 1},
+	{'fade','cubicout', {{rl20,166*4+1},{rl20,166*4+1}}, 0},
+
+	{'fade','sineOut', {{rl20,198*4+2.5},{rl20,198*4+4.0}}, 0.1,0.4},
+	{'fade','cubicout', {{rl20,198*4+4.0},{rl20,198*4+4*4}}, 0.4,0.8},
+	{'fade','quintOut', {{rl20,198*4+4*4},{rl20,198*4+4*6}}, 0.8,1.0},
+	{'fade','quartOut', {{rl20,206*4},{rl20,208*4}}, 1,0},
+
 	sb.concadd(rl20_move_in)
 )
 
+storyboard:newObject("sb/RaikoSTop3.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,4*4}}, 0.667},
+	{'fade','cubicout', {{rl20,8*4},{rl20,8*4}}, 1},
+	{'fade','cubicout', {{rl20,16*4},{rl20,16*4}}, 1},
+	{'fade','cubicout', {{rl20,20*4-1},{rl20,20*4+1}}, 1,0.7},
+	{'fade','cubicout', {{rl20,20*4+1}}, 0},
+	--
+	--
+	{'fade','cubicout', {{rl20,35*4+2},{rl20,36*4}}, 1},
+	{'fade','cubicout', {{rl20,44*4+1},{rl20,44*4+1}}, 0},
+	--
+	--
+	--
+	{'fade','cubicout', {{rl20,91*4+2},{rl20,92*4}}, 1},
+	{'fade','cubicout', {{rl20,100*4+1},{rl20,100*4+1}}, 0},
+	--
+	--
+	--
+	{'fade','cubicout', {{rl20,124*4+1.5},{rl20,124*4+2.5}}, 0,0.5},
+	{'fade','cubicout', {{rl20,124*4+2.5},{rl20,124*4+4*4}}, 0.5,0.8},
+	{'fade','quintOut', {{rl20,124*4+4*4},{rl20,124*4+4*6}}, 0.8,1.0},
+	{'fade','cubicout', {{rl20,124*4+8*4+1},{rl20,124*4+8*4+1}}, 0},
+	--
+	{'fade','cubicout', {{rl20,157*4+2},{rl20,158*4}}, 1},
+	{'fade','cubicout', {{rl20,166*4+1},{rl20,166*4+1}}, 0},
+
+	{'fade','sineOut', {{rl20,198*4+2.5},{rl20,198*4+4.0}}, 0.1,0.4},
+	{'fade','cubicout', {{rl20,198*4+4.0},{rl20,198*4+4*4}}, 0.4,0.8},
+	{'fade','quintOut', {{rl20,198*4+4*4},{rl20,198*4+4*6}}, 0.8,1.0},
+	{'fade','quartOut', {{rl20,206*4},{rl20,208*4}}, 1,0},
+
+	sb.concadd(rl20_move_in_text)
+)
+
+storyboard:newObject("sb/RaikoSTop2.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade', 'linear', {{rl20,0}}, 1},
+	{'color','cubicout', {{rl20,0},{rl20,0.5}}, GRAY(0),GRAY(0.6)},
+	{'color','cubicout', {{rl20,0.5},{rl20,4*4}}, GRAY(0.6),GRAY(0.7)},
+	{'fade','cubicout', {{rl20,8*4}, {rl20,8*4+1}}, 1, 0},
+	sb.concadd(rl20_move_in_text)
+)
+
+storyboard:newObject("sb/RaikoInst2.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,132*4},{rl20,132*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,140*4},{rl20,140*4+1}}, 1,0},
+	sb.concadd(rl20_move_in)
+)
+
+storyboard:newObject("sb/RaikoInst1.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,140*4},{rl20,140*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,150*4},{rl20,150*4+1}}, 1,0},
+	sb.concadd(rl20_move_in)
+)
+
+storyboard:newObject("sb/RaikoInst2Top.jpg", "Background", "TopLeft", -107, 0):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,132*4},{rl20,132*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,140*4},{rl20,140*4+1}}, 1,0}
+)
+
+storyboard:newObject("sb/RaikoInst1Top.jpg", "Background", "TopLeft", -107, 0):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,140*4},{rl20,140*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,150*4},{rl20,150*4+1}}, 1,0}
+)
+
+storyboard:newObject("sb/RaikoSTop4.jpg", "Background", "TopLeft", -107, 0):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,8*4-0.5},{rl20,8*4}}, 0,1},
+	{'fade','cubicout', {{rl20,16*4},{rl20,17*4}}, 1,0},
+	{'fade','cubicout', {{rl20,20*4},{rl20,20*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,44*4-0.5},{rl20,44*4}}, 1,0},
+	{'fade','cubicout', {{rl20,35*4+2},{rl20,36*4}}, 1,0},
+
+	{'fade','cubicout', {{rl20,68*4-0.5},{rl20,68*4}}, 0,1},
+	{'fade','cubicout', {{rl20,92*4-2},{rl20,92*4}}, 1,0},
+
+	{'fade','cubicout', {{rl20,190*4},{rl20,190*4+1}}, 0,1},
+	{'fade','sineout', {{rl20,198*4+0.5},{rl20,198*4+2}}, 1,0}
+	--sb.concadd(rl20_move_in_text)
+)
 storyboard:newObject("sb/Raiko1.jpg", "Background", "TopLeft", -107, 50):add(
 	{'scale', 'linear', {{rl20,0}}, 0.667},
 	{'fade','cubicout', {{rl20,8*4-0.5},{rl20,8*4}}, 0,1},
+	{'fade','cubicout', {{rl20,16*4},{rl20,17*4}}, 1,0},
+	{'fade','cubicout', {{rl20,20*4},{rl20,20*4+1}}, 0,1},
 	{'fade','cubicout', {{rl20,44*4-0.5},{rl20,44*4}}, 1,0},
+	{'fade','cubicout', {{rl20,35*4+2},{rl20,36*4}}, 1,0},
+
+	{'fade','cubicout', {{rl20,68*4-0.5},{rl20,68*4}}, 0,1},
+	{'fade','cubicout', {{rl20,92*4-2},{rl20,92*4}}, 1,0},
+
+	{'fade','cubicout', {{rl20,190*4},{rl20,190*4+1}}, 0,1},
+	{'fade','sineout', {{rl20,198*4+0.5},{rl20,198*4+2}}, 1,0},
 	sb.concadd(rl20_move_in)
 )
 
+local function rl20_kiai_flashes(X)
+	local R={}
+	X=X*4
+	table.insert(R, Flash({rl20,X+0*4}, 800, 1.0, 0.1))
+	table.insert(R, Flash({rl20,X+1*4}, 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+2*4}, 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+3*4}, 200, 0.3, 0.3))
+
+	table.insert(R, Flash({rl20,X+4*4}, 600, 0.6, 0.1))
+	table.insert(R, Flash({rl20,X+5*4}, 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+6*4}, 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+7*4}, 200, 0.3, 0.3))
+
+	table.insert(R, Flash({rl20,X+8*4} , 600, 0.6, 0.1))
+	table.insert(R, Flash({rl20,X+9*4} , 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+10*4}, 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+11*4}, 200, 0.3, 0.3))
+	table.insert(R, Flash({rl20,X+12*4}, 600, 0.7, 0.1))
+
+	table.insert(R, Flash({rl20,X+16*4}, 200, 0.6, 0.3))
+	for i=16*4+2,20*4-2, 2 do
+		table.insert(R, Flash({rl20,X+i}, 200, 0.2, 0.3))
+	end
+	table.insert(R, Flash({rl20,X+20*4}, 200, 0.6, 0.3))
+	for i=20*4+2,24*4-4, 2 do
+		table.insert(R, Flash({rl20,X+i}, 200, 0.2, 0.3))
+	end
+	table.insert(R, Flash({rl20,X+24*4-2}, 500, 0.6, 0.2))
+	return R
+end
+storyboard:newObject("sb/RaikoK.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,44*4},{rl20,44*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,68*4},{rl20,68*4+1}}, 1,0},
+
+	{'fade','cubicout', {{rl20,100*4},{rl20,100*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,124*4},{rl20,124*4+1}}, 1,0},
+
+	{'fade','cubicout', {{rl20,150*4},{rl20,150*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,158*4},{rl20,158*4+1}}, 1,0},
+
+	{'fade','cubicout', {{rl20,166*4},{rl20,166*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,189*4+1},{rl20,189*4+4}}, 1,0.7},
+	{'fade','cubicout', {{rl20,190*4+1},{rl20,190*4+1}}, 0},
+	sb.concadd(rl20_move_in)
+)
+
+storyboard:newObject("sb/RaikoKTop.jpg", "Background", "TopLeft", -107, 0):add(
+	{'scale', 'linear', {{rl20,0}}, 0.667},
+	{'fade','cubicout', {{rl20,44*4},{rl20,44*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,68*4},{rl20,68*4+1}}, 1,0},
+
+	{'fade','cubicout', {{rl20,100*4},{rl20,100*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,124*4},{rl20,124*4+1}}, 1,0},
+
+	{'fade','cubicout', {{rl20,150*4},{rl20,150*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,158*4},{rl20,158*4+1}}, 1,0},
+
+	{'fade','cubicout', {{rl20,166*4},{rl20,166*4+1}}, 0,1},
+	{'fade','cubicout', {{rl20,189*4+1},{rl20,189*4+4}}, 1,0.7},
+	{'fade','cubicout', {{rl20,190*4+1},{rl20,190*4+1}}, 0}
+)
+
+local function rl20_choir_flashes(X)
+	local X=X*4
+	local R = {}
+	table.insert(R, Flash({rl20,X}, 300, 0.9, 0.2))
+	for i=X+1, X+4*4-1 do
+		table.insert(R, Flash({rl20,i}, 300, 0.3, 0.1))
+	end
+	table.insert(R, Flash({rl20,X+4*4}, 300, 0.65, 0.1))
+	for i=X+4*4+1, X+8*4-1 do
+		table.insert(R, Flash({rl20,i}, 300, 0.3, 0.1))
+	end
+	return R
+end
+
+local function rl20_int_flashes(X)
+	local X=X*4
+	local R = {}
+
+	for i = 0,3 do
+		table.insert(R, Flash({rl20,X+0}, 120, 0.35, 0.3))
+		table.insert(R, Flash({rl20,X+0.5},120, 0.20, 0.3))
+
+		table.insert(R, Flash({rl20,X+1.5},120, 0.20, 0.3))
+		table.insert(R, Flash({rl20,X+2.0},120, 0.20, 0.3))
+
+		table.insert(R, Flash({rl20,X+3.0},120, 0.20, 0.3))
+		table.insert(R, Flash({rl20,X+3.5},120, 0.20, 0.3))
+
+		table.insert(R, Flash({rl20,X+4.5},120, 0.20, 0.3))
+		table.insert(R, Flash({rl20,X+5.0},120, 0.20, 0.3))
+
+		table.insert(R, Flash({rl20,X+6.0},240, 0.40, 0.3))
+		table.insert(R, Flash({rl20,X+7.0},240, 0.40, 0.3))
+
+		X=X+8
+	end
+
+
+	return R
+end
+
+local rl20_inst1_flashes = {}
+for i = 140*4+1, 148*4-1 do
+	table.insert(rl20_inst1_flashes, Flash({rl20, i}, 280, 0.11, 0.22))
+end
 storyboard:newObject("sb/RaikoFlash.png", "Background", "TopLeft", -107, 50):add(
 	Flash({rl20,0}, 800, 0.9, 0.1),
-	Flash({rl20,2*4}, 500, 0.4, 0.3),
-	Flash({rl20,6*4}, 500, 0.3, 0.3),
-	Flash({rl20,7*4}, 500, 0.2, 0.3),
-	Flash({rl20,8*4}, 800, 0.9, 0.1),
-	Flash({rl20,16*4}, 1600, 0.9, 0.1),
-	sb.concadd(rl20_move_in)
+	Flash({rl20,2*4}, 500, 0.5, 0.3),
+	Flash({rl20,6*4}, 500, 0.4, 0.3),
+	Flash({rl20,7*4}, 500, 0.3, 0.3),
+
+	--
+	--
+	Flash({rl20,8*4+8*4}, 300, 0.9, 0.1),
+	Flash({rl20,8*4+9*4}, 150, 0.45, 0.3),
+	Flash({rl20,8*4+10*4}, 150, 0.65, 0.3),
+	Flash({rl20,8*4+10*4+0.5}, 150, 0.65, 0.3),
+	Flash({rl20,8*4+10*4+3}, 150, 0.35, 0.3),
+	Flash({rl20,8*4+11*4+2}, 150, 0.35, 0.3),
+	Flash({rl20,8*4+11*4+3}, 200, 0.68, 0.3),--]]
+	--
+	--
+
+	Flash({rl20,24*4}, 400, 0.3, 0.3),
+	Flash({rl20,28*4}, 400, 0.3, 0.3),
+	Flash({rl20,32*4}, 400, 0.3, 0.3),
+	Flash({rl20,35*4+2}, 150, 0.3, 0.3),
+	Flash({rl20,35*4+3}, 200, 0.3, 0.3),
+	--Flash({rl20,36*4}, 400, 0.9, 0.3),
+	--
+	--
+	Flash({rl20,80*4}, 400, 0.3, 0.3),
+	Flash({rl20,84*4}, 400, 0.3, 0.3),
+	Flash({rl20,88*4}, 400, 0.3, 0.3),
+	Flash({rl20,91*4+2}, 150, 0.3, 0.3),
+	Flash({rl20,91*4+3}, 200, 0.3, 0.3),
+	--
+	Flash({rl20,124*4}, 360, 0.9, 0.3),
+	Flash({rl20,126*4}, 600, 0.5, 0.25),
+	Flash({rl20,128*4}, 500, 0.2, 0.4),
+	Flash({rl20,130*4}, 500, 0.4, 0.3),
+	Flash({rl20,131*4}, 500, 0.3, 0.3),
+	Flash({rl20,131*4+2}, 500, 0.3, 0.3),
+	--
+	--
+	Flash({rl20,198*4}, 360, 0.9, 0.3),
+	Flash({rl20,200*4}, 600, 0.5, 0.25),
+	Flash({rl20,202*4}, 500, 0.2, 0.4),
+	Flash({rl20,204*4}, 500, 0.4, 0.3),
+	Flash({rl20,205*4}, 500, 0.3, 0.3),
+	Flash({rl20,205*4+2}, 500, 0.5, 0.3),
+	Flash({rl20,206*4}, 3500, 0.8, 0.3),
+
+	sb.concadd(rl20_move_in, rl20_choir_flashes(8), rl20_int_flashes(36), rl20_kiai_flashes(44),
+		rl20_choir_flashes(68), rl20_int_flashes(92), rl20_kiai_flashes(100), rl20_inst1_flashes,
+		rl20_int_flashes(158), rl20_kiai_flashes(166), rl20_choir_flashes(190)))
+
+storyboard:newObject("sb/RaikoFlash2.png", "Background", "TopLeft", -107, 220):add(
+	{'scale', 0, {{rl20,132*4}}, 2},
+	Flash({rl20,132*4}, 400, 0.3, 0.1),
+	Flash({rl20,132*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,133*4}, 400, 0.09, 0.1),
+	Flash({rl20,133*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,134*4}, 400, 0.09, 0.1),
+	Flash({rl20,134*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,135*4}, 400, 0.09, 0.1),
+	Flash({rl20,135*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,136*4}, 400, 0.3, 0.1),
+	Flash({rl20,136*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,137*4}, 400, 0.09, 0.1),
+	Flash({rl20,137*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,138*4}, 400, 0.09, 0.1),
+	Flash({rl20,138*4+1.5}, 400, 0.09, 0.1),
+
+	Flash({rl20,139*4}, 400, 0.09, 0.1),
+	Flash({rl20,139*4+1.5}, 400, 0.09, 0.1)
+)
+
+storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
+	Flash({rl20,57*4}, 300, 0.15, 0.1),
+	Flash({rl20,58*4}, 300, 0.15, 0.1),
+	Flash({rl20,59*4}, 300, 0.15, 0.1)
 )
 
 local rl20_text = {180.0, 1167774}
@@ -2395,6 +3229,367 @@ storyboard:newObject("sb/180bpm_r.png", "Foreground", "Centre", 320, 443):add(
 	{'fade', 1, { {rl20_text,2+22}, {rl20_text,5+22} }, 0   ,0.9 },
 	{'scale',0, { {rl20_text,0}, {rl20_text,0} }, 0.47,0.47 },
 	{'fade' ,'cubicOut', { {rl20,206*4},{rl20,208*4}}, 0.9, 0}
+)
+--
+--
+--
+--
+--
+--
+--
+--
+-- Songe 8
+--
+--
+
+local rl30 = {165.000, 1679956}
+
+local rl30_move_in = {
+	{'move', 'linear', {{rl30,0}}, {-107,135}},
+	{'moverel', 'cubicout', {{rl30,0}, {rl30,3}}, {0,0}, {0,60}},
+	{'moverel', 'cubicout', {{rl30,0}, {rl30,9*4}}, {0,0}, {0,60}},
+}
+local rl30_move_in_top = {
+	{'move', 'linear', {{rl30,0}}, {-107,-40}},
+	{'moverel', 'cubicout', {{rl30,0}, {rl30,3}}, {0,0}, {0,20}},
+	{'moverel', 'cubicout', {{rl30,0}, {rl30,9*4}}, {0,0}, {0,20}},
+}
+
+storyboard:newObject("sb/SatoriK.jpg", "Background", "TopLeft", -107, 50):add(
+	{'color', 'cubicout', {{rl30,0},{rl30,3}}, {130,90,255}, {240,235,255}},
+	{'scale', 'linear', {{rl30,0}}, 0.667},
+	{'fade', 'cubicOut', {{rl30,0},{rl30,3}}, 0.1,0.65},
+	{'fade', 'cubicOut', {{rl30,4},{rl30,5}}, 0.65,1},
+	{'color', 'cubicout', {{rl30,3},{rl30,4}}, {240,235,255}, {230,160,255}},
+	{'color', 'cubicOut', {{rl30,4},{rl30,4+0.5}}, {230,120,255},GRAY(0.9)},
+	{'fade', 'cubicOut', {{rl30,9*4},{rl30,9*4+0.5}}, 1,0},
+	--
+	--
+	--
+	{'fade', 'cubicOut', {{rl30,27*4}}, 1},
+	{'fade', 'cubicOut', {{rl30,44*4}, {rl30,44*4+1}}, 1,0.8},
+	{'fade', 'cubicOut', {{rl30,48*4}, {rl30,49*4}}, 0.8,1},
+	{'fade', 'cubicOut', {{rl30,57*4+1}, {rl30,57*4+1}}, 0},
+
+	{'fade', 'cubicOut', {{rl30,73*4}}, 1},
+
+
+	{'color', 'cubicOut', {{rl30,89*4}, {rl30,89*4+1}}, GRAY(0.9),GRAY(0.8)},
+	{'color', 'cubicOut', {{rl30,90*4}, {rl30,90*4+1}}, GRAY(0.8),GRAY(0.9)},
+
+	{'fade', 'cubicOut', {{rl30,90*4}, {rl30,90*4+1}}, 1,0.8},
+	{'fade', 'cubicOut', {{rl30,94*4}, {rl30,94*4}}, 0.8,1},
+
+
+	{'color', 'cubicOut', {{rl30,102*4}, {rl30,103*4+1}}, GRAY(0.9),GRAY(0.6)},
+	{'color', 'cubicOut', {{rl30,103*4+1}}, GRAY(0.9)},
+
+	{'fade', 'cubicOut', {{rl30,103*4+1}, {rl30,103*4+1}}, 0},
+
+
+	{'fade', 'cubicOut', {{rl30,161*4}}, 1},
+	{'fade', 'cubicOut', {{rl30,162*4}, {rl30,162*4+2}}, 1,0.8},
+	{'fade', 'cubicOut', {{rl30,164*4}, {rl30,164*4+1}}, 0.8,1},
+
+	{'color', 'cubicOut', {{rl30,173*4}, {rl30,173*4+1}}, GRAY(0.9),GRAY(0.6)},
+	{'color', 'cubicOut', {{rl30,174*4+1}}, GRAY(0.9)},
+
+	{'fade', 'cubicOut', {{rl30,174*4+1}}, 0},
+	sb.concadd(rl30_move_in)
+)
+storyboard:newObject("sb/SatoriTopK.jpg", "Background", "TopLeft", -107, 50):add(
+	{'color', 'cubicout', {{rl30,0},{rl30,3}}, {130,90,255}, {240,235,255}},
+	{'scale', 'linear', {{rl30,0}}, 0.667},
+	{'fade', 'cubicOut', {{rl30,0},{rl30,3}}, 0.1,0.65},
+	{'fade', 'cubicOut', {{rl30,4},{rl30,5}}, 0.65,1},
+	{'color', 'cubicout', {{rl30,3},{rl30,4}}, {240,235,255}, {230,160,255}},
+	{'color', 'cubicOut', {{rl30,4},{rl30,4+0.5}}, {230,120,255},GRAY(0.9)},
+	{'fade', 'cubicOut', {{rl30,9*4},{rl30,9*4+0.5}}, 1,0},
+	--
+	--
+	--
+	{'fade', 'cubicOut', {{rl30,27*4}}, 1},
+	{'fade', 'cubicOut', {{rl30,44*4}, {rl30,44*4+1}}, 1,0.8},
+	{'fade', 'cubicOut', {{rl30,48*4}, {rl30,49*4}}, 0.8,1},
+	{'fade', 'cubicOut', {{rl30,57*4+1}, {rl30,57*4+1}}, 0},
+
+	{'fade', 'cubicOut', {{rl30,73*4}}, 1},
+
+
+	{'color', 'cubicOut', {{rl30,89*4}, {rl30,89*4+1}}, GRAY(0.9),GRAY(0.8)},
+	{'color', 'cubicOut', {{rl30,90*4}, {rl30,90*4+1}}, GRAY(0.8),GRAY(0.9)},
+
+	{'fade', 'cubicOut', {{rl30,90*4}, {rl30,90*4+1}}, 1,0.8},
+	{'fade', 'cubicOut', {{rl30,94*4}, {rl30,94*4}}, 0.8,1},
+
+
+	{'color', 'cubicOut', {{rl30,102*4}, {rl30,103*4+1}}, GRAY(0.9),GRAY(0.6)},
+	{'color', 'cubicOut', {{rl30,103*4+1}}, GRAY(0.9)},
+
+	{'fade', 'cubicOut', {{rl30,103*4+1}, {rl30,103*4+1}}, 0},
+
+
+	{'fade', 'cubicOut', {{rl30,161*4}}, 1},
+	{'fade', 'cubicOut', {{rl30,162*4}, {rl30,162*4+2}}, 1,0.8},
+	{'fade', 'cubicOut', {{rl30,164*4}, {rl30,164*4+1}}, 0.8,1},
+
+	{'color', 'cubicOut', {{rl30,173*4}, {rl30,173*4+1}}, GRAY(0.9),GRAY(0.6)},
+	{'color', 'cubicOut', {{rl30,174*4+1}}, GRAY(0.9)},
+
+	{'fade', 'cubicOut', {{rl30,174*4+1}}, 0},
+	sb.concadd(rl30_move_in_top)
+)
+storyboard:newObject("sb/SatoriS.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl30,9*4}}, 0.667},
+	{'fade', 'cubicOut', {{rl30,9*4},{rl30,9*4+0.5}}, 0,1},
+	{'fade', 'cubicOut', {{rl30,27*4},{rl30,27*4+0.5}}, 1,0},
+
+	{'fade', 'cubicOut', {{rl30,57*4}, {rl30,57*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,73*4}, {rl30,73*4+1}}, 1, 0},
+
+	{'fade', 'cubicOut', {{rl30,103*4}, {rl30,103*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,119*4+1}, {rl30,119*4+1}}, 0},
+
+	{'fade', 'cubicOut', {{rl30,174*4}, {rl30,174*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,207*4+2}, {rl30,211*4}}, 1, 0},
+	sb.concadd(rl30_move_in)
+)
+storyboard:newObject("sb/SatoriTopS.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl30,9*4}}, 0.667},
+	{'fade', 'cubicOut', {{rl30,9*4},{rl30,9*4+0.5}}, 0,1},
+	{'fade', 'cubicOut', {{rl30,27*4},{rl30,27*4+0.5}}, 1,0},
+	{'fade', 'cubicOut', {{rl30,57*4}, {rl30,57*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,73*4}, {rl30,73*4+1}}, 1, 0},
+	{'fade', 'cubicOut', {{rl30,103*4}, {rl30,103*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,119*4+1}, {rl30,119*4+1}}, 0},
+	{'fade', 'cubicOut', {{rl30,174*4}, {rl30,174*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,207*4+2}, {rl30,211*4}}, 1, 0},
+	sb.concadd(rl30_move_in_top)
+)
+storyboard:newObject("sb/SatoriInst1.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl30,119*4}}, 0.667},
+	{'color', 'linear', {{rl30,119*4}}, GRAY(0.78)},
+	{'color', 'linear', {{rl30,127*4-1}, {rl30,127*4}}, GRAY(0.78), GRAY(1)},
+	{'fade', 'cubicOut', {{rl30,119*4}, {rl30,119*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,143*4+1}, {rl30,143*4+1}}, 0},
+	sb.concadd(rl30_move_in))
+storyboard:newObject("sb/SatoriTopInst1.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl30,119*4}}, 0.667},
+	{'color', 'linear', {{rl30,119*4}}, GRAY(0.78)},
+	{'color', 'linear', {{rl30,127*4-1}, {rl30,127*4}}, GRAY(0.78), GRAY(1)},
+	{'fade', 'cubicOut', {{rl30,119*4}, {rl30,119*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,143*4+1}, {rl30,143*4+1}}, 0},
+	sb.concadd(rl30_move_in_top))
+storyboard:newObject("sb/SatoriInst2.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl30,143*4}}, 0.667},
+	{'fade', 'cubicOut', {{rl30,143*4}, {rl30,143*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,159*4}, {rl30,159*4+3}}, 1, 0.8},
+	{'fade', 'cubicOut', {{rl30,160*4}, {rl30,160*4+1}}, 0.8, 1},
+	{'fade', 'cubicOut', {{rl30,161*4}, {rl30,161*4+2}}, 1, 0},
+	sb.concadd(rl30_move_in))
+storyboard:newObject("sb/SatoriTopInst2.jpg", "Background", "TopLeft", -107, 50):add(
+	{'scale', 'linear', {{rl30,143*4}}, 0.667},
+	{'fade', 'cubicOut', {{rl30,143*4}, {rl30,143*4+1}}, 0, 1},
+	{'fade', 'cubicOut', {{rl30,159*4}, {rl30,159*4+3}}, 1, 0.8},
+	{'fade', 'cubicOut', {{rl30,160*4}, {rl30,160*4+1}}, 0.8, 1},
+	{'fade', 'cubicOut', {{rl30,161*4}, {rl30,161*4+2}}, 1, 0},
+	sb.concadd(rl30_move_in_top))
+
+local rl30_kiai_flashes = function(X, Ff)
+	X=X*4
+	local F, G
+	if not Ff then
+		G = Flash({rl30,X+17*4}, 800, 0.4, 0.1)
+		F = Flash({rl30,X+18*4}, 800, 0.35, 0.1)
+	end
+	return {
+		Flash({rl30,X}, 800, 0.3, 0.1),
+		Flash({rl30,X+7*4+2}, 400, 0.15, 0.2),
+		Flash({rl30,X+8*4}, 800, 0.3, 0.1),
+		Flash({rl30,X+12*4}, 400, 0.1, 0.2),
+		Flash({rl30,X+15*4+2}, 400, 0.15, 0.2),
+		Flash({rl30,X+16*4}, 800, 0.3, 0.1),
+		G, F
+	}
+end
+local rl30_kiai_flashes2 = function(X, A)
+	X=X*4
+	return {
+		Flash({rl30,X}, 800, 0.3, 0.1),
+		Flash({rl30,X+4*2}, 600, 0.15, 0.2),
+		Flash({rl30,X+8*4}, 800, 0.3, 0.1),
+		Flash({rl30,X+12*4}, 800, 0.15, 0.1),
+		Flash({rl30,X+14*4}, 800, 0.3, 0.1),
+	}
+end
+local rl30_choral_flashes = function(X)
+	X=X*4
+	return {
+		Flash({rl30,X}, 900, 0.3, 0.1),
+		Flash({rl30,X+1*4}, 1200, 0.2, 0.2),
+		Flash({rl30,X+2*4}, 600, 0.3, 0.1),
+		Flash({rl30,X+3*4}, 500, 0.2, 0.25),
+		Flash({rl30,X+3*4+2}, 400, 0.1, 0.15),
+		Flash({rl30,X+4*4}, 500, 0.2, 0.25),
+		--Flash({rl30,X+5*4}, 350, 0.2, 0.1),
+		Flash({rl30,X+7*4}, 450, 0.12, 0.1),
+		Flash({rl30,X+8*4}, 500, 0.15, 0.12),
+		--Flash({rl30,X+10*4}, 600, 0.1, 0.1),
+		Flash({rl30,X+11*4}, 500, 0.2, 0.1),
+	}
+end
+
+local rl30_flashes = {}
+for i=135*4+1, 139*4-1 do
+	table.insert(rl30_flashes, Flash({rl30,i}, 220, 0.05, 0.25) ) end
+table.insert(rl30_flashes, Flash({rl30,139*4}, 300, 0.15, 0.29) )
+for i=139*4+2, 141*4-2, 2 do
+	table.insert(rl30_flashes, Flash({rl30,i}, 220, 0.09, 0.25) ) end
+storyboard:newObject("sb/SatoriFlash.png", "Background", "TopLeft", -107, 50):add(
+	{'protract', {'parameter', {{rl30, 0}}, value='a'}},
+
+	{'color', 0, {{rl30, 0}}, {235,255,150}},
+
+	Flash({rl30,0}, 250, 0.2, 0.05),
+	Flash({rl30,0.75}, 180, 0.12, 0.05),
+	Flash({rl30,1.5}, 250, 0.15, 0.05),
+	Flash({rl30,2.25}, 180, 0.20, 0.15),
+	Flash({rl30,3}, 350, 0.45, 0.3),
+
+
+	Flash({rl30,31*4}, 400, 0.1, 0.1),
+	Flash({rl30,35*4}, 800, 0.25, 0.1),
+	Flash({rl30,39*4}, 400, 0.1, 0.1),
+
+	Flash({rl30,73*4}, 400, 0.5, 0.1),
+	Flash({rl30,77*4}, 600, 0.1, 0.1),
+	Flash({rl30,81*4}, 800, 0.25, 0.1),
+	Flash({rl30,85*4}, 400, 0.15, 0.1),
+	Flash({rl30,86*4}, 400, 0.09, 0.1),
+	Flash({rl30,87*4}, 400, 0.09, 0.1),
+	Flash({rl30,87*4+2}, 400, 0.09, 0.1),
+	Flash({rl30,88*4}, 400, 0.15, 0.1),
+
+
+	Flash({rl30,102*4}, 400, 0.35, 0.1),
+
+
+	Flash({rl30,119*4}, 500, 0.3, 0.2),
+	Flash({rl30,119*4+2}, 500, 0.15, 0.15),
+	Flash({rl30,119*4+4}, 500, 0.15, 0.15),
+	Flash({rl30,119*4+6}, 500, 0.15, 0.15),
+	Flash({rl30,119*4+8}, 500, 0.15, 0.15),
+	Flash({rl30,119*4+10}, 500, 0.15, 0.15),
+	Flash({rl30,119*4+12}, 500, 0.15, 0.15),
+	Flash({rl30,119*4+14}, 500, 0.15, 0.15),
+
+	Flash({rl30,123*4}, 500, 0.3, 0.2),
+	Flash({rl30,123*4+2}, 500, 0.15, 0.15),
+	Flash({rl30,123*4+4}, 500, 0.15, 0.15),
+	Flash({rl30,123*4+6}, 500, 0.15, 0.15),
+	Flash({rl30,123*4+8}, 500, 0.15, 0.15),
+	Flash({rl30,123*4+10}, 500, 0.15, 0.15),
+	Flash({rl30,123*4+12}, 500, 0.15, 0.15),
+	Flash({rl30,123*4+14}, 500, 0.15, 0.15),
+
+	Flash({rl30,127*4}, 500, 0.3, 0.2),
+	Flash({rl30,131*4}, 500, 0.15, 0.1),
+	Flash({rl30,135*4}, 350, 0.3, 0.2),
+
+	Flash({rl30,143*4}, 500, 0.3, 0.2),
+	Flash({rl30,144*4}, 500, 0.1, 0.2),
+	Flash({rl30,145*4}, 500, 0.1, 0.2),
+	Flash({rl30,146*4}, 500, 0.1, 0.2),
+	Flash({rl30,147*4}, 500, 0.3, 0.15),
+	Flash({rl30,148*4}, 500, 0.1, 0.2),
+	Flash({rl30,149*4}, 500, 0.1, 0.2),
+	Flash({rl30,150*4}, 500, 0.1, 0.2),
+	Flash({rl30,150*4+2}, 400, 0.15, 0.25),
+	Flash({rl30,151*4}, 500, 0.3, 0.2),
+	Flash({rl30,152*4}, 500, 0.1, 0.2),
+	Flash({rl30,153*4}, 500, 0.1, 0.2),
+	Flash({rl30,154*4}, 500, 0.1, 0.2),
+	Flash({rl30,155*4}, 500, 0.3, 0.2),
+	Flash({rl30,156*4}, 500, 0.1, 0.2),
+	Flash({rl30,157*4}, 500, 0.1, 0.2),
+	Flash({rl30,158*4}, 500, 0.1, 0.2),
+	Flash({rl30,158*4+2}, 400, 0.15, 0.25),
+	Flash({rl30,159*4}, 500, 0.3, 0.2),
+	Flash({rl30,160*4}, 500, 0.3, 0.2),
+
+	Flash({rl30,167*4}, 500, 0.15, 0.15),
+
+	Flash({rl30,173*4}, 500, 0.4, 0.15),
+	Flash({rl30,207*4}, 400, 0.2, 0.15),
+	Flash({rl30,207*4+1.5}, 2500, 0.4, 0.15),
+
+	{'color', 0, {{rl30, 4}}, {255,240,190}},
+	Flash({rl30,4}, 1200, 0.25, 0.1),
+	sb.concadd(rl30_move_in, rl30_kiai_flashes(9), rl30_choral_flashes(44), rl30_kiai_flashes2(57), rl30_choral_flashes(90),
+		rl30_kiai_flashes2(103), rl30_flashes, rl30_choral_flashes(161), rl30_kiai_flashes2(174), rl30_kiai_flashes(190, true))
+)
+
+storyboard:newObject("sb/Black.jpg", "Foreground", "BottomLeft", -106.7, 480):add(
+	Flash({rl30,50*4}, 450, 0.1, 0.1),
+	Flash({rl30,50*4+2}, 450, 0.1, 0.1),
+	Flash({rl30,50*4+4}, 450, 0.1, 0.1),
+	Flash({rl30,50*4+6}, 450, 0.1, 0.1),
+	Flash({rl30,56*4}, 1600, 0.2, 0.1),
+
+	--
+	--
+	Flash({rl30,71*4+2}, 550, 0.09, 0.12),
+	Flash({rl30,71*4+4}, 550, 0.09, 0.12),
+	Flash({rl30,71*4+6}, 550, 0.09, 0.12),
+	Flash({rl30,73*4}, 400, 0.25, 0.1),
+
+	Flash({rl30,141*4+0}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+1}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+2}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+3}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+4}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+5}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+6}, 220, 0.07, 0.3),
+	Flash({rl30,141*4+7}, 220, 0.07, 0.3),
+
+	Flash({rl30,173*4}, 500, 0.2, 0.15),
+
+	--Flash({rl30,207*4}, 250, 0.3, 0.25),
+	Flash({rl30,207*4+0.75}, 500, 0.15, 0.15)
+)
+
+local rl30_text = {165.0, sb.time:convert("28:01:410")}
+storyboard:newObject("sb/glow_away.png", "Foreground", "Centre", 242, 294):add(
+	{'moverel', 1, { {rl30_text,3}, {rl30_text,3.5} }, {0, 0}, {33,0}},
+	{'moverel', 0, { {rl30_text,3.5}, {rl30_text,4} }, {0, 0}, {17,0}},
+	{'moverel', 1, { {rl30_text,4}, {rl30_text,25+4} }, {0, 0}, {24,0}},
+	{'fade', 1, { {rl30_text,3}, {rl30_text,5} }, 0   ,0.9 },
+	{'scale',0, { {rl30_text,3}, {rl30_text,3} }, 0.58,0.58 },
+	{'fade', 0, { {rl30_text,32-0.5}, {rl30_text,34-0.5} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/heartfelt.png", "Foreground", "Centre", 385, 344):add(
+	{'moverel', 1, { {rl30_text,2+8}, {rl30_text,3.5+8} }, {0, 0}, {-43,0}},
+	{'moverel', 0, { {rl30_text,3.5+8}, {rl30_text,5.2+8} }, {0, 0}, {-9,0}},
+	{'moverel', 1, { {rl30_text,5.2+8}, {rl30_text,26+8} }, {0, 0}, {-18,0}},
+	{'fade', 1, { {rl30_text,2+8}, {rl30_text,5+8} }, 0   ,0.9 },
+	{'scale',0, { {rl30_text,2+8}, {rl30_text,2+8} }, 0.51,0.51 },
+	{'fade', 0, { {rl30_text,32.15-0.6}, {rl30_text,34.15-0.6} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/subterranean.png", "Foreground", "Centre", 253, 393):add(
+	{'moverel', 1, { {rl30_text,2+15}, {rl30_text,3.5+15} }, {0, 0}, {35,0}},
+	{'moverel', 0, { {rl30_text,3.5+15}, {rl30_text,5.2+15} }, {0, 0}, {7,0}},
+	{'moverel', 1, { {rl30_text,5.2+15}, {rl30_text,23+8} }, {0, 0}, {16,0}},
+	{'fade', 1, { {rl30_text,2+15}, {rl30_text,5+15} }, 0   ,0.9 },
+	{'scale',0, { {rl30_text,2+15}, {rl30_text,2+15} }, 0.40,0.40 },
+	{'fade', 0, { {rl30_text,32.3-0.6}, {rl30_text,34.3-0.6} }, 0.9,0 }
+)
+
+storyboard:newObject("sb/165bpm.png", "Foreground", "Centre", 320, 443):add(
+	{'fade', 1, { {rl30_text,2+22}, {rl30_text,5+22} }, 0   ,0.9 },
+	{'scale',0, { {rl30_text,0}, {rl30_text,0} }, 0.47,0.47 },
+	{'fade' ,'cubicOut', { {rl30,206*4},{rl30,208*4}}, 0.9, 0}
 )
 
 storyboard:writeToFile2()
