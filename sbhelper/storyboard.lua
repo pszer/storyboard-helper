@@ -20,6 +20,7 @@ local storyboard = {
 	eval = require (modules..'eval'),
 	ir = require (modules..'ir'),
 	clone = require (modules..'clone'),
+	config = require (modules..'config'),
 
 	-- 3d functionality
 	tri = require (modules..'tri'),
@@ -98,20 +99,30 @@ function storyboard:out()
 		return str
 	end
 
-	local variables = "[Variables]\n"
-	local header = [[[Events]
+	local variables, header = "",""
+	if not self.config['silence-headers'] then
+		variables = "[Variables]\n"
+		header = [[[Events]
 //Background and Video events
 //Storyboard Layer 0 (Background)
 ]]..
-	get(backgrounds) ..
-"//Storyboard Layer 1 (Fail)\n"..
-	get(fail)..
-"//Storyboard Layer 2 (Pass)\n"..
-	get(pass)..
-"//Storyboard Layer 3 (Foreground)\n"..
-	get(foregrounds)..
-"//Storyboard Layer 4 (Overlays)\n"..
-	get(overlays)
+		get(backgrounds) ..
+		"//Storyboard Layer 1 (Fail)\n"..
+		get(fail)..
+		"//Storyboard Layer 2 (Pass)\n"..
+		get(pass)..
+		"//Storyboard Layer 3 (Foreground)\n"..
+		get(foregrounds)..
+		"//Storyboard Layer 4 (Overlays)\n"..
+		get(overlays)
+	else
+		header =
+		get(backgrounds) ..
+		get(fail)..
+		get(pass)..
+		get(foregrounds)..
+		get(overlays)
+	end
 
 	return variables .. header
 end
@@ -133,20 +144,28 @@ function storyboard:out_file(f)
 		--return str
 	end
 
-	f:write("[Variables]\n")
-	f:write([[[Events]
+	if not self.config['silence-headers'] then
+		f:write("[Variables]\n")
+		f:write([[[Events]
 //Background and Video events
 //Storyboard Layer 0 (Background)
 ]])
-	get(backgrounds) 
-	f:write("//Storyboard Layer 1 (Fail)\n")
-	get(fail)
-	f:write("//Storyboard Layer 2 (Pass)\n")
-	get(pass)
-	f:write("//Storyboard Layer 3 (Foreground)\n")
-	get(foregrounds)
-	f:write("//Storyboard Layer 4 (Overlays)\n")
-	get(overlays)
+		get(backgrounds) 
+		f:write("//Storyboard Layer 1 (Fail)\n")
+		get(fail)
+		f:write("//Storyboard Layer 2 (Pass)\n")
+		get(pass)
+		f:write("//Storyboard Layer 3 (Foreground)\n")
+		get(foregrounds)
+		f:write("//Storyboard Layer 4 (Overlays)\n")
+		get(overlays)
+	else
+		get(backgrounds) 
+		get(fail)
+		get(pass)
+		get(foregrounds)
+		get(overlays)
+	end
 end
 
 function storyboard:writeToFile(f, overwrite)

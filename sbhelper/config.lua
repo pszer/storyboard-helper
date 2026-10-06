@@ -9,6 +9,8 @@ local config = {
 	["no-overlap-checks"] = false,
 	["ignore-version"] = false,
 
+	["silence-headers"] = false,
+
 	["forbid-unsupported-negative-scale-easing"] = false,
 
 	["disable-easing-keyframing"] = false,
