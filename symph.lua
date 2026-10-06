@@ -861,7 +861,6 @@ storyboard:newObject("sb/rem3.jpg", "Background", "TopLeft", -107, 229):add(
 	{'fade', 2, { {rl3,140*4-0.5}, {rl3,140*4} }, 0, 1},
 	{'fade', 2, { {rl3,149*4}, {rl3,149*4} }, 0, 0},
 
-
 	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 1},
 	{'fade', 2, { {rl3,165*4}, {rl3,165*4} }, 0, 0}
 )
@@ -882,10 +881,12 @@ storyboard:newObject("sb/rem4.jpg", "Background", "TopLeft", -107, 229):add(
 	{'fade', 2, { {rl3,174*4-0.25}, {rl3,174*4+0.25} }, 0.9, 0}
 )
 storyboard:newObject("sb/rem3top.jpg", "Foreground", "TopLeft", -107, -6):add(
-	{'scale', 0, { {rl3,156*4}, {rl3,156*4} }, 0.6675, 0.6675},
-	{'protract', {'parameter', { {rl3, 156*4}, {rl3, 156*4} }, value='a'}},
-	Flash({rl3,156*4}, 1600, 0.3, 0.08),
-	Flash({rl3,160*4}, 1600, 0.2, 0.08)
+	{'scale', 0, { {rl3,140*4}, {rl3,140*4} }, 0.6675, 0.6675},
+	{'fade', 2, { {rl3,140*4-0.5}, {rl3,140*4} }, 0, 1},
+	{'fade', 2, { {rl3,149*4}, {rl3,149*4} }, 0, 0},
+
+	{'fade', 2, { {rl3,156*4-0.5}, {rl3,156*4} }, 1, 1},
+	{'fade', 2, { {rl3,165*4}, {rl3,165*4} }, 0, 0}
 )
 storyboard:newObject("sb/rem4top.jpg", "Background", "TopLeft", -107, -6):add(
 	{'scale', 0, { {rl3,148*4}, {rl3,148*4} }, 0.6675, 0.6675},
@@ -1075,13 +1076,13 @@ local rl4_int_move = {
 	{'moverel', 'linear',  { {rl4,(LLLL+12)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-16} },
 }
 local rl4_int_move_top = {
-	{'move', 'linear', { {rl4,LLLL*4}, {rl4,LLLL*4} }, {-107,242-242}, {-107,183-242}},
-	{'moverel', 'sineIn',  { {rl4,LLLL*4-1}, {rl4,(LLLL+4)*4} }, {0,0},{0,22*0.4} },
-	{'moverel', 'linear',  { {rl4,(LLLL+3)*4}, {rl4,(LLLL+5)*4} }, {0,0},{0,12*0.4} },
-	{'moverel', 'out',  { {rl4,(LLLL+4)*4}, {rl4,(LLLL+8)*4} }, {0,0},{0,-4*0.4} },
-	{'moverel', 'linear',  { {rl4,(LLLL+8)*4}, {rl4,(LLLL+13)*4} }, {0,0},{0,-16*0.4} },
-	{'moverel', 'in',  { {rl4,(LLLL+5)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-24*0.4} },
-	{'moverel', 'linear',  { {rl4,(LLLL+12)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-16*0.4} },
+	{'move', 'linear', { {rl4,LLLL*4}, {rl4,LLLL*4} }, {-107,242-192}, {-107,183-192}},
+	{'moverel', 'sineIn',  { {rl4,LLLL*4-1}, {rl4,(LLLL+4)*4} }, {0,0},{0,22*0.7} },
+	{'moverel', 'linear',  { {rl4,(LLLL+3)*4}, {rl4,(LLLL+5)*4} }, {0,0},{0,12*0.7} },
+	{'moverel', 'out',  { {rl4,(LLLL+4)*4}, {rl4,(LLLL+8)*4} }, {0,0},{0,-4*0.7} },
+	{'moverel', 'linear',  { {rl4,(LLLL+8)*4}, {rl4,(LLLL+13)*4} }, {0,0},{0,-16*0.7} },
+	{'moverel', 'in',  { {rl4,(LLLL+5)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-24*0.7} },
+	{'moverel', 'linear',  { {rl4,(LLLL+12)*4}, {rl4,(LLLL+16)*4} }, {0,0},{0,-16*0.7} },
 }
 
 local LLLL2 = 90
@@ -1095,13 +1096,13 @@ local rl4_int_move2 = {
 	{'moverel', 'linear',  { {rl4,(LLLL2+12)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-16} },
 }
 local rl4_int_move_top2 = {
-	{'move', 'linear', { {rl4,LLLL2*4}, {rl4,LLLL2*4} }, {-107,242-242}, {-107,183-242}},
-	{'moverel', 'sineIn',  { {rl4,LLLL2*4-1}, {rl4,(LLLL2+4)*4} }, {0,0},{0,22*0.4} },
-	{'moverel', 'linear',  { {rl4,(LLLL2+3)*4}, {rl4,(LLLL2+5)*4} }, {0,0},{0,12*0.4} },
-	{'moverel', 'out',  { {rl4,(LLLL2+4)*4}, {rl4,(LLLL2+8)*4} }, {0,0},{0,-4*0.4} },
-	{'moverel', 'linear',  { {rl4,(LLLL2+8)*4}, {rl4,(LLLL2+13)*4} }, {0,0},{0,-16*0.4} },
-	{'moverel', 'in',  { {rl4,(LLLL2+5)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-24*0.4} },
-	{'moverel', 'linear',  { {rl4,(LLLL2+12)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-16*0.4} },
+	{'move', 'linear', { {rl4,LLLL2*4}, {rl4,LLLL2*4} }, {-107,242-192}, {-107,183-192}},
+	{'moverel', 'sineIn',  { {rl4,LLLL2*4-1}, {rl4,(LLLL2+4)*4} }, {0,0},{0,22*0.7} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+3)*4}, {rl4,(LLLL2+5)*4} }, {0,0},{0,12*0.7} },
+	{'moverel', 'out',  { {rl4,(LLLL2+4)*4}, {rl4,(LLLL2+8)*4} }, {0,0},{0,-4*0.7} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+8)*4}, {rl4,(LLLL2+13)*4} }, {0,0},{0,-16*0.7} },
+	{'moverel', 'in',  { {rl4,(LLLL2+5)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-24*0.7} },
+	{'moverel', 'linear',  { {rl4,(LLLL2+12)*4}, {rl4,(LLLL2+16)*4} }, {0,0},{0,-16*0.7} },
 }
 
 local rl4_flashes = {
@@ -2137,12 +2138,12 @@ local rl7_move_in = {
 }
 
 storyboard:newObject("sb/Lines.jpg", "Background", "TopLeft", -107, 252):add(
-	{'color', 'linear', { {rl7,0*4-0.8} }, {255,0,0} },
+	{'color', 'linear', { {rl7,0*4-0.8} }, {80,0,0} },
 	{'vector', 0, { {rl7,0*4-0.8}, {rl7,0*4-0.8} }, {0.58*rl7_SV,0.58}},
 	{'fade', 'quartIn', { {rl7,0*4-0.8}, {rl7,0*4+0.5} }, 0, 1},
 	{'fade', 'quartIn', { {rl7,16*4-4}, {rl7,16*4+0.5} }, 1, 0},
 
-	{'color', 'linear', { {rl8,8*6-0.8} }, {255,255,255} },
+	{'color', 'linear', { {rl8,8*6-0.8} }, {80,80,80} },
 	{'fade', 'quartIn', { {rl8,8*6-0.8}, {rl8,8*6+0.5} }, 0, 1},
 	{'fade', 'quartIn', { {rl8,16*6-4}, {rl8,16*6} }, 1, 0},
 	sb.concadd(rl7_scrolls)
@@ -2290,37 +2291,41 @@ storyboard:newObject("sb/ReisenEdge.png", "Foreground", "Centre", 320, 366):add(
 
 local function rl7_negative_flash_func(X, str, rl)
 	local rl=rl or rl7
+
+	local count = 1
+	local step = 0.75/count
+
 	return function(out)
 		local X=X*4
 		out{'color',0,{{rl,X}}, {0,0,255}}
-		for i=X,X+0.75,0.25 do
+		for i=X,X+0.75,step do
 			out{'fade',0, {{rl,i}}, str}
-			if i~=X+0.75 then out{'fade',0, {{rl,i+0.125}}, str*0.2}	
-			             else out{'fade',0, {{rl,i+0.125}}, 0}	
+			if i~=X+0.75 then out{'fade',0, {{rl,i+step/2}}, str*0.2}	
+			             else out{'fade',0, {{rl,i+step/2}}, 0}	
 			end
 		end
 		X=X+1
 		out{'color',0, {{rl,X}}, {0,255,0}}
-		for i=X,X+0.75,0.25 do
+		for i=X,X+0.75,step do
 			out{'fade',0, {{rl,i}}, str}	
-			if i~=X+0.75 then out{'fade',0, {{rl,i+0.125}}, str*0.2}	
-			             else out{'fade',0, {{rl,i+0.125}}, 0}	
+			if i~=X+0.75 then out{'fade',0, {{rl,i+step/2}}, str*0.2}	
+			             else out{'fade',0, {{rl,i+step/2}}, 0}	
 			end
 		end
 		X=X+1
 		out{'color',0, {{rl,X}}, {255,0,0}}
-		for i=X,X+0.75,0.25 do
+		for i=X,X+0.75,step do
 			out{'fade',0, {{rl,i}}, str}	
-			if i~=X+0.75 then out{'fade',0, {{rl,i+0.125}}, str*0.2}	
-			             else out{'fade',0, {{rl,i+0.125}}, 0}	
+			if i~=X+0.75 then out{'fade',0, {{rl,i+step/2}}, str*0.2}	
+			             else out{'fade',0, {{rl,i+step/2}}, 0}	
 			end
 		end
 		X=X+1
 		out{'color',0, {{rl,X}}, {0,0,255}}
-		for i=X,X+0.75,0.25 do
+		for i=X,X+0.75,step do
 			out{'fade',0, {{rl,i}}, str}	
-			if i~=X+0.75 then out{'fade',0, {{rl,i+0.125}}, str*0.2}	
-			             else out{'fade',0, {{rl,i+0.125}}, 0}	
+			if i~=X+0.75 then out{'fade',0, {{rl,i+step/2}}, str*0.2}	
+			             else out{'fade',0, {{rl,i+step/2}}, 0}	
 			end
 		end
 	end
@@ -2346,17 +2351,17 @@ end
 storyboard:newObject("sb/ReisenNegative.png", "Foreground", "Centre", 320, 366):add(
 	--{'protract', {'parameter', {{rl7, 0}}, value='a'}},
 	{'fade',0,{{rl7,19}}, 0},
-	rl7_negative_flash_func(19,0.4),
-	rl7_negative_flash_func(23,0.4),
-	rl7_negative_flash_func(3,0.4,rl9),
-	rl7_negative_flash_func(7,0.4,rl9),
-	rl7_negative_flash_func(11,0.6,rl9),
-	rl7_negative_flash_func(15,0.6,rl9),
+	rl7_negative_flash_func(19,0.3),
+	rl7_negative_flash_func(23,0.3),
+	rl7_negative_flash_func(3,0.3,rl9),
+	rl7_negative_flash_func(7,0.3,rl9),
+	rl7_negative_flash_func(11,0.45,rl9),
+	rl7_negative_flash_func(15,0.45,rl9),
 
-	rl7_negative_flash_func(51+3,0.4,rl9),
-	rl7_negative_flash_func(51+7,0.4,rl9),
-	rl7_negative_flash_func(51+11,0.6,rl9),
-	rl7_negative_flash_func(51+15,0.6,rl9),
+	rl7_negative_flash_func(51+3,0.3,rl9),
+	rl7_negative_flash_func(51+7,0.3,rl9),
+	rl7_negative_flash_func(51+11,0.45,rl9),
+	rl7_negative_flash_func(51+15,0.45,rl9),
 
 	sb.concadd(rl7_move_in, rl9_color_transitions(0,rl9), rl9_color_transitions(-16,rl11), rl9_color_transitions(49-16,rl11))
 )
@@ -2567,8 +2572,8 @@ local BGN={
 	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
 }
 storyboard:newObject("sb/ReisenTop.jpg", "Foreground", "TopLeft", -107, 0):add(
-	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{50,50,230},{50*1.3,50*1.2,230*1.12}},
-	{'color','cubicout',{{rl11_comp,8*4},{rl11_comp,9*4}},{50*1.3,50*1.2,230*1.12}, {82,44,222}},
+	{'color','cubicIn',{{rl11_comp,7*4},{rl11_comp,8*4}},{50*0.5,50*0.6,230*0.6},{50*1.3*0.6,50*1.2*0.6,230*1.12*0.6}},
+	{'color','cubicout',{{rl11_comp,8*4},{rl11_comp,9*4}},{50*1.3*0.6,50*1.2*0.6,230*1.12*0.6}, {82*0.6,44*0.6,222*0.6}},
 	{'color','cubicout',{{rl11,99*4}},{255,0,255}},
 
 	{'fade','cubicIn',{{rl11_comp,0*4},{rl11_comp,1*4}},0,1},
@@ -2702,7 +2707,7 @@ storyboard:newObject("sb/imperishable_night.png", "Foreground", "Centre", 253, 3
 	rl7_text_flash_func(19,0.4),
 	rl7_text_flash_func(23,0.4)
 )
-storyboard:newObject("sb/reisen.png", "Foreground", "Centre", 395, 407):add(
+storyboard:newObject("sb/reisen_t.png", "Foreground", "Centre", 395, 407):add(
 	{'move', 0, { {rl7_text,2+22} }, {395,407} },
 	{'moverel', 1, { {rl7_text,2+22-0.5}, {rl7_text,3.5+22-0.5} }, {0, 0}, {-59,0}},
 	{'moverel', 0, { {rl7_text,3.5+22-0.5}, {rl7_text,4.5+22-0.5} }, {0, 0}, {-07,0}},
@@ -2849,7 +2854,7 @@ storyboard:newObject("sb/RaikoSTop.jpg", "Background", "TopLeft", -107, 50):add(
 	{'fade', 'linear', {{rl20,0}}, 1},
 	{'color','cubicout', {{rl20,0},{rl20,0.5}}, GRAY(0),GRAY(0.6)},
 	{'color','cubicout', {{rl20,0.5},{rl20,4*4}}, GRAY(0.6),GRAY(0.7)},
-	{'fade','cubicout', {{rl20,4*4}}, 0},
+	{'fade','cubicout', {{rl20,3*4},{rl20,4*4}}, 1,0},
 	sb.concadd(rl20_move_in_text)
 )
 
@@ -2896,8 +2901,8 @@ storyboard:newObject("sb/RaikoS.jpg", "Background", "TopLeft", -107, 50):add(
 )
 
 storyboard:newObject("sb/RaikoSTop3.jpg", "Background", "TopLeft", -107, 50):add(
-	{'scale', 'linear', {{rl20,4*4}}, 0.667},
-	{'fade','cubicout', {{rl20,8*4},{rl20,8*4}}, 1},
+	{'scale', 'linear', {{rl20,8*4}}, 0.667},
+	{'fade','cubicout', {{rl20,2*4},{rl20,2*4}}, 1},
 	{'fade','cubicout', {{rl20,16*4},{rl20,16*4}}, 1},
 	{'fade','cubicout', {{rl20,20*4-1},{rl20,20*4+1}}, 1,0.7},
 	{'fade','cubicout', {{rl20,20*4+1}}, 0},
@@ -2934,7 +2939,7 @@ storyboard:newObject("sb/RaikoSTop2.jpg", "Background", "TopLeft", -107, 50):add
 	{'fade', 'linear', {{rl20,0}}, 1},
 	{'color','cubicout', {{rl20,0},{rl20,0.5}}, GRAY(0),GRAY(0.6)},
 	{'color','cubicout', {{rl20,0.5},{rl20,4*4}}, GRAY(0.6),GRAY(0.7)},
-	{'fade','cubicout', {{rl20,8*4}, {rl20,8*4+1}}, 1, 0},
+	{'fade','cubicout', {{rl20,2*4}, {rl20,3*4}}, 1, 0},
 	sb.concadd(rl20_move_in_text)
 )
 
