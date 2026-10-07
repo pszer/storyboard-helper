@@ -82,6 +82,15 @@ function storyboard:addObject(...)
 			table.insert(self.objects, v)
 		end
 	end
+
+	return storyboard.unpack(args)
+end
+
+function storyboard:sortByHeight()
+	local compare = function(x,y)
+		return (x.height or 0) < (y.height or 0)
+	end
+	table.sort(self.objects, compare)
 end
 
 function storyboard:out()

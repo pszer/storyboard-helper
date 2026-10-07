@@ -319,20 +319,23 @@ local progressB = sb.log:initProgressBar(0, 16)
 ---3dd
 ---
 local lastTri, lastCols, lastT1 = nil, nil, nil
-for t = 14000, 27500, 1000/25 do
+
+local TrisTable_i = 1
+local TrisTable = {}
+
+for t = 14000, 27500, 1000/30 do
 	progressB(1.0 - (27500-t)/(27500-14000))
 	--print(t)
 
 	local diff = (t - 14000)/1000
 
 	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.6*math.sin(diff/1.9)-math.pi,math.pi/2+1.6*math.cos(diff/1.4),math.pi/2+1.2*math.cos(diff/3)})	
-	--local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {-math.pi/2+0.5,math.sin(diff/2.6)+math.pi,0})
 
 	local light_dir = {0,1/2^0.5,-1/2^0.5}
 
 	local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(nitoModel.vertices, nitoModel.format,
 		model, view, proj,
-		sb.m3d:getAnimationFrame(nitoModel, 'Wiggle', diff*1.8, true),
+		sb.m3d:getAnimationFrame(nitoModel, 'Wiggle', diff*0.75, true),
 		function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)--]]
 
@@ -341,22 +344,52 @@ for t = 14000, 27500, 1000/25 do
 		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)--]]
 
-	local T1s = {}--]]
-	if lastTri and nitoTri then
+	local depthStack = sb.tri:calculateDepthStack(nitoTri)
 
-		for i,v in ipairs(nitoTri) do
-			local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastCols[i], v, nitoCols[i])
-			--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
+	TrisTable[TrisTable_i] = {}
+	local T_out = TrisTable[TrisTable_i]
+	TrisTable_i = TrisTable_i+1
+	for i,v in ipairs(depthStack) do
+		--print("guppp", v, v[1], v.height, v.id)
+		T_out[v.id] = v
+		T_out[v.id].start_t = t
+	end
 
-			if T1 then
-				storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/25))
+	--local T1s = {}--]]
+	--if lastTri and nitoTri then
+
+		--for i,v in ipairs(nitoTri) do
+		--for i,v in ipairs(depthStack) do
+		--	local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastTri[i].cols, v, v.cols)
+	--		--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
+--
+	--		if T1 then
+	--			storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/25))
+	--		end
+	--	end
+	--end
+
+	--lastTri = depthStack
+	--lastCols = nitoCols
+end
+
+for i=1,TrisTable_i-2, 1 do
+	local T = TrisTable[i]	
+	local T_n = TrisTable[i+1]	
+	for id, tri in pairs(T) do
+		if T_n[id] then
+			To1, To2 = sb.tri:getSpritesTwoFrames(tri, tri.cols, T_n[id], T_n[id].cols)
+			if To1 then
+				local O = storyboard:addObject(sb.tri:convertTriDataToObjects(To1, To2, 'Foreground', tri.start_t,tri.start_t+1000/30))
+			--	print(tri.height)
+				O:setHeight(tri.height)
 			end
 		end
 	end
-
-	lastTri = nitoTri
-	lastCols = nitoCols
 end
+
+storyboard:sortByHeight()
+
 sb.log:clearProgressBar()
 
 

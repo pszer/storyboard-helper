@@ -35,7 +35,9 @@ function object:new(file,layer,...)
 		time=nil,--sample
 		volume=nil,--sample
 
-		commands=nil
+		commands=nil,
+
+		height = 0 -- height in terms of draw order, not image size
 	}
 	setmetatable(t, object)
 
@@ -128,6 +130,10 @@ function object:getObjectType()
 	end
 
 	sb_log:error("object:objectType(): cannot determine type")
+end
+
+function object:setHeight(x)
+	self.height = x
 end
 
 function object:getImageSize()

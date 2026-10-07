@@ -210,6 +210,7 @@ end
 -- VertexBone
 -- VertexWeight
 --
+local VERTEX_ID = 0
 function m3d:loadModelTable(filename)
 	local test_file = io.open(filename, 'r')
 	sb_log:assert(io.type(test_file)=="file", "m3d.loadModelTable(): couldn't open '%s'.", filename)
@@ -226,6 +227,11 @@ function m3d:loadModelTable(filename)
 		v.offset = count
 		m_t.format[v[1]] = {count,count+v[3]-1}
 		count = count + v[3]
+	end
+
+	for i,v in ipairs(m_t.vertices) do
+		v.id = VERTEX_ID
+		VERTEX_ID = VERTEX_ID + 1
 	end
 
 	for i,v in ipairs(m_t.anims) do

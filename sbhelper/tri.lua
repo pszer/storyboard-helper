@@ -267,7 +267,8 @@ function tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 	return 2,3
 end
 
-function tri:triangleOverlap(tri1, tri2)
+function tri:triangleOverlap(a, b, epsilon)
+	local epsilon = 0.25
 	local ax, ay = a[1], a[2]
 	local bx, by = a[3], a[4]
 	local cx, cy = a[5], a[6]
@@ -306,13 +307,19 @@ function tri:triangleOverlap(tri1, tri2)
 		bmin = math.min(bmin, p)
 		bmax = math.max(bmax, p)
 
-		return amax <= bmin or bmax <= amin
+		return amax+epsilon <= bmin or bmax+epsilon <= amin
 	end
 
 	local function testEdge(x1, y1, x2, y2)
 		-- Perpendicular to edge
 		local nx = -(y2 - y1)
 		local ny =  (x2 - x1)
+
+		local len = math.sqrt(nx * nx + ny * ny)
+		if len > 0 then
+				nx = nx / len
+				ny = ny / len
+		end
 
 		return separated(nx, ny)
 	end
@@ -673,6 +680,8 @@ function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats
 	local m3d = sb_m3d
 
 	for i=1, #verts, 3 do
+		local ID = verts[i+0].id
+
 		local v1_pos, v1_norm, v1_c, v1_x, v1_y = m3d:vertexOut(verts[i+0], format, model_m, view_m, proj_m, bone_mats)
 		local v2_pos, v2_norm, v2_c, v2_x, v2_y = m3d:vertexOut(verts[i+1], format, model_m, view_m, proj_m, bone_mats)
 		local v3_pos, v3_norm, v3_c, v3_x, v3_y = m3d:vertexOut(verts[i+2], format, model_m, view_m, proj_m, bone_mats)
@@ -683,7 +692,8 @@ function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats
 
 		local centroid_z = tri:centroidZ(v1_pos, v2_pos, v3_pos)
 
-		table.insert(Triangles, {v1_x,v1_y, v2_x,v2_y, v3_x,v3_y, ["centroid_z"] = centroid_z, height=1})
+		table.insert(Triangles, {v1_x,v1_y, v2_x,v2_y, v3_x,v3_y, ["centroid_z"] = centroid_z, height=0, cols =
+			{v1_col,v2_col,v3_col}, id=ID})
 		table.insert(Colors   , {v1_col, v2_col, v3_col})
 	end
 
@@ -697,27 +707,34 @@ end
 --
 --
 function tri:calculateDepthStack(triangles)
+	local sorted_count = 1
 	local sorted_by_centroid = {}
 	for i,v in ipairs(triangles) do
 		local orientation = tri:getTriangleOrientation(v)
-		-- 
+		
 		if orientation == tri.orientation and v.centroid_z > 0.0 then
-			sorted_by_centroid[i] = v
-
 			v.min_x = math.min(v[1],v[3],v[5])
 			v.min_y = math.min(v[2],v[4],v[6])
 			v.max_x = math.min(v[1],v[3],v[5])
 			v.max_y = math.min(v[2],v[4],v[6])
+
+			sorted_by_centroid[sorted_count] = v
+			sorted_count=sorted_count+1
 		end
 	end
-	table.sort(sorted_by_centroid, function (a,b) return a.centroid_z > b.centroid_z end)
+
+	local function compare(x,y)
+		if not y or not x then return true end
+		return x.centroid_z > y.centroid_z
+	end
+	table.sort(sorted_by_centroid, compare)
 
 	local function overlap(t1,t2)
 		-- bounding box test first
 		if t1.min_x > t2.max_x or
 			 t1.min_y > t2.max_y or
 			 t2.min_x > t1.max_x or
-			 t2_min_y > t1.max_y then
+			 t2.min_y > t1.max_y then
 			return false
 		end
 		return tri:triangleOverlap(t1,t2)
@@ -728,13 +745,16 @@ function tri:calculateDepthStack(triangles)
 		local test_tri = sorted_by_centroid[i]
 
 		for j=i,1,-1 do
-			local O = overlap(test_tri, sorted_by_centroid[j])
+			local Ov = overlap(test_tri, sorted_by_centroid[j])
 			
-			if O then
-				test_tri.height = math.max(O.height+1, test_tri.height)
+			if Ov then
+				test_tri.height = math.max(sorted_by_centroid[j].height+1, test_tri.height)
 			end
 		end
 	end
+
+	table.sort(sorted_by_centroid, function(a,b) return a.height < b.height end)
+	return sorted_by_centroid
 end
 
 return tri
