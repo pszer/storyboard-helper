@@ -24,6 +24,7 @@ tri.PIXEL_DIM = 1.0 / tri.DIM
 tri.__index = tri
 
 tri.sample_set = {}
+tri.file_set = {}
 
 local function degToRad(x)
 	return math.pi*x/180.0
@@ -39,6 +40,9 @@ for i=0,0.5, 0.5/tri.set_size do
                                   file_v2 = string.format(tri.file_str_format_v2, count),
                                   file_v3 = string.format(tri.file_str_format_v3, count),
 																}
+	table.insert(tri.file_set, string.format(tri.file_str_format, count))
+	table.insert(tri.file_set, string.format(tri.file_str_format_v2, count))
+	table.insert(tri.file_set, string.format(tri.file_str_format_v3, count))
 	count=count+1
 end
 
@@ -521,8 +525,6 @@ function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 	local orientation = tri:getTriangleOrientation(x1,y1, x2,y2, x3,y3)
 	local x,y,angle
 
-	if T2_flip ~= T1.flip then print("huh") end
-
 	local edge_padding = sb_config['3d-scale-padding']
 	local sc_pad = edge_padding * tri.PIXEL_DIM
 
@@ -715,8 +717,8 @@ function tri:calculateDepthStack(triangles)
 		if orientation == tri.orientation and v.centroid_z > 0.0 then
 			v.min_x = math.min(v[1],v[3],v[5])
 			v.min_y = math.min(v[2],v[4],v[6])
-			v.max_x = math.min(v[1],v[3],v[5])
-			v.max_y = math.min(v[2],v[4],v[6])
+			v.max_x = math.max(v[1],v[3],v[5])
+			v.max_y = math.max(v[2],v[4],v[6])
 
 			sorted_by_centroid[sorted_count] = v
 			sorted_count=sorted_count+1
@@ -737,14 +739,14 @@ function tri:calculateDepthStack(triangles)
 			 t2.min_y > t1.max_y then
 			return false
 		end
-		return tri:triangleOverlap(t1,t2)
+		return tri:triangleOverlap(t1,t2, 0.0)
 	end
 	
 	local set_size = #sorted_by_centroid
 	for i=2,set_size do
 		local test_tri = sorted_by_centroid[i]
 
-		for j=i,1,-1 do
+		for j=i-1, 1,-1 do
 			local Ov = overlap(test_tri, sorted_by_centroid[j])
 			
 			if Ov then

@@ -29,6 +29,7 @@ function object:new(file,layer,...)
 
 		x=nil,--sprite
 		y=nil,--sprite
+		anchor=nil,--sprite
 		frame_count=nil,--animation
 		frame_delay=nil,--animation
 		loop_type=nil,--animation
@@ -166,6 +167,54 @@ function object:add(...)
 
 	return self
 end
+function object:addTable(t)
+	for i,v in ipairs(t) do
+		table.insert(self.commands, v)
+	end
+
+	return self
+end
+
+-- creates a new object with the same object definition, but no commands.
+function object:cloneHeader()
+	local t = {
+		layer = self.layer,
+		file = self.file,
+
+		file_type = self.file_type,
+		object_type = self.object_type,
+
+		x=self.x,--sprite
+		y=self.y,--sprite
+		anchor=self.anchor,--sprite
+		frame_count=self.frame_count,--animation
+		frame_delay=self.frame_delay,--animation
+		loop_type=self.loop_type,   --animation
+		time=self.time,--sample
+		volume=self.volume,--sample
+
+		commands={},
+
+		height = self.height -- height in terms of draw order, not image size
+	}
+	setmetatable(t, object)
+	return t
+end
+
+function object:evalObject()
+	self.commands = {
+		sb_com:evalTop({
+			start_x     = self.x,
+			start_y     = self.y,
+			start_sx    = self.sx or 1,
+			start_sy    = self.sy or 1,
+			start_r     = self.r or 0,
+			start_col_r = self.col_r or 255,
+			start_col_g = self.col_g or 255,
+			start_col_b = self.col_b or 255},
+			table.unpack(self.commands or {}))
+	}
+end
 
 function object:out(...)
 	local header = self:getObjectType()
@@ -210,6 +259,46 @@ function object:out(...)
 			local com_str = com_ir:out()
 			header=header.."\n"..com_str
 		end
+	end
+
+	return header
+end
+
+function object:outRaw()
+	local header = self:getObjectType()
+
+	if header=="Sample" then
+		header=string.format("Sample,%d,%d,\"%s\",%d",
+			self.time,sb_layer:out(self.layer),self.file:out(),self.volume)
+	elseif header=="Sprite" then
+		header=string.format("Sprite,%d,%d,\"%s\",%d,%d",
+			sb_layer:out(self.layer),sb_anchor:out(self.anchor),self.file:out(),math.floor(self.x),math.floor(self.y))
+	elseif header=="Animation" then
+		header=string.format("Animation,%d,%d,\"%s\",%d,%d,%d,%d,%s",
+			sb_layer:out(self.layer),sb_anchor:out(self.anchor),self.file:out(),math.floor(self.x),math.floor(self.y),
+			 self.frame_count, self.frame_delay, self.loop_type)
+	end
+
+	local evaluated = {
+		sb_com:evalTop({
+			start_x     = self.x,
+			start_y     = self.y,
+			start_sx    = self.sx or 1,
+			start_sy    = self.sy or 1,
+			start_r     = self.r or 0,
+			start_col_r = self.col_r or 255,
+			start_col_g = self.col_g or 255,
+			start_col_b = self.col_b or 255},
+			table.unpack(self.commands))}
+
+	if not sb_config["unsorted-output"] then
+		sb_verify:sortCommandsByTime(evaluated)
+	end
+
+	for i,com in ipairs(evaluated) do
+		local com_ir  = sb_com:out(com)
+		local com_str = com_ir:out()
+		header=header.."\n"..com_str
 	end
 
 	return header

@@ -256,6 +256,8 @@ for x = 0 - (64)*2, 640+107, 64 do
 		local rot = nil
 		if flipd == 2 or flipd == -2 then
 			rot = {'rotate', 0, {Sq_time_in,Sq_time_in}, math.pi/2, math.pi/2}
+		else
+			rot = {'rotate', 0, {Sq_time_in,Sq_time_in}, 0}
 		end
 
 		table.insert(fake_3d_square_edges_objects,
@@ -301,11 +303,7 @@ local Cols2 = {
 	{0,0,255},
 }--]]
 
---[[local T1,T2 = sb.tri:getSpritesTwoFrames(Tri, Cols, Tri3, Cols3)
-print(T1.tri2, T2.tri2)
-storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, "Background", 15000, 18100))--]]
 
---sb.m3d:setCamera({0,25,-70}, 'xyz', {0,0,0})
 sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
 sb.m3d:setPerspective()
 
@@ -323,7 +321,7 @@ local lastTri, lastCols, lastT1 = nil, nil, nil
 local TrisTable_i = 1
 local TrisTable = {}
 
-for t = 14000, 27500, 1000/30 do
+for t = 14000, 27500, 1000/25 do
 	progressB(1.0 - (27500-t)/(27500-14000))
 	--print(t)
 
@@ -350,7 +348,6 @@ for t = 14000, 27500, 1000/30 do
 	local T_out = TrisTable[TrisTable_i]
 	TrisTable_i = TrisTable_i+1
 	for i,v in ipairs(depthStack) do
-		--print("guppp", v, v[1], v.height, v.id)
 		T_out[v.id] = v
 		T_out[v.id].start_t = t
 	end
@@ -380,7 +377,7 @@ for i=1,TrisTable_i-2, 1 do
 		if T_n[id] then
 			To1, To2 = sb.tri:getSpritesTwoFrames(tri, tri.cols, T_n[id], T_n[id].cols)
 			if To1 then
-				local O = storyboard:addObject(sb.tri:convertTriDataToObjects(To1, To2, 'Foreground', tri.start_t,tri.start_t+1000/30))
+				local O = storyboard:addObject(sb.tri:convertTriDataToObjects(To1, To2, 'Foreground', tri.start_t,tri.start_t+1000/25))
 			--	print(tri.height)
 				O:setHeight(tri.height)
 			end
@@ -389,6 +386,8 @@ for i=1,TrisTable_i-2, 1 do
 end
 
 storyboard:sortByHeight()
+storyboard:evalObjects()
+--sb.pool:poolObjects(storyboard.objects)
 
 sb.log:clearProgressBar()
 

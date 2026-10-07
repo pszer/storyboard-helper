@@ -32,7 +32,7 @@ local config = {
 
 	["3d-interp-1-weight"] = 0.6,
 	["3d-interp-2-weight"] = 0.4,
-	["3d-scale-padding"] = 1.5,
+	["3d-scale-padding"] = 1.8,
 	["3d-larger-size-priority-scalar"] = 2.0,
 
 	["unsorted-output"] = false,

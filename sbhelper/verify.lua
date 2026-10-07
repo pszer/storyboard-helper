@@ -966,6 +966,28 @@ function verify:commandTimeLessThan(a,b)
 	return time1 < time 
 end
 
+-- looks for a fade command, if the lifespan of an object
+-- finishes with a fade to 0 then nothing happens, otherwise
+-- it will return the appropiate fade command to 0
+function verify:getFade0(coms)
+	local min,max = verify:getCommandsTimeSpan(coms)
+
+	-- Search for pre-existing fade command
+	for i,v in ipairs(coms) do
+		if sb_com:equal(v, 'fade') then
+			local time = sb_com:parse(v, 'time')
+			local vec2 = sb_com:parse(v, 'vec2')
+
+
+			if time[2] == max and vec2[1] == 0 then
+				return
+			end
+		end
+	end
+
+	return {'fade',0,{max,max},0,0}
+end
+
 --
 -- overlapping H or V parameters will cancel each other out
 --

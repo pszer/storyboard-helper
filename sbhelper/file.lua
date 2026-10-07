@@ -109,6 +109,10 @@ function file:getFilenameType(f)
 	return "unknown"
 end
 
+function file:equal(b)
+	if type(b)=="string" then return self.filename == b end
+	return self.filename == b.filename
+end
 
 function file:out()
 	return self.filename

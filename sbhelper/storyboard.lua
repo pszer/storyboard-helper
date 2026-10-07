@@ -21,6 +21,7 @@ local storyboard = {
 	ir = require (modules..'ir'),
 	clone = require (modules..'clone'),
 	config = require (modules..'config'),
+	pool = require (modules..'pool'),
 
 	-- 3d functionality
 	tri = require (modules..'tri'),
@@ -47,6 +48,8 @@ function storyboard:new(filename, ...)
 	local sb = {
 		filename = filename or "Storyboard.osb",
 		objects = {...},
+
+
 	}
 	setmetatable(sb, storyboard)
 	return sb
@@ -93,17 +96,26 @@ function storyboard:sortByHeight()
 	table.sort(self.objects, compare)
 end
 
-function storyboard:out()
+function storyboard:out(params)
+	local params = params or {}
 	local backgrounds = self:filterObjectsToLayer(0)
 	local foregrounds = self:filterObjectsToLayer(3)
 	local fail = self:filterObjectsToLayer(1)
 	local pass = self:filterObjectsToLayer(2)
 	local overlays = self:filterObjectsToLayer(4)
 
+	local pool_sprites = params.pool_sprites
+	for i,v in ipairs(self.objects) do
+		v:evalObject()
+	end
+	if pool_sprites then
+		storyboard.pool:poolObjects(self.objects, pool_sprites)
+	end
+
 	local function get(t)
 		local str = ""
 		for i,v in ipairs(t) do
-			str = str .. v:out() .. "\n"
+			str = str .. v:outRaw() .. "\n"
 		end
 		return str
 	end
@@ -136,17 +148,26 @@ function storyboard:out()
 	return variables .. header
 end
 
-function storyboard:out_file(f)
+function storyboard:out_file(f, params)
+	local params = params or {}
 	local backgrounds = self:filterObjectsToLayer(0)
 	local foregrounds = self:filterObjectsToLayer(3)
 	local fail = self:filterObjectsToLayer(1)
 	local pass = self:filterObjectsToLayer(2)
 	local overlays = self:filterObjectsToLayer(4)
 
+	local pool_sprites = params.pool_sprites
+	for i,v in ipairs(self.objects) do
+		v:evalObject()
+	end
+	if pool_sprites then
+		storyboard.pool:poolObjects(self.objects, pool_sprites)
+	end
+
 	local function get(t)
 		--local str = ""
 		for i,v in ipairs(t) do
-			local str = v:out()
+			local str = v:outRaw()
 			f:write(str,'\n')
 			--str = str .. v:out() .. "\n"
 		end
@@ -177,14 +198,20 @@ function storyboard:out_file(f)
 	end
 end
 
-function storyboard:writeToFile(f, overwrite)
+function storyboard:evalObjects()
+	for i,v in ipairs(self.objects) do
+		v:evalObject()
+	end
+end
+
+function storyboard:writeToFile(f, params)
 	f = f or self.filename
 	local file, err_str, err_num = io.open(f, "w")
 	if not file then
 		sb_log:error("storyboard:writeToFile(): couldn't write to '%s', %s %d", f, err_str, err_num or 0)
 	end
 
-	local str_out = self:out()
+	local str_out = self:out(params)
 	file:write(str_out)
 
 	            -- subtract modulo 32 to simplify decimal points
@@ -193,14 +220,14 @@ function storyboard:writeToFile(f, overwrite)
 	file:close()
 end
 
-function storyboard:writeToFile2(f, overwrite)
+function storyboard:writeToFile2(f, params)
 	f = f or self.filename
 	local file, err_str, err_num = io.open(f, "w")
 	if not file then
 		sb_log:error("storyboard:writeToFile(): couldn't write to '%s', %s %d", f, err_str, err_num or 0)
 	end
 
-	self:out_file(file)
+	self:out_file(file, params)
 	            -- subtract modulo 32 to simplify decimal points
 	local size = file:seek('end')
 	local kb = (size - size%64) / 1024.0

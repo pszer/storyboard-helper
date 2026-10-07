@@ -17,15 +17,8 @@ return function(easing, t, vector_a, vector_b, args, varargs)
 
 	local evals = sb.com:eval(varargs)
 
-	--[[print()
-	for i,v in ipairs(evals) do
-		print(sb.com:toString(v))
-	end--]]
-
 	local status = sb.verify:checkTimeOverlaps(evals)
 	if status then
-		print(#evals)
-
 		sb.log:error(status)
 	end
 
