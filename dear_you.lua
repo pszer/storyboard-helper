@@ -31,8 +31,8 @@ local T = {174.100,35}
 local BG_S = 854/1920
 
 local Scale_in = {
-	{'scalerel', 'cubicout', {{T,0}, {T,8*4}}, 1.06, 0.98},
-	{'scalerel', 'out', {{T,8*4}, {T,8*4+0.5}}, 1.0, 1/0.98},
+	{'scalerel', 'cubicout', {{T,0}, {T,8*4}}, 1.06, 0.985},
+	{'scalerel', 'out', {{T,8*4}, {T,8*4+0.5}}, 1.0, 1/0.985},
 
 	{'scalerel', 'cubicout', {{T,8*4+0.5}, {T,24*4}}, 1.00, 0.99},
 	{'scalerel', 'out', {{T,24*4}, {T,24*4+0.5}}, 1.0, 1/0.99},
@@ -50,11 +50,14 @@ local Scale_in = {
 	{'scalerel', 'out', {{T,72*4}, {T,72*4+0.5}}, 1.0, 1/0.99}
 }
 
-local GRAY = function(X) return {X*255,X*255,X*255} end
-storyboard:newObject("sb/1gamma.jpg", "Background", "Centre", 320,240):add(
+local GRAY = function(X) return {X*240,X*240,X*240} end
+storyboard:newObject("sb/1gamma.jpg", "Foreground", "Centre", 320,240):add(
 	{'scale', 0, {{T,0}},  1},
 	{'fade', 0, {{T,0}},  1},
-	{'color', 'cubicOut', {{T,0},{T,4}},  GRAY(0), GRAY(0.8)},
+	{'fade', 'In', {{T,0},{T,2}},  1,0.6},
+	{'fade', 'Out', {{T,2},{T,4*4}},  0.6,0.25},
+	{'fade', 'CubicIn', {{T,8*4-2},{T,8*4}},  0.2,0.0},
+	{'color', 'cubicOut', {{T,0},{T,4}},  GRAY(0), GRAY(0.9)},
 	{'fade', 0, {{T,8*4}},  0},
 	sb.concadd(Scale_in)
 )
@@ -63,11 +66,13 @@ local Norm1 ={
 	{'scale', 0, {{T,0}},  BG_S},
 	{'fade', 0, {{T,0}},  1},
 	{'color', 0, {{T,0}},  GRAY(0.55)},
-	{'fade', 'In', {{T,0},{T,2}},  0,0.2},
-	{'fade', 'Out', {{T,2},{T,4*4}},  0.2,0.8},
-	{'color', 'cubicin', {{T,8*4-2},{T,8*4-1}},  GRAY(0.55), GRAY(0.75)},
-	{'fade', 'CubicIn', {{T,8*4-2},{T,8*4-1}},  0.8,1.0},
-	{'color', 'cubicout', {{T,8*4},{T,8*4+1}},  GRAY(0.75), GRAY(0.9)},
+
+	--{'fade', 'In', {{T,0},{T,2}},  0,0.75},
+	--{'fade', 'Out', {{T,2},{T,4*4}},  0.75,0.9},
+
+	{'color', 'cubicin', {{T,8*4-2},{T,8*4-1}},  GRAY(0.55), GRAY(0.65)},
+	--{'fade', 'CubicIn', {{T,8*4-2},{T,8*4}},  0.9,1.0},
+	{'color', 'cubicout', {{T,8*4},{T,8*4+1}},  GRAY(0.65), GRAY(0.79)},
 	{'fade', 0, {{T,24*4},{T,24*4}},  0},
 	{'fade', 0, {{T,40*4+0.5},{T,40*4+0.5}},  1},
 	{'color', 'cubicOut', {{T,40*4+1.0},{T,40*4+1.0}}, GRAY(0.6), GRAY(0.8)},
@@ -92,11 +97,11 @@ local Alt1 = {
 	{'scale', 0, {{T,0}},  BG_S},
 	{'fade', 0, {{T,0}},  1},
 	{'color', 0, {{T,0}},  GRAY(0.55)},
-	{'fade', 'In', {{T,0},{T,2}},  0,0.2},
-	{'fade', 'Out', {{T,2},{T,4*4}},  0.2,0.8},
+	--{'fade', 'In', {{T,0},{T,2}},  0,0.75},
+	--{'fade', 'Out', {{T,2},{T,4*4}},  0.75,0.9},
 	{'color', 'cubicin', {{T,8*4-2},{T,8*4-1}},  GRAY(0.55), GRAY(0.75)},
-	{'fade', 'CubicIn', {{T,8*4-2},{T,8*4-1}},  0.8,1.0},
-	{'color', 'cubicout', {{T,8*4},{T,8*4+1}},  GRAY(0.75), GRAY(0.9)},
+	--{'fade', 'CubicIn', {{T,8*4-2},{T,8*4}},  0.9,1.0},
+	{'color', 'cubicout', {{T,8*4},{T,8*4+1}},  GRAY(0.75), GRAY(0.83)},
 	{'fade', 0, {{T,24*4},{T,24*4}},  0},
 	{'fade', 0, {{T,40*4+0.5},{T,40*4+0.5}},  1},
 	{'color', 'cubicOut', {{T,40*4+1.0},{T,40*4+1.0}}, GRAY(0.6), GRAY(0.8)},
@@ -284,19 +289,19 @@ storyboard:newObject("sb/3CloudFlash.jpg", "Background", "Centre", 320,240):add(
 	Flash({T,72*4}, 320, 0.4, 0.1),
 	sb.concadd(Scale_in, kiai3_flashes)
 )
-CircFlash_at(8, 0.55, 1.0, Circ1)
-CircFlash_at(16, 0.55, 1.0, Circ1)
-CircFlash_at(24, 0.55, 1.0, Circ2)
-CircFlash_at(32, 0.55, 1.0, Circ2)
-CircFlash_at(40, 0.65, 1.0, Circ2)
+CircFlash_at(8, 0.82, 1.5, Circ1)
+CircFlash_at(16, 0.82, 1.5, Circ1)
+CircFlash_at(24, 0.82, 1.5, Circ2)
+CircFlash_at(32, 0.82, 1.5, Circ2)
+CircFlash_at(40, 0.89, 1.5, Circ2)
 
-CircFlash_at(48, 0.55, 2.0, Circ1)
-CircFlash_at(56, 0.55, 2.0, Circ1)
+CircFlash_at(48, 0.82, 2.0, Circ1)
+CircFlash_at(56, 0.82, 2.0, Circ1)
 
-CircFlash_at(64, 0.55, 1.5, Circ3)
-CircFlash_at(72, 0.55, 1.5, Circ3)
+CircFlash_at(64, 0.82, 1.5, Circ3)
+CircFlash_at(72, 0.82, 1.5, Circ3)
 
-CircFlash_at(80, 0.70, 2.0, Circ3)
+CircFlash_at(80, 0.95, 2.0, Circ3)
 
 -- Text
 local TEXT_S = 0.52
