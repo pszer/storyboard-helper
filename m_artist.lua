@@ -376,17 +376,19 @@ for i=1,TrisTable_i-2, 1 do
 	for id, tri in pairs(T) do
 		if T_n[id] then
 			To1, To2 = sb.tri:getSpritesTwoFrames(tri, tri.cols, T_n[id], T_n[id].cols)
+			To1.height = tri.height
+			To2.height = T_n[id].height
 			if To1 then
 				local O = storyboard:addObject(sb.tri:convertTriDataToObjects(To1, To2, 'Foreground', tri.start_t,tri.start_t+1000/25))
 			--	print(tri.height)
-				O:setHeight(tri.height)
+				O:setHeight(math.max(tri.height,T_n[id].height))
 			end
 		end
 	end
 end
 
 storyboard:sortByHeight()
-storyboard:evalObjects()
+--storyboard:evalObjects()
 --sb.pool:poolObjects(storyboard.objects)
 
 sb.log:clearProgressBar()
@@ -438,5 +440,5 @@ storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
 
-storyboard:writeToFile2()
+storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})
 print(string.format("elapsed time: %.2f\n", os.clock() - x))

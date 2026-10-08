@@ -98,19 +98,18 @@ end
 
 function storyboard:out(params)
 	local params = params or {}
+
+	local pool_sprites = params.pool_sprites
+	self:evalObjects()
+	if pool_sprites then
+		storyboard.pool:poolObjectsWithHeight(self.objects, pool_sprites)
+	end
+
 	local backgrounds = self:filterObjectsToLayer(0)
 	local foregrounds = self:filterObjectsToLayer(3)
 	local fail = self:filterObjectsToLayer(1)
 	local pass = self:filterObjectsToLayer(2)
 	local overlays = self:filterObjectsToLayer(4)
-
-	local pool_sprites = params.pool_sprites
-	for i,v in ipairs(self.objects) do
-		v:evalObject()
-	end
-	if pool_sprites then
-		storyboard.pool:poolObjects(self.objects, pool_sprites)
-	end
 
 	local function get(t)
 		local str = ""
@@ -150,28 +149,24 @@ end
 
 function storyboard:out_file(f, params)
 	local params = params or {}
+
+	local pool_sprites = params.pool_sprites
+	self:evalObjects()
+	if pool_sprites then
+		storyboard.pool:poolObjectsWithHeight(self.objects, pool_sprites)
+	end
+
 	local backgrounds = self:filterObjectsToLayer(0)
 	local foregrounds = self:filterObjectsToLayer(3)
 	local fail = self:filterObjectsToLayer(1)
 	local pass = self:filterObjectsToLayer(2)
 	local overlays = self:filterObjectsToLayer(4)
 
-	local pool_sprites = params.pool_sprites
-	for i,v in ipairs(self.objects) do
-		v:evalObject()
-	end
-	if pool_sprites then
-		storyboard.pool:poolObjects(self.objects, pool_sprites)
-	end
-
 	local function get(t)
-		--local str = ""
 		for i,v in ipairs(t) do
 			local str = v:outRaw()
 			f:write(str,'\n')
-			--str = str .. v:out() .. "\n"
 		end
-		--return str
 	end
 
 	if not self.config['silence-headers'] then

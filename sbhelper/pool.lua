@@ -49,7 +49,7 @@ function pool:poolObjects(objs, file_set)
 	local obj_min = {}
 	local obj_max = {}
 
-	for obj_i, file in ipairs(file_set) do
+	for _, file in ipairs(file_set) do
 		local f_objs = get(file)
 
 		-- populate min and max data
@@ -76,7 +76,7 @@ function pool:poolObjects(objs, file_set)
 			local bin = bin_stack[i]
 
 			-- add to bin if it is free at time A_min
-			if A_min > bin.next_free then
+			if A_min >= bin.next_free then
 				bin.next_free = obj_max[A] -- reserve bin until objects lifespan end.
 				table.insert(bin, A)
 			else
@@ -89,7 +89,7 @@ function pool:poolObjects(objs, file_set)
 			insert_to_bins(1, v)
 		end
 
-		for _,bin in ipairs(bin_stack) do
+		for j,bin in ipairs(bin_stack) do
 			local level_object = bin[1]:cloneHeader()
 			local max_height = 0
 
@@ -118,6 +118,154 @@ function pool:poolObjects(objs, file_set)
 	for i,v in ipairs(new_objs) do
 		table.insert(objs, v)
 	end
+	return new_objs
+end
+
+--
+--
+--
+--
+--
+--
+--
+function pool:poolObjectsWithHeight(objs, file_set)
+	local new_objs = {}
+	--
+	-- populate file_set if one isn't provided
+	--
+	if file_set==nil then
+		local S = {}
+		for i,v in ipairs(objs) do
+			S[v.file:out()] = true
+		end
+
+		file_set = {}
+		for file,_ in pairs(S) do
+			table.insert(file_set, file)
+		end
+	end
+
+	local filter = require (modules..'filter')
+	local extract = require (modules..'extract')
+
+	local function get(X)
+		-- sample objects can't be pooled, if any are found then output them directly
+		--
+		local extracted_samples = extract(function(a) return a.file:equal(X) and a.file_type~="image" end, objs)
+		for i,v in ipairs(extracted_samples) do
+			table.insert(new_objs, v) end
+
+		return extract(function(a) return a.file:equal(X) end, objs)
+	end
+
+	-- the min and max times
+	-- for an objects commands
+	local obj_min = {}
+	local obj_max = {}
+
+	local new_objs_height = {}
+
+	for _, file in ipairs(file_set) do
+		local f_objs = get(file)
+
+		-- populate min and max data
+		for _,v in ipairs(f_objs) do
+			local min,max = sb_verify:getCommandsTimeSpan( v.commands )
+			obj_min[v] = min
+			obj_max[v] = max
+		end
+
+		-- sort based on increasing height first, then
+		-- sort based on start time for objects lifespan if same height
+		table.sort(f_objs,
+			function(a,b)
+				if a.height<b.height then return true end
+				if a.height>b.height then return false end
+				return obj_min[a] < obj_min[b] end)
+
+		for i,v in ipairs(f_objs) do
+			--print(obj_min[v], v.height)
+		end
+		--print()
+
+		local bin_stack = { }
+
+		-- if bin i is free, add to bin i.
+		-- if not, add to bin i+1 and repeat check.
+		local function insert_to_bins(i, A)
+			if bin_stack[i]==nil then
+				bin_stack[i] = {A, next_free = obj_max[A]}
+				return
+			end
+
+			local A_min = obj_min[A]
+			local bin = bin_stack[i]
+
+			-- add to bin if it is free at time A_min
+			if A_min >= bin.next_free then
+				bin.next_free = obj_max[A] -- reserve bin until objects lifespan end.
+				table.insert(bin, A)
+			else
+				insert_to_bins(i+1, A)
+			end
+		end
+
+		-- insert from sorted table
+		for oi,v in ipairs(f_objs) do
+			local last_obj = f_objs[oi-1]
+
+			--print(last_obj and last_obj.height, v.height)
+
+			-- commit bins for current height
+			if last_obj and (last_obj.height ~= v.height) then
+
+				for j,bin in ipairs(bin_stack) do
+					local level_object = bin[1]:cloneHeader()
+
+					for i,obj in ipairs(bin) do
+						local next_obj = bin[i+1]
+						local coms = obj.commands
+						level_object:addTable(coms)
+						if (next_obj~=nil and (obj_min[next_obj] > obj_max[obj])) then
+							local fade0 = sb_verify:getFade0(obj.commands)
+							level_object:add(fade0)
+						end
+					end
+
+					level_object:setHeight(last_obj.height)
+					table.insert(new_objs_height, level_object)
+				end
+
+				bin_stack = {}
+			end
+
+			insert_to_bins(1, v)
+		end
+
+		for j,bin in ipairs(bin_stack) do
+			local level_object = bin[1]:cloneHeader()
+			local max_height = 0
+
+			for i,obj in ipairs(bin) do
+				local next_obj = bin[i+1]
+				local coms = obj.commands
+				level_object:addTable(coms)
+				if (next_obj~=nil and (obj_min[next_obj] > obj_max[obj])) then
+					local fade0 = sb_verify:getFade0(obj.commands)
+					level_object:add(fade0)
+				end
+			end
+
+			level_object:setHeight(bin[1].height)
+			table.insert(new_objs_height, level_object)
+		end
+	end
+
+	table.sort(new_objs_height, function(a,b) return a.height < b.height end)
+	for i,v in ipairs(new_objs) do
+		table.insert(objs, v) end
+	for i,v in ipairs(new_objs_height) do
+		table.insert(objs, v) end
 	return new_objs
 end
 

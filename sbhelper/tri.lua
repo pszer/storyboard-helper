@@ -272,7 +272,7 @@ function tri:determineTriangleSide(x1,y1, x2,y2, x3,y3)
 end
 
 function tri:triangleOverlap(a, b, epsilon)
-	local epsilon = 0.25
+	local epsilon = epsilon or 0.25
 	local ax, ay = a[1], a[2]
 	local bx, by = a[3], a[4]
 	local cx, cy = a[5], a[6]
@@ -311,7 +311,7 @@ function tri:triangleOverlap(a, b, epsilon)
 		bmin = math.min(bmin, p)
 		bmax = math.max(bmax, p)
 
-		return amax+epsilon <= bmin or bmax+epsilon <= amin
+		return amax-epsilon <= bmin or bmax-epsilon <= amin
 	end
 
 	local function testEdge(x1, y1, x2, y2)
@@ -620,6 +620,11 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 	if T2==nil then T2=T1 end
 	local L = sb_layer:out(layer)
 
+	if T1 and sb_config['3d-debug-depth-shader'] then
+		T1.col = {math.min(T1.height*50+50,255), math.min(T1.height*75+50,255), 50}
+		T2.col = T1.col
+	end
+
 	if T1 then
 		obj1 = sb_object:new(T1.file, L, T1.anchor, 0,0):add(
 			{'fade',    0, {time1,time2}, 1,1},
@@ -726,7 +731,7 @@ function tri:calculateDepthStack(triangles)
 	end
 
 	local function compare(x,y)
-		if not y or not x then return true end
+		--if not y or not x then return true end
 		return x.centroid_z > y.centroid_z
 	end
 	table.sort(sorted_by_centroid, compare)
@@ -739,7 +744,7 @@ function tri:calculateDepthStack(triangles)
 			 t2.min_y > t1.max_y then
 			return false
 		end
-		return tri:triangleOverlap(t1,t2, 0.0)
+		return tri:triangleOverlap(t1,t2, 0.25)
 	end
 	
 	local set_size = #sorted_by_centroid

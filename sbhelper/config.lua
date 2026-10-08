@@ -14,9 +14,9 @@ local config = {
 	["forbid-unsupported-negative-scale-easing"] = false,
 
 	["disable-easing-keyframing"] = false,
-	["default-easing-keyframing-epsilon"]        = 2.4,
-	["default-easing-keyframing-epsilon-scale"]  = 0.012,
-	["default-easing-keyframing-epsilon-rotate"] = 0.1,
+	["default-easing-keyframing-epsilon"]        = 1.4,
+	["default-easing-keyframing-epsilon-scale"]  = 0.001,
+	["default-easing-keyframing-epsilon-rotate"] = 0.05,
 	["default-easing-keyframing-epsilon-color"]  = 2,
 	["default-easing-keyframing-interval"] = 4,
 
@@ -33,7 +33,9 @@ local config = {
 	["3d-interp-1-weight"] = 0.6,
 	["3d-interp-2-weight"] = 0.4,
 	["3d-scale-padding"] = 1.8,
-	["3d-larger-size-priority-scalar"] = 2.0,
+	["3d-larger-size-priority-scalar"] = 2.1,
+
+	["3d-debug-depth-shader"] = false,
 
 	["unsorted-output"] = false,
 	["whitespace"] = "_",
