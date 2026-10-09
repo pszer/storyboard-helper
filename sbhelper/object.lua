@@ -304,4 +304,11 @@ function object:outRaw()
 	return header
 end
 
+function object:sortByHeights(objs)
+	local compare = function(x,y)
+		return (x.height or 0) < (y.height or 0)
+	end
+	table.sort(objs, compare)
+end
+
 return object

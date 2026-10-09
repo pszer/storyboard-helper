@@ -310,10 +310,8 @@ sb.m3d:setPerspective()
 local view,proj = sb.m3d:getViewAndProjMats()
 
 local nitoModel = sb.m3d:loadModelTable('cubeAnim.txt')
-sb.m3d:fixAttribute(nitoModel, 'VertexColor', 0, 255)
---sb.m3d:addAttributeToModel(nitoModel, 'VertexColor', 'byte', 3, {255,255,255})
 
-local progressB = sb.log:initProgressBar(0, 16)
+--[[local progressB = sb.log:initProgressBar(0, 16)
 ---3dd
 ---
 local lastTri, lastCols, lastT1 = nil, nil, nil
@@ -323,7 +321,6 @@ local TrisTable = {}
 
 for t = 14000, 27500, 1000/25 do
 	progressB(1.0 - (27500-t)/(27500-14000))
-	--print(t)
 
 	local diff = (t - 14000)/1000
 
@@ -335,12 +332,7 @@ for t = 14000, 27500, 1000/25 do
 		model, view, proj,
 		sb.m3d:getAnimationFrame(nitoModel, 'Wiggle', diff*0.75, true),
 		function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)--]]
-
-	--[[local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(sb.m3d.CubeVerts, sb.m3d.CubeVerts_Format,
-		model, view, proj,
-		nil, function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)--]]
+				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
 
 	local depthStack = sb.tri:calculateDepthStack(nitoTri)
 
@@ -351,23 +343,6 @@ for t = 14000, 27500, 1000/25 do
 		T_out[v.id] = v
 		T_out[v.id].start_t = t
 	end
-
-	--local T1s = {}--]]
-	--if lastTri and nitoTri then
-
-		--for i,v in ipairs(nitoTri) do
-		--for i,v in ipairs(depthStack) do
-		--	local T1, T2 = sb.tri:getSpritesTwoFrames(lastTri[i], lastTri[i].cols, v, v.cols)
-	--		--local T1, T2 = sb.tri:getSpriteForTriangle(v, cubeCols[i])
---
-	--		if T1 then
-	--			storyboard:addObject(sb.tri:convertTriDataToObjects(T1, T2, 'Foreground', t,t+1000/25))
-	--		end
-	--	end
-	--end
-
-	--lastTri = depthStack
-	--lastCols = nitoCols
 end
 
 for i=1,TrisTable_i-2, 1 do
@@ -380,19 +355,47 @@ for i=1,TrisTable_i-2, 1 do
 			To2.height = T_n[id].height
 			if To1 then
 				local O = storyboard:addObject(sb.tri:convertTriDataToObjects(To1, To2, 'Foreground', tri.start_t,tri.start_t+1000/25))
-			--	print(tri.height)
 				O:setHeight(math.max(tri.height,T_n[id].height))
 			end
 		end
 	end
 end
 
-storyboard:sortByHeight()
---storyboard:evalObjects()
---sb.pool:poolObjects(storyboard.objects)
-
 sb.log:clearProgressBar()
+--]]
+local light_dir = {0,1/2^0.5,-1/2^0.5}
+local animobjs = sb.a3d:animate3D{
+	start_time = 14000,
+	end_time = 27500,
+	sample_step = 5,
+	shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
+				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end,
 
+	camera_func = function(t) return
+		{0,0,-15}, 'xyz', {0,0,0}
+	end,
+
+	actors = {
+		{ model = nitoModel,
+
+			mat_func = function(t)
+				t=t/2000.0
+				return sb.m3d:modelMatrix(
+					{0,0,0}, 
+					{2,2,2}, 
+					'xyz', {0.6*math.sin(t/1.9)-math.pi,math.pi/2+1.6*math.cos(t/1.4),math.pi/2+1.2*math.cos(t/3)})
+			end,
+
+			anim_func = function(t)
+				return 'Wiggle', 0.75*(t/2000), true
+			end,
+
+			master_func = nil
+		}
+	}
+}
+storyboard:addObject(table.unpack(animobjs))
+--storyboard:sortByHeight()
 
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
@@ -440,5 +443,6 @@ storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
 
-storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})
+storyboard:writeToFile2()
+--storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})
 print(string.format("elapsed time: %.2f\n", os.clock() - x))

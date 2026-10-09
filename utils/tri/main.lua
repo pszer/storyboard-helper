@@ -1,5 +1,5 @@
 local DIM=160
-local SET_SIZE=100
+local SET_SIZE=166
 
 local sample_set = {
 

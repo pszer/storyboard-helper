@@ -11,7 +11,7 @@ local sb_m3d = require (modules..'model')
 local tri = {
 	DIM = 160,
 	PIXEL_DIM,
-	set_size = 100,
+	set_size = 166,
 	anchor = 'TopCentre',
 	file_str_format = 'T/%d.png',
 	file_str_format_v2 = 'T/%dA.png',
@@ -339,6 +339,42 @@ function tri:triangleOverlap(a, b, epsilon)
 	return true
 end
 
+function tri:triangleContains(tri, sub, epsilon)
+	local function pointInTriangle(px, py, t)
+		local x1, y1 = t[1], t[2]
+		local x2, y2 = t[3], t[4]
+		local x3, y3 = t[5], t[6]
+
+		local function cross(ax, ay, bx, by)
+				return (bx - ax) * (py - ay)
+						 - (by - ay) * (px - ax)
+		end
+
+		local c1 = cross(x1, y1, x2, y2)
+		local c2 = cross(x2, y2, x3, y3)
+		local c3 = cross(x3, y3, x1, y1)
+
+		-- normalise by length, so that it can be tested for
+		-- tolerance epsilon in actual pixel units
+		local len1,len2,len3 =
+			(x2-x1)^2 + (y2-y1)^2,
+			(x3-x2)^2 + (y3-y2)^2,
+			(x1-x3)^2 + (y1-y3)^2
+		if len1 > 0 then c1=c1/math.sqrt(len1) end
+		if len2 > 0 then c2=c2/math.sqrt(len2) end
+		if len3 > 0 then c3=c3/math.sqrt(len3) end
+
+		local min_c = math.min(c1, c2, c3)
+    local max_c = math.max(c1, c2, c3)
+
+		return min_c >= -epsilon or max_c <= epsilon
+	end
+
+	return pointInTriangle(sub[1], sub[2], tri) and
+	       pointInTriangle(sub[3], sub[4], tri) and
+	       pointInTriangle(sub[5], sub[6], tri) 
+end
+
 function tri:centroid(v1,v2,v3)
 	return (v1.x + v2.x + v3.x)/3.0,
 	       (v1.y + v2.y + v3.y)/3.0,
@@ -457,6 +493,9 @@ end
 -- generates the closest fitting sprite for tri1, and the closest fitting sprite for
 -- tri2 using the same source triangle
 function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
+	local cols1 = cols1 or tri1.cols
+	local cols2 = cols2 or tri2.cols
+
 	local T1 = tri:getSpriteForTriangle(tri1, cols1)
 	if not T1 then return nil end
 
@@ -627,7 +666,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 
 	if T1 then
 		obj1 = sb_object:new(T1.file, L, T1.anchor, 0,0):add(
-			{'fade',    0, {time1,time2}, 1,1},
+			{'fade',    0, {time1,time1}, 1,1},
 			{'move',    0, {time1,time2}, T1.pos, T2.pos},
 			{'rot',     0, {time1,time2}, T1.rot, T2.rot},
 			{'vector',  0, {time1,time2}, T1.vector, T2.vector},
@@ -636,7 +675,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 
 		if T1.tri2 then
 			obj2 = sb_object:new(T1.tri2.file, L, T1.anchor, 0,0):add(
-				{'fade',    0, {time1,time2}, 1,1},
+				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.tri2.pos, T2.tri2.pos},
 				{'rot',     0, {time1,time2}, T1.tri2.rot, T2.tri2.rot},
 				{'vector',  0, {time1,time2}, T1.tri2.vector, T2.tri2.vector},
@@ -644,7 +683,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 			)
 		elseif T2.tri2 then
 			obj2 = sb_object:new(T1.file_v2, L, T1.anchor, 0,0):add(
-				{'fade',    0, {time1,time2}, 1,1},
+				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.pos, T2.tri2.pos},
 				{'rot',     0, {time1,time2}, T1.rot, T2.tri2.rot},
 				{'vector',  0, {time1,time2}, T1.vector, T2.tri2.vector},
@@ -654,7 +693,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 
 		if T1.tri3 then
 			obj3 = sb_object:new(T1.tri3.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
-				{'fade',    0, {time1,time2}, 1,1},
+				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.tri3.pos, T2.tri3.pos},
 				{'rot',     0, {time1,time2}, T1.tri3.rot, T2.tri3.rot},
 				{'vector',  0, {time1,time2}, T1.tri3.vector, T2.tri3.vector},
@@ -662,7 +701,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 			)
 		elseif T2.tri3 then
 			obj3 = sb_object:new(T1.file_v3, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
-				{'fade',    0, {time1,time2}, 1,1},
+				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.pos, T2.tri3.pos},
 				{'rot',     0, {time1,time2}, T1.rot, T2.tri3.rot},
 				{'vector',  0, {time1,time2}, T1.vector, T2.tri3.vector},
@@ -678,6 +717,14 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 	return obj1, obj2, obj3
 end
 
+--
+-- format
+--
+-- {x,y, x,y, x,y,  centroid_z=, height=, cols={}, id=ID,    start_t=..., end_t=..., final=false/true}
+--
+-- start_t, end_t and final is to be filled out by the animation framework.
+-- final==true means that the triangle next frame is to be culled.
+--
 function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats, frag_shader)
 	local Triangles = {}
 	local Colors    = {}
@@ -707,6 +754,88 @@ function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats
 	return Triangles, Colors
 end
 
+-- subdivides triangle once
+--     /\         /\
+--    /  \       /  \
+--   /    \     /____\
+--  /      \   / \   /\
+-- /________\ /__ \ /__\
+--
+function tri:subdivideTriangle(tri)
+	local mid_12_x = (tri[1] + tri[3]) * 0.5
+	local mid_12_y = (tri[2] + tri[4]) * 0.5
+	--
+	local mid_23_x = (tri[3] + tri[5]) * 0.5
+	local mid_23_y = (tri[4] + tri[6]) * 0.5
+	--
+	local mid_31_x = (tri[5] + tri[1]) * 0.5
+	local mid_31_y = (tri[6] + tri[2]) * 0.5
+	--
+	local Tri1, Tri2, Tri3, Tri4
+	Tri1 =   {tri[1], tri[2], mid_12_x, mid_12_y, mid_31_x, mid_31_y }
+	Tri2 =   {mid_12_x, mid_12_y, tri[3], tri[4], mid_23_x, mid_23_y }
+	Tri3 =   {mid_23_x, mid_23_y, tri[5], tri[6], mid_31_x, mid_31_y }
+	Tri4 = {mid_12_x, mid_12_y, mid_23_x, mid_23_y, mid_31_x, mid_31_y}
+
+	return Tri1, Tri2, Tri3, Tri4
+end
+
+-- Test if a triangle to be rendered behind others, is fully occluded by them.
+-- returns true if full occlusion, meaning the triangle can safely be not drawn.
+--
+-- epsilon is a value in pixels that allows for differences in that many pixels
+-- to still count as occlusion, which allows for numerical edge cases to still be occluded
+-- because they visually make little impact.
+--
+function tri:testTriangleOcclusion(triangle, set, epsilon)
+	local epsilon = epsilon or sb_config['3d-default-occlusion-epsilon'] -- 1.8 pixel by default
+	local TriRoot = { triangle, coverage=false, children=nil }
+
+	local recur = nil
+	recur = function(root, top_tri)
+		-- already occluded
+		if root.coverage == true then 
+			return
+		end
+
+		-- if full occlusion of this subdivision
+		if tri:triangleContains(top_tri, root[1], epsilon) then
+			root.coverage = true
+			return
+		elseif tri:triangleOverlap(top_tri, root[1]) then
+
+			-- subdivide if new
+			if root.children==nil then
+				local t1,t2,t3,t4 = tri:subdivideTriangle(root[1])
+				root.children = {{t1},{t2},{t3},{t4}}
+				root.children[1].coverage = false
+				root.children[2].coverage = false
+				root.children[3].coverage = false
+				root.children[4].coverage = false
+			end
+
+			recur(root.children[1], top_tri)
+			recur(root.children[2], top_tri)
+			recur(root.children[3], top_tri)
+			recur(root.children[4], top_tri)
+
+			if root.children[1].coverage and root.children[2].coverage
+				and root.children[3].coverage and root.children[4].coverage
+			then
+				root.coverage = true
+				return
+			end
+		end
+
+	end
+
+	for i,v in ipairs(set) do
+		recur(TriRoot, v)
+		if TriRoot.coverage then return true end
+	end
+	return false
+end
+
 --
 --
 -- triangle centroid Z is used to approximate depth order, the resulting
@@ -731,7 +860,6 @@ function tri:calculateDepthStack(triangles)
 	end
 
 	local function compare(x,y)
-		--if not y or not x then return true end
 		return x.centroid_z > y.centroid_z
 	end
 	table.sort(sorted_by_centroid, compare)
@@ -746,17 +874,49 @@ function tri:calculateDepthStack(triangles)
 		end
 		return tri:triangleOverlap(t1,t2, 0.25)
 	end
+
+	-- store for each triangle, what triangles overlap on top of it
+	-- this is used to determine fully/99% overlapped triangles that
+	-- do not need to be rendered.
+	local occlusion_set = {}
 	
 	local set_size = #sorted_by_centroid
 	for i=2,set_size do
 		local test_tri = sorted_by_centroid[i]
 
 		for j=i-1, 1,-1 do
-			local Ov = overlap(test_tri, sorted_by_centroid[j])
+			local tri_j = sorted_by_centroid[j]
+			local Ov = overlap(test_tri, tri_j)
 			
 			if Ov then
-				test_tri.height = math.max(sorted_by_centroid[j].height+1, test_tri.height)
+				test_tri.height = math.max(tri_j.height+1, test_tri.height)
+
+				-- add overlapping triangle to occlusion set
+				local set = occlusion_set[tri_j]
+				if set == nil then
+					occlusion_set[tri_j] = {}
+					set = occlusion_set[tri_j]
+				end
+				table.insert(set, test_tri)
 			end
+
+		end
+	end
+
+	-- test for triangles that are fully occluded by whats above them, they
+	-- can be removed from rendering.
+	for test_tri, overlaps in pairs(occlusion_set) do
+		local test = tri:testTriangleOcclusion(test_tri, overlaps)
+
+		if test then
+			--remove
+			for i,v in ipairs(sorted_by_centroid) do
+				if v==test_tri then
+					table.remove(sorted_by_centroid, i)
+					break
+				end
+			end
+			--
 		end
 	end
 

@@ -99,8 +99,6 @@ function keyframe:simplify(input, parameters)
 			dist = dist + p_linear[i]*p_linear[i]
 		end
 
-		--print("dist", dist)
-
 		return dist ^ 0.5
 	end
 

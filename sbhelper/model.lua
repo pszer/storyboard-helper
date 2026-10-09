@@ -89,6 +89,18 @@ m3d.CubeVerts = {
     { 0.5, -0.5,  0.5, 0,-1,0, 0, 255, 255},
 }
 
+-- Each vertex is given a unique identifier, the first vertex in a triangle
+-- is the triangles ID. these are used to keep track of individual triangles
+-- for complex purposes like keyframing, interpolation, depth resolution etc.
+--
+-- triangles which are culled are split into triangles with unique identifiers of their own
+--
+local VERTEX_ID = 0
+function m3d:getNewVertexID()
+	VERTEX_ID = VERTEX_ID + 1
+	return VERTEX_ID-1
+end
+
 local __tempvec3_2 = cpml.vec3.new()
 function m3d:rotateMatrix(mat, rot_type, rot)
 	local mat4 = cpml.mat4
@@ -210,7 +222,6 @@ end
 -- VertexBone
 -- VertexWeight
 --
-local VERTEX_ID = 0
 function m3d:loadModelTable(filename)
 	local test_file = io.open(filename, 'r')
 	sb_log:assert(io.type(test_file)=="file", "m3d.loadModelTable(): couldn't open '%s'.", filename)
@@ -230,8 +241,7 @@ function m3d:loadModelTable(filename)
 	end
 
 	for i,v in ipairs(m_t.vertices) do
-		v.id = VERTEX_ID
-		VERTEX_ID = VERTEX_ID + 1
+		v.id = m3d:getNewVertexID()
 	end
 
 	for i,v in ipairs(m_t.anims) do
@@ -250,6 +260,7 @@ function m3d:loadModelTable(filename)
 		sb_log:printf("  - '%s' [%s,%s] @%sfps%s", v.name, v.first, v.last, v.framerate, v.loop and (" (looping)") or "")
 	end
 
+	self:fixAttribute(m_t, 'VertexColor', 0, 255)
 	return m_t
 end
 

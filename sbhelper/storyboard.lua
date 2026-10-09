@@ -26,6 +26,7 @@ local storyboard = {
 	-- 3d functionality
 	tri = require (modules..'tri'),
 	m3d = require (modules..'model'),
+	a3d = require (modules..'animate3d'),
 
 	unpack = table.unpack or unpack,
 
@@ -90,10 +91,7 @@ function storyboard:addObject(...)
 end
 
 function storyboard:sortByHeight()
-	local compare = function(x,y)
-		return (x.height or 0) < (y.height or 0)
-	end
-	table.sort(self.objects, compare)
+	storyboard.object:sortByHeights(self.objects)
 end
 
 function storyboard:out(params)
@@ -101,8 +99,10 @@ function storyboard:out(params)
 
 	local pool_sprites = params.pool_sprites
 	self:evalObjects()
-	if pool_sprites then
+	if pool_sprites and not storyboard.config['disable-pooling'] then
 		storyboard.pool:poolObjectsWithHeight(self.objects, pool_sprites)
+	else
+		self:sortByHeight()
 	end
 
 	local backgrounds = self:filterObjectsToLayer(0)
@@ -152,8 +152,10 @@ function storyboard:out_file(f, params)
 
 	local pool_sprites = params.pool_sprites
 	self:evalObjects()
-	if pool_sprites then
+	if pool_sprites and not storyboard.config['disable-pooling'] then
 		storyboard.pool:poolObjectsWithHeight(self.objects, pool_sprites)
+	else
+		self:sortByHeight()
 	end
 
 	local backgrounds = self:filterObjectsToLayer(0)
