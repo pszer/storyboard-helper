@@ -253,9 +253,9 @@ function m3d:loadModelTable(filename)
 
 	sb_log:printf("Loaded model '%s'", filename)
 	sb_log:printf("* %s triangles'", math.floor(#m_t.vertices/3.0))
-	sb_log:printf("* %s bones'", #m_t.skeleton)
-	sb_log:printf("* %s animation frames'", #m_t.frames)
-	sb_log:printf("* %s animation defs'", #m_t.anims)
+	sb_log:printf("* %s bones'", (m_t.skeleton and #m_t.skeleton) or 0)
+	sb_log:printf("* %s animation frames'", (m_t.frames and #m_t.frames) or 0)
+	sb_log:printf("* %s animation defs'", (m_t.anims and #m_t.anims) or 0)
 	for i,v in ipairs(m_t.anims) do
 		sb_log:printf("  - '%s' [%s,%s] @%sfps%s", v.name, v.first, v.last, v.framerate, v.loop and (" (looping)") or "")
 	end
@@ -307,6 +307,10 @@ function m3d:getVertexAttributeIndex(format, attr)
 	return offset, format[attr][2]
 end
 
+function m3d:hasAttribute(format, attr)
+	return format[attr] ~= nil
+end
+
 local __pos_reg = {0,0,0,0}
 local __norm_reg = {0,0,0,0}
 local __screen_reg = {0,0,0,0}
@@ -327,7 +331,6 @@ function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
 	if bone_mats then
 		local VertexBone_i, VertexBone_j = m3d:getVertexAttributeIndex(format, 'VertexBone')
 		local VertexWeight_i, VertexWeight_j = m3d:getVertexAttributeIndex(format, 'VertexWeight')
-
 
 		--[[
 		local deform_mat =
@@ -403,6 +406,11 @@ function m3d:basicDiffuseColor(vertex, normal, color, light)
 	local B_x = (dot * (light_col[3]/255) + amb[3]/255) * color[3]
 
 	return {R_x, G_x, B_x}
+end
+function m3d:basicNormalShader(vertex, normal, color, light)
+	return {math.abs(math.floor(norm.x*255.0)),
+	        math.abs(math.floor(norm.y*255.0)),
+					math.abs(math.floor(norm.z*255.0)) }
 end
 
 function m3d:setupAnimations(m_t)

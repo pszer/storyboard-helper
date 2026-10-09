@@ -32,11 +32,11 @@ local config = {
 
 	["3d-interp-1-weight"] = 0.6,
 	["3d-interp-2-weight"] = 0.42,
-	["3d-scale-padding"] = 1.8,
+	["3d-scale-padding"] = 2.5,
 	["3d-larger-size-priority-scalar"] = 2.1,
 	["3d-debug-depth-shader"] = false,
 	["3d-default-occlusion-epsilon"] = 1.9,
-	["3d-default-triangle-epsilon"] = 0.035,
+	["3d-default-triangle-epsilon"] = 0.245,
 
 	["disable-pooling"] = false,
 	["unsorted-output"] = false,

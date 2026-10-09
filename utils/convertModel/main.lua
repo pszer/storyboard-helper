@@ -4,7 +4,7 @@ local serialise = require 'serialise'
 local invert_triangles = true
 
 function love.load()
-	local model_name = 'cubeAnim.iqm'
+	local model_name = 'derpyflatg.iqm'
 	local M,A = loadModel(model_name)
 
 	local vertices = {}

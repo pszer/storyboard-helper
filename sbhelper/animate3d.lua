@@ -106,8 +106,8 @@ function anim3d:animate3D(params)
 			if anim_name then
 				bone_mats = sb_m3d:getAnimationFrame(Model, anim_name, anim_time, anim_forceloop)
 			else -- identity matrix fallback if no anim
-				bone_mats = cpml.mat4.new()
-				for i=1,16 do bone_mats[i]=__id[i] end
+				--bone_mats = cpml.mat4.new()
+				--for i=1,16 do bone_mats[i]=__id[i] end
 			end
 
 			-- Master func
@@ -224,8 +224,8 @@ function anim3d:outputActorTris(actor_tris, start_time, end_time, time_step, fra
 							O3:setHeight(math.max(To1.height,To2.height))
 							table.insert(objects, O3) end
 					end
-				elseif T1.start_t >= T2.start_t then
-					sb_log:error("anim3d.outputActorTris(): malformed triangles at indices %S-%s, their timepoints go backwards (%s,%s).",
+				elseif T1.start_t > T2.start_t then
+					sb_log:error("anim3d.outputActorTris(): malformed triangles at indices %s-%s, their timepoints go backwards (%s,%s).",
 						i,i+1, T1.start_t, T2.start_t)
 				end
 				--
@@ -344,8 +344,8 @@ function anim3d:keyframeTriangles(out_frame)
 
 	local result = RDP(out_frame, 1, #out_frame)
 
-	print()
-	print('simplified to '..#result..' from '..#out_frame)
+	--print()
+	--print('simplified to '..#result..' from '..#out_frame)
 
 	return result
 end

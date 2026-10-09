@@ -309,7 +309,8 @@ sb.m3d:setPerspective()
 
 local view,proj = sb.m3d:getViewAndProjMats()
 
-local nitoModel = sb.m3d:loadModelTable('cubeAnim.txt')
+--local nitoModel = sb.m3d:loadModelTable('cubeAnim.txt')
+local derpymodel = sb.m3d:loadModelTable('derpyflat.txt')
 
 --[[local progressB = sb.log:initProgressBar(0, 16)
 ---3dd
@@ -367,28 +368,32 @@ local light_dir = {0,1/2^0.5,-1/2^0.5}
 local animobjs = sb.a3d:animate3D{
 	start_time = 14000,
 	end_time = 27500,
-	sample_step = 5,
+	sample_step = 10,
 	shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end,
+				{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
+	--shader = function(vert,norm,col)
+	--	return {math.abs(math.floor(norm.x*255.0)), math.abs(math.floor(norm.y*255.0)), math.abs(math.floor(norm.z*255.0))}
+	--end,
 
 	camera_func = function(t) return
-		{0,0,-15}, 'xyz', {0,0,0}
+		{0,3.5,-15}, 'xyz', {0,0,0}
 	end,
 
 	actors = {
-		{ model = nitoModel,
+		{ model = derpymodel,
 
 			mat_func = function(t)
 				t=t/2000.0
 				return sb.m3d:modelMatrix(
 					{0,0,0}, 
-					{2,2,2}, 
-					'xyz', {0.6*math.sin(t/1.9)-math.pi,math.pi/2+1.6*math.cos(t/1.4),math.pi/2+1.2*math.cos(t/3)})
+					{5.5,5.5,5.5}, 
+					--'xyz', {0.6*math.sin(t/1.9)-math.pi/2,math.pi/2+1.6*math.cos(t/1.4), 0})
+					'xyz', {-math.pi/2, t*2.5,0})
 			end,
 
-			anim_func = function(t)
-				return 'Wiggle', 0.75*(t/2000), true
-			end,
+			--anim_func = function(t)
+			--	return 'Wiggle', 0.75*(t/2000), true
+			--end,
 
 			master_func = nil
 		}
