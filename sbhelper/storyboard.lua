@@ -102,7 +102,7 @@ function storyboard:out(params)
 	if pool_sprites and not storyboard.config['disable-pooling'] then
 		storyboard.pool:poolObjectsWithHeight(self.objects, pool_sprites)
 	else
-		self:sortByHeight()
+		--self:sortByHeight()
 	end
 
 	local backgrounds = self:filterObjectsToLayer(0)
@@ -155,7 +155,7 @@ function storyboard:out_file(f, params)
 	if pool_sprites and not storyboard.config['disable-pooling'] then
 		storyboard.pool:poolObjectsWithHeight(self.objects, pool_sprites)
 	else
-		self:sortByHeight()
+		--self:sortByHeight()
 	end
 
 	local backgrounds = self:filterObjectsToLayer(0)
