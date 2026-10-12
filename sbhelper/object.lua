@@ -253,6 +253,9 @@ function object:out(...)
 		if not sb_config["unsorted-output"] then
 			sb_verify:sortCommandsByTime(evaluated)
 		end
+		if not sb_config["dont-trim-invisible"] then
+			evaluated = sb_verify:trimToVisible(evaluated)
+		end
 
 		for i,com in ipairs(evaluated) do
 			local com_ir  = sb_com:out(com)
@@ -293,6 +296,9 @@ function object:outRaw()
 
 	if not sb_config["unsorted-output"] then
 		sb_verify:sortCommandsByTime(evaluated)
+	end
+	if not sb_config["dont-trim-invisible"] then
+		evaluated = sb_verify:trimToVisible(evaluated, self.file:out()=="sb/TilingC_Col1.png")
 	end
 
 	for i,com in ipairs(evaluated) do

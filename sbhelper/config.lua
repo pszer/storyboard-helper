@@ -39,6 +39,7 @@ local config = {
 	["3d-default-triangle-epsilon"] = 0.245,
 
 	["disable-pooling"] = false,
+	["dont-trim-invisible"] = false,
 	["unsorted-output"] = false,
 	["whitespace"] = "_",
 	["project-folder"] = "."..package.config:sub(1,1),

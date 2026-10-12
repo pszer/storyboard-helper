@@ -1132,4 +1132,138 @@ function verify:resolve(commands_list)
 	end
 end
 
+-- trims commands out that are fully outside the visible window of group of commands
+-- determined by the fade commands.
+function verify:trimToVisible(coms, debug)
+	local function TimeSort(a,b)
+		local time_a = sb_com:parse(a, 'time')
+		local time_b = sb_com:parse(b, 'time')
+		if time_a[1] == time_b[1] then
+			return time_a[2] < time_b[2] end
+		return time_a[1] < time_b[1]
+	end
+
+	local Fades = verify:filterToCommand(coms, 'fade')
+	table.sort(Fades,TimeSort)
+
+	local visible_wins = {}
+
+	local curr_fade_in = nil
+	local curr_start = nil
+	local curr_end = nil
+
+	for i=1,#Fades do
+		local time = sb_com:parse(Fades[i], 'time')
+		local f1,f2 = sb_com:parse(Fades[i], 'vec')
+		f1=f1[1] -- 1-dimension vector
+		f2=f2[1]
+
+		if f1==0.0 and f2==0.0 and curr_start then
+			table.insert(visible_wins, {curr_start, time[1]})
+			curr_start = nil
+			curr_end = nil
+		elseif f2==0.0 and curr_start then
+			table.insert(visible_wins, {curr_start, time[2]})
+			curr_start = nil
+			curr_end = nil
+		elseif not (f1==0.0 and f2==0.0) then
+			if not curr_start then
+				curr_start = time[1]
+			end
+			curr_end = time[2]
+		end
+	end
+	if curr_end then
+		table.insert(visible_wins, {curr_start, curr_end})
+	end
+
+	local instanced  = {}
+	local candidates = {}
+
+	local function isVisible(x)
+		local time = sb_com:parse(x, 'time')
+		for i,v in ipairs(visible_wins) do
+			if not ((v[1] < time[1] and v[2] < time[1]) or
+				      (v[1] > time[2] and v[2] > time[2])) 
+			then
+				return true
+			end
+		end
+		return false
+	end
+
+	-- Filter to visible
+	--
+	table.sort(coms, TimeSort)
+	local Result = {}
+	--
+	for i,v in ipairs(coms) do
+		local com_type = sb_com:type(v)
+		local vis = isVisible(v)
+
+		if vis then
+			if instanced[com_type] then
+				table.insert(Result, candidates[com_type])
+			end
+
+			table.insert(Result, v)
+			instanced[com_type]   = nil
+			candidates[com_type]  = nil
+		else
+			--
+			-- If commands A and B don't have timepoints in a visible window, then command
+			-- A can be discarded entirely if at no point there is a visible window between
+			-- A and B such as:
+			--
+			-- AAAA......visible......BBBBB
+			--
+			--
+
+			if instanced[com_type] then
+				local time_now = sb_com:parse(v, 'time')[1]
+				local time_then = instanced[com_type]
+
+				-- Determine if there is a visible window between Then and Now
+				local no_vis = true
+				for i,v in ipairs(visible_wins) do
+					if (v[1]>=time_now and v[1]<=time_then) or
+						 (v[2]<time_now and v[2]<time_then) then
+						 no_vis = false
+						 break
+					elseif v[1]>time_then then -- stop search
+						break
+					end
+				end
+
+				-- Discard if no window
+				if no_vis then
+					--sb_log:printf("Discarding %s", sb_com:toString(candidates[com_type]))
+					instanced[com_type]   = sb_com:parse(v, 'time')[2]
+					candidates[com_type]  = v
+				else
+				-- If window found, then add command A to result
+					table.insert(Result, candidates[com_type])
+					instanced[com_type]   = sb_com:parse(v, 'time')[2]
+					candidates[com_type]  = v
+				end
+			else
+				instanced[com_type]   = sb_com:parse(v, 'time')[2]
+				candidates[com_type]  = v
+			end
+		end
+	end
+
+	-- Add in commands that still leave a transformation state
+	-- even if their timepoints are not within a fade commands window
+	for i,v in pairs(candidates) do
+		if v then
+			table.insert(Result, v)
+		end
+	end
+	--TODO reduce resulting visual transfomations of commands outside visible time frames
+	--     to a point command at the start point of the fade command which makes it visible
+
+	return Result
+end
+
 return verify
