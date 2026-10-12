@@ -367,8 +367,8 @@ sb.log:clearProgressBar()
 local light_dir = {0,1/2^0.5,-1/2^0.5}
 local animobjs = sb.a3d:animate3D{
 	start_time = 14000,
-	end_time = 27500,
-	sample_step = 10,
+	end_time = 27400,
+	sample_step = 20,
 	shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 				{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
 	--shader = function(vert,norm,col)
@@ -399,8 +399,8 @@ local animobjs = sb.a3d:animate3D{
 		}
 	}
 }
-storyboard:addObject(table.unpack(animobjs))
---storyboard:sortByHeight()
+storyboard:addObjectTable(animobjs)
+storyboard:sortByHeight()
 
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(

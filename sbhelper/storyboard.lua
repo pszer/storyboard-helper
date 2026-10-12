@@ -89,6 +89,11 @@ function storyboard:addObject(...)
 
 	return storyboard.unpack(args)
 end
+function storyboard:addObjectTable(t)
+	for i,v in ipairs(t) do
+		table.insert(self.objects, v)
+	end
+end
 
 function storyboard:sortByHeight()
 	storyboard.object:sortByHeights(self.objects)

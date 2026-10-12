@@ -586,6 +586,8 @@ function tri:getSpritesTwoFrames(tri1, cols1, tri2, cols2)
 		angle = angle + 2*math.pi
 	end
 
+	angle = math.fmod(angle, 2*math.pi)
+
 	--if math.abs(angle - T1.rot) > 0.0 then
 	--	angle = T1.rot
 	--end
@@ -829,10 +831,28 @@ function tri:testTriangleOcclusion(triangle, set, epsilon)
 
 	end
 
+	local recur_coverage = nil
+	recur_coverage = function(root, i)
+		if root.coverage then return 4^(1-i) end
+
+		if root.children then
+			return recur_coverage(root.children[1], i+1) + 
+			       recur_coverage(root.children[2], i+1) +
+			       recur_coverage(root.children[3], i+1) +
+			       recur_coverage(root.children[4], i+1)
+		end
+
+		return 0.0
+	end
+
 	for i,v in ipairs(set) do
 		recur(TriRoot, v)
 		if TriRoot.coverage then return true end
 	end
+
+	local coverage = recur_coverage(TriRoot, 1)
+	if coverage > 0.95 then return true end
+
 	return false
 end
 
@@ -872,7 +892,7 @@ function tri:calculateDepthStack(triangles)
 			 t2.min_y > t1.max_y then
 			return false
 		end
-		return tri:triangleOverlap(t1,t2, 0.25)
+		return tri:triangleOverlap(t1,t2, 0.15)
 	end
 
 	-- store for each triangle, what triangles overlap on top of it
