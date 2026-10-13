@@ -5,14 +5,33 @@ table.unpack = unpack or table.unpack
 
 local x = os.clock()
 
+
 storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
 sb.file:setProjectFolder("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/")
 
+--- 3d
+--- model
 --         BPM, offset
 redline = {138.37, -25}
 interval_1_4 = sb.time:convert{redline, 0.25}
 interval_1_2 = sb.time:convert{redline, 0.5}
 interval_1_1 = sb.time:convert{redline, 1.0}
+sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
+sb.m3d:setPerspective()
+
+local derpy = sb.m3d:loadModelTable('derpyflat.txt')
+
+local AnimPhases = require 'm_artist_anims'
+local MarioStars = require 'm_artist_stars'
+
+storyboard:addObjectTable(AnimPhases[1](derpy, 5.5, 3.2, 30))
+storyboard:addObjectTable(AnimPhases[2](derpy, 5.5, 3.2))
+storyboard:addObjectTable(AnimPhases[3](derpy, 5.5, 3.2))
+storyboard:addObjectTable(AnimPhases[4](derpy, 5.5, 3.2))
+storyboard:addObjectTable(MarioStars.stars)
+storyboard:addObjectTable(MarioStars.trails)
+
+storyboard:sortByHeight()
 
 local tiles = {{1,3},{1,4},{2,3},{2,4},{3,1},{3,2},{3,3},{3,4},{4,0},{4,1},{4,2},{4,3},{4,4},{5,0},{5,1},{5,2},{5,3},{5,4},{6,0},{6,1},{6,2},{6,3},{6,4},{7,3},{7,4},{8,3},{8,4},
 }
@@ -65,9 +84,17 @@ local std_squares = {}
 local std_fadein_times = {}
 local std_fadein_flipd = {}
 
+
+local std_squares_2 = {}
+local std_fadein_times_2 = {}
+local std_fadein_flipd_2 = {}
+
 for x=-2, 11 do
 	std_fadein_times[x] = {}
 	std_fadein_flipd[x] = {}
+
+	std_fadein_times_2[x] = {}
+	std_fadein_flipd_2[x] = {}
 end
 
 local start_time = sb.time:convert{redline, 0.25}
@@ -82,11 +109,15 @@ local FF_time = sb.time:convert{redline, 28}
 
 local squares_fade_out_time_1 = sb.time:convert{redline, 30.75}
 
+local start_time_2 = sb.time:convert{redline, 16*4+1}
+local end_time_2 = sb.time:convert{redline, 18*4+2}
+local squares_fade_out_time_2a = sb.time:convert{redline, 20*4+1}
+local squares_fade_out_time_2b = sb.time:convert{redline, 22*4+2}
+
 local reset_time = sb.time:convert{redline, 16*4-0.25}
 
 while true do
 	if std_fadein_times[X][Y] then break end
-
 	std_fadein_times[X][Y] = steps*DT + start_time
 
 	if DX==1 then
@@ -145,33 +176,46 @@ for y=0,7 do
 	std_fadein_times[11][y] = std_fadein_times[11][y]+DT+DT
 end
 
---[[ console out for debug.
---
-for y=0,7 do
-	local result = ""
-	for x=-2,11 do
-		local V = std_fadein_times[x][y]
-		if V == nil then V = '.'
-		else V = math.floor(V) end
-		result = result..string.format("%s ",V)
+math.randomseed(66663)
+-- Tiles 2
+for x=-2,11 do
+	local D = end_time_2 - start_time_2
+	for y=0,8 do
+		local R = math.random() -- random fade in time
+		std_fadein_times_2[x][y] = start_time_2 + D*R
+		R = math.random()
+		R = math.floor(R)*5
+		if R<1 then R = -2 -- random flip direction
+		elseif R<2 then R = 2
+		elseif R<3 then R = 1
+		else R=-1 end
 	end
-	print(result)
-end--]]
+end
 
 local fake_3d_square_edges_objects = {}
 
 math.randomseed(500)
 
 local sfx_count = 0
+--- Tiles In
+---
+---
 for x = 0 - (64)*2, 640+107, 64 do
 	for y = 0, 480, 64 do
 
 		local Sq = {x + 64/2.0 , y + 64/2.0, math.floor(x/64), math.floor(y/64), {}}
 		table.insert(std_squares, Sq)
 
+		local Sq2 = {x + 64/2.0 , y + 64/2.0, math.floor(x/64), math.floor(y/64), {}}
+		table.insert(std_squares_2, Sq2)
+
 		local Sq_time_in = std_fadein_times[Sq[3]][Sq[4]]
 		table.insert(Sq[5], {'move'  , 'linear',  {Sq_time_in, Sq_time_in}, {Sq[1],Sq[2]}, {Sq[1],Sq[2]}})
-		table.insert(Sq[5], {'fade'  , 'linear',  {Sq_time_in, Sq_time_in}, 1, 1})
+		table.insert(Sq[5], {'fade'  , 'linear',  {Sq_time_in, Sq_time_in}, 0, 1})
+
+		local Sq_time_in_2 = std_fadein_times_2[Sq2[3]][Sq2[4]]
+		table.insert(Sq2[5], {'move'  , 'linear',  {Sq_time_in_2, Sq_time_in_2}, {Sq2[1],Sq2[2]}, {Sq2[1],Sq2[2]}})
+		table.insert(Sq2[5], {'fade'  , 'linear',  {Sq_time_in_2, Sq_time_in_2}, 0, 1})
 
 		local flipd = std_fadein_flipd[Sq[3]][Sq[4]]
 		local edge_v = {}
@@ -197,13 +241,42 @@ for x = 0 - (64)*2, 640+107, 64 do
 			vec2[2] = vec2[2] * 0.5
 		end
 
+		local flipd_2 = std_fadein_flipd[Sq2[3]][Sq2[4]]
+		local edge_v_2 = {}
+		local vec1_2, vec2_2
+		if flipd_2==1 then
+			vec1_2,vec2_2 = {0,1},{1,1}
+			edge_v_2 = {29,0}
+		elseif flipd_2==-1 then
+			vec1_2,vec2_2 = {0,1},{1,1}
+			edge_v_2 = {-29,0}
+		elseif flipd_2==2 then
+			vec1_2,vec2_2 = {1,0},{1,1}
+			edge_v_2 = {0,29}
+		elseif flipd_2==-2 then
+			vec1_2,vec2_2 = {1,0},{1,1}
+			edge_v_2 = {0,-29}
+		end
+
+		if tileHasImg(Sq2[3],Sq2[4]) then
+			vec1_2[1] = vec1_2[1] * 0.5
+			vec2_2[1] = vec2_2[1] * 0.5
+			vec1_2[2] = vec1_2[2] * 0.5
+			vec2_2[2] = vec2_2[2] * 0.5
+		end
+
 		if (Sq[3] >= 0) and (Sq[3] <= 9) and (Sq[3]+Sq[4])%1==0 then
 			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in+DT*0.3, 70)
+		end
+		if (Sq2[3] >= 0) and (Sq2[3] <= 9) and (Sq2[3]+Sq2[4])%1==0 then
+			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in_2+DT*0.3, 70)
 		end
 		sfx_count = sfx_count+1
 
 		table.insert(Sq[5], {'vector', 'sineOut', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, vec1, vec2})
 		table.insert(Sq[5], {'color', 'sineOut' , {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {111,111,111},{255,255,255}})
+		table.insert(Sq2[5], {'vector', 'sineOut', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, vec1, vec2})
+		table.insert(Sq2[5], {'color', 'sineOut' , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {111,111,111},{255,255,255}})
 
 		-- fade out after 1st sequence
 
@@ -253,11 +326,22 @@ for x = 0 - (64)*2, 640+107, 64 do
 			)
 		end
 
+		table.insert(Sq2[5], {'fade'  , 'linear',  {squares_fade_out_time_2a,
+																							 squares_fade_out_time_2b}, 1, 0})
+		--table.insert(Sq2[5], {'vector', 'sineOut', {squares_fade_out_time_2a + DT*0.1+D_sq, squares_fade_out_time_2a + DT*6.5+D_sq}, vec1, vec2})
+
 		local rot = nil
 		if flipd == 2 or flipd == -2 then
 			rot = {'rotate', 0, {Sq_time_in,Sq_time_in}, math.pi/2, math.pi/2}
 		else
 			rot = {'rotate', 0, {Sq_time_in,Sq_time_in}, 0}
+		end
+
+		local rot_2 = nil
+		if flipd_2 == 2 or flipd_2 == -2 then
+			rot = {'rotate', 0, {Sq_time_in_2,Sq_time_in_2}, math.pi/2, math.pi/2}
+		else
+			rot = {'rotate', 0, {Sq_time_in_2,Sq_time_in_2}, 0}
 		end
 
 		table.insert(fake_3d_square_edges_objects,
@@ -266,6 +350,14 @@ for x = 0 - (64)*2, 640+107, 64 do
 			{'color', 'sineout', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.4}, {233,233,233},{50,50,50} },
 			{'fade',  1        , {Sq_time_in + DT*3.2, Sq_time_in + DT*3.4}, 1,0 },
 			{'move', 'sineOut', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {Sq[1],Sq[2]}, {Sq[1]+edge_v[1],Sq[2]+edge_v[2]}},
+			rot
+		))
+		table.insert(fake_3d_square_edges_objects,
+		storyboard:newObject("sb/Edge.png", "Background", "Center", 320, 240):add(
+			{'fade',  1        , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*0.2}, 0,1 },
+			{'color', 'sineout', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.4}, {233,233,233},{50,50,50} },
+			{'fade',  1        , {Sq_time_in_2 + DT*3.2, Sq_time_in_2 + DT*3.4}, 1,0 },
+			{'move', 'sineOut', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {Sq2[1],Sq2[2]}, {Sq2[1]+edge_v_2[1],Sq2[2]+edge_v_2[2]}},
 			rot
 		))
 	end
@@ -278,129 +370,17 @@ for _,v in ipairs(std_squares) do
 		table.unpack(v[5])
 	)
 end
+for _,v in ipairs(std_squares_2) do
+	local img = tileHasImg(v[3],v[4]) or "Sq.png"
+
+	storyboard:newObject(img, "Background", "Center", 320, 240):add(
+		table.unpack(v[5])
+	)
+end
 for _,v in ipairs(fake_3d_square_edges_objects) do
 	storyboard:addObject(v)
 end
 
-local Tri = { 300,40, 480,340, 200,220 }
-local Cols = {
-	{255,0,0},
-	{0,0,255},
-	{255,0,0},
-}
-
-local Tri3 = { 300,40, 480,340, 100, 260 }
-local Cols3 = {
-	{0,255,0},
-	{0,50,240},
-	{255,0,0},
-}
-
-local Tri2 = { 100,40, 180,100, 50,140 }
-local Cols2 = {
-	{255,255,0},
-	{80,255,0},
-	{0,0,255},
-}--]]
-
-
-sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
-sb.m3d:setPerspective()
-
-local view,proj = sb.m3d:getViewAndProjMats()
-
---local nitoModel = sb.m3d:loadModelTable('cubeAnim.txt')
-local derpymodel = sb.m3d:loadModelTable('derpyflat.txt')
-
---[[local progressB = sb.log:initProgressBar(0, 16)
----3dd
----
-local lastTri, lastCols, lastT1 = nil, nil, nil
-
-local TrisTable_i = 1
-local TrisTable = {}
-
-for t = 14000, 27500, 1000/25 do
-	progressB(1.0 - (27500-t)/(27500-14000))
-
-	local diff = (t - 14000)/1000
-
-	local model = sb.m3d:modelMatrix({0,0,0}, {2,2,2}, 'xyz', {0.6*math.sin(diff/1.9)-math.pi,math.pi/2+1.6*math.cos(diff/1.4),math.pi/2+1.2*math.cos(diff/3)})	
-
-	local light_dir = {0,1/2^0.5,-1/2^0.5}
-
-	local nitoTri, nitoCols = sb.tri:get3DTrianglesOut(nitoModel.vertices, nitoModel.format,
-		model, view, proj,
-		sb.m3d:getAnimationFrame(nitoModel, 'Wiggle', diff*0.75, true),
-		function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={230,230,230}, ambient={25,25,25}}) end)
-
-	local depthStack = sb.tri:calculateDepthStack(nitoTri)
-
-	TrisTable[TrisTable_i] = {}
-	local T_out = TrisTable[TrisTable_i]
-	TrisTable_i = TrisTable_i+1
-	for i,v in ipairs(depthStack) do
-		T_out[v.id] = v
-		T_out[v.id].start_t = t
-	end
-end
-
-for i=1,TrisTable_i-2, 1 do
-	local T = TrisTable[i]	
-	local T_n = TrisTable[i+1]	
-	for id, tri in pairs(T) do
-		if T_n[id] then
-			To1, To2 = sb.tri:getSpritesTwoFrames(tri, tri.cols, T_n[id], T_n[id].cols)
-			To1.height = tri.height
-			To2.height = T_n[id].height
-			if To1 then
-				local O = storyboard:addObject(sb.tri:convertTriDataToObjects(To1, To2, 'Foreground', tri.start_t,tri.start_t+1000/25))
-				O:setHeight(math.max(tri.height,T_n[id].height))
-			end
-		end
-	end
-end
-
-sb.log:clearProgressBar()
---]]
-local light_dir = {0,1/2^0.5,-1/2^0.5}
-local animobjs = sb.a3d:animate3D{
-	start_time = 14000,
-	end_time = 27400,
-	sample_step = 20,
-	shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-				{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
-	--shader = function(vert,norm,col)
-	--	return {math.abs(math.floor(norm.x*255.0)), math.abs(math.floor(norm.y*255.0)), math.abs(math.floor(norm.z*255.0))}
-	--end,
-
-	camera_func = function(t) return
-		{0,3.5,-15}, 'xyz', {0,0,0}
-	end,
-
-	actors = {
-		{ model = derpymodel,
-
-			mat_func = function(t)
-				t=t/2000.0
-				return sb.m3d:modelMatrix(
-					{0,0,0}, 
-					{5.5,5.5,5.5}, 
-					--'xyz', {0.6*math.sin(t/1.9)-math.pi/2,math.pi/2+1.6*math.cos(t/1.4), 0})
-					'xyz', {-math.pi/2, t*2.5,0})
-			end,
-
-			--anim_func = function(t)
-			--	return 'Wiggle', 0.75*(t/2000), true
-			--end,
-
-			master_func = nil
-		}
-	}
-}
-storyboard:addObjectTable(animobjs)
-storyboard:sortByHeight()
 
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(

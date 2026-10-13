@@ -115,11 +115,15 @@ function sb_ir:out()
 		if vec3_shortcut and i>=8 and i<=10 then x="" skip_comma = true end
 		if vec3_shortcut and i==7 then skip_comma = true end
 
+		local function ToStringF(f)
+			return string.format("%.10f", f):gsub("%.?0+$", "")
+		end
+
 		if type(x)=="number" then
 			if mathtype.tointeger(x) then
 				x=string.format("%d",mathtype.tointeger(x))
 			else
-				x=string.format("%s", self:limitDecimalPlaces(tostring(x), decimal_points))
+				x=string.format("%s", self:limitDecimalPlaces(ToStringF(x), decimal_points))
 			end
 		end
 

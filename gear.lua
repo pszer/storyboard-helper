@@ -113,25 +113,25 @@ local Tile3_Origin = {43,269}
 local Tile4_Origin = {33,86}
 local Tile3_Rot = math.pi * (15.75/180.0) 
 
-local Tile1_Tint1 = {0 / 182, 123 / 182, 35 / 182}
+local Tile1_Tint1 = {0 / 183, 123 / 183, 35 / 183}
 local Tile2_Tint1 = {180 / 255, 180 / 255, 255 / 255}
-local Tile3_Tint1 = {125 / 182, 32 / 182, 30 / 182}
-local Tile4_Tint1 = {8 / 182, 31 / 182, 59 / 182}
+local Tile3_Tint1 = {125 / 225, 32 / 225, 30 / 225}
+local Tile4_Tint1 = {8 / 179, 31 / 179, 59 / 179}
 
 local Tile1_Tint2 = {0 / 255, 145 / 255, 26 / 255}
 local Tile2_Tint2 = {255 / 255, 255 / 255, 255 / 255}
 local Tile3_Tint2 = {112 / 255, 76 / 255, 27 / 255}
 local Tile4_Tint2 = {6 / 255, 63 / 255, 44 / 255}
 
-local Tile1_Tint3 = {0 / 170, 123 / 170, 35 / 170}
+local Tile1_Tint3 = {0 / 175, 123 / 175, 35 / 175}
 local Tile2_Tint3 = {180 / 210, 180 / 210, 255 / 230}
-local Tile3_Tint3 = {125 / 170, 32 / 170, 30 / 170}
+local Tile3_Tint3 = {125 / 215, 32 / 215, 30 / 215}
 local Tile4_Tint3 = {8 / 170, 31 / 170, 59 / 170}
 
-local Tile1_Tint4 = {125 / 320, 0 / 280, 255 / 320}
+local Tile1_Tint4 = {125 / 255, 0 / 2255, 255 / 255}
 local Tile2_Tint4 = {180 / 180, 180 / 180, 240 / 255}
-local Tile3_Tint4 = {170 / 360, 10 / 360, 230 / 360}
-local Tile4_Tint4 = {125 / 310, 125 / 310, 160 / 310}
+local Tile3_Tint4 = {179 / 432, 10 / 432, 230 / 432}
+local Tile4_Tint4 = {125 / 350, 125 / 350, 160 / 350}
 
 local C_MAX = 0.81
 local C_MIN = 0.65
@@ -172,7 +172,7 @@ local function SwitchBGS(i, delay, offset)
 	local o = (i-1) * delay/9.0 + offset
 
 	local go = false
-	for T=sb.time:convert{T,0}, sb.time:convert{T,223*4}, delay do
+	for T=sb.time:convert{T,0}, sb.time:convert{T,226*4}, delay do
 		if go then
 			table.insert( result1, {'fade', 'linear', { o+T+(delay/18.0)*(-1), o+T      }, 0,1 } )
 		end
@@ -187,9 +187,19 @@ local function SwitchBGS(i, delay, offset)
 		go = true
 	end
 
-	result1[#result1][5]=1
-	result2[#result2][5]=1
-	result3[#result3][5]=1
+	for i=#result1,1 do
+		if result1[i][3][2] >= sb.time:convert{T,226*4} then table.remove(result1, i) end
+	end
+	for i=#result2,1 do
+		if result2[i][3][2] >= sb.time:convert{T,226*4} then table.remove(result2, i) end
+	end
+	for i=#result3,1 do
+		if result3[i][3][2] >= sb.time:convert{T,226*4} then table.remove(result3, i) end
+	end
+
+	--if result1[#result1][3][2] >= sb.time:convert{T,227*4} then result1[#result1][5]=1 end
+	--if result2[#result2][3][2] >= sb.time:convert{T,227*4} then result2[#result2][5]=1 end
+	--if result3[#result3][3][2] >= sb.time:convert{T,227*4} then result3[#result3][5]=1 end
 
 	return result1, result2, result3
 end
@@ -442,7 +452,7 @@ storyboard:newObject('sb/StarsTiles1.jpg', 'Background', 'TopLeft', 550,357):add
 		translate = Tile4_Origin,
 		{'fade', 0, { {T,1.1},{T,2.1} }, 0,1 },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile4_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, GetFlashes(Tile4_Tint1, Tile4_Tint3, Tile4_Tint4))
 	}
 )
@@ -452,14 +462,14 @@ storyboard:newObject('sb/TilingB_Col1.jpg', 'Background', 'TopLeft', 550,357):ad
 		translate = Tile2_Origin,
 		{'fade', 2, { {T,1.25},{T,2} }, 0,1 },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile2_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileB_BG1_Fade, GetFlashes(Tile2_Tint1, Tile2_Tint3, Tile2_Tint4))
 	})
 storyboard:newObject('sb/TilingB_Col2.jpg', 'Background', 'TopLeft', 550,357):add(
 	{'origin_scale',
 		translate = Tile2_Origin,
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile2_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileB_BG2_Fade, GetFlashes(Tile2_Tint1, Tile2_Tint3, Tile2_Tint4))
 	})
 storyboard:newObject('sb/TilingB_Col3.jpg', 'Background', 'TopLeft', 550,357):add(
@@ -467,7 +477,7 @@ storyboard:newObject('sb/TilingB_Col3.jpg', 'Background', 'TopLeft', 550,357):ad
 		translate = Tile2_Origin,
 		--{'fade', 0, { {T,0},{T,2*1} }, 0,1 },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile2_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileB_BG3_Fade, GetFlashes(Tile2_Tint1, Tile2_Tint3, Tile2_Tint4))
 	})
 
@@ -484,7 +494,7 @@ storyboard:newObject('sb/TilingA_Col1.png', 'Background', 'TopLeft', 550,357):ad
 		translate = Tile1_Origin,
 		{'fade', 0, { {T,1},{T,2} }, 0,1 },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile1_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileA_BG1_Fade, GetFlashes(Tile1_Tint1, Tile1_Tint3, Tile1_Tint4))
 	})
 storyboard:newObject('sb/TilingA_Col2.png', 'Background', 'TopLeft', 550,357):add(
@@ -492,7 +502,7 @@ storyboard:newObject('sb/TilingA_Col2.png', 'Background', 'TopLeft', 550,357):ad
 		translate = Tile1_Origin,
 		--{'fade', 0, { {T,0},{T,2*1} }, 0,1 },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile1_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileA_BG2_Fade, GetFlashes(Tile1_Tint1, Tile1_Tint3, Tile1_Tint4))
 	})
 storyboard:newObject('sb/TilingA_Col3.png', 'Background', 'TopLeft', 550,357):add(
@@ -500,7 +510,7 @@ storyboard:newObject('sb/TilingA_Col3.png', 'Background', 'TopLeft', 550,357):ad
 		translate = Tile1_Origin,
 		--{'fade', 0, { {T,0},{T,2*1} }, 0,1 },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile1_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileA_BG3_Fade, GetFlashes(Tile1_Tint1, Tile1_Tint3, Tile1_Tint4))
 	})
 --
@@ -513,7 +523,7 @@ storyboard:newObject('sb/TilingC_Col1.png', 'Background', 'TopLeft', 550,357):ad
 		{'fade', 0, { {T,0.9},{T,1.7} }, 0,1 },
 		{'rot' , 0, { {T,0} }, Tile3_Rot },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile3_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileC_BG1_Fade, GetFlashes(Tile3_Tint1, Tile3_Tint3, Tile3_Tint4))
 	})
 storyboard:newObject('sb/TilingC_Col2.png', 'Background', 'TopLeft', 550,357):add(
@@ -522,7 +532,7 @@ storyboard:newObject('sb/TilingC_Col2.png', 'Background', 'TopLeft', 550,357):ad
 		--{'fade', 0, { {T,0},{T,2*1} }, 0,1 },
 		{'rot' , 0, { {T,0} }, Tile3_Rot },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile3_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileC_BG2_Fade, GetFlashes(Tile3_Tint1, Tile3_Tint3, Tile3_Tint4))
 	})
 storyboard:newObject('sb/TilingC_Col3.png', 'Background', 'TopLeft', 550,357):add(
@@ -531,7 +541,7 @@ storyboard:newObject('sb/TilingC_Col3.png', 'Background', 'TopLeft', 550,357):ad
 		--{'fade', 0, { {T,0},{T,2*1} }, 0,1 },
 		{'rot' , 0, { {T,0} }, Tile3_Rot },
 		{'color',0, { {T,0},{T,0} }, Vec3Mul( START_COL, Tile3_Tint1 ) },
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove, TileC_BG3_Fade, GetFlashes(Tile3_Tint1, Tile3_Tint3, Tile3_Tint4))
 	})
 
@@ -547,7 +557,7 @@ storyboard:newObject('sb/CrossA.png', 'Background', 'TopLeft', 550,357):add(
 
 		{'fade', 0, { {T,162*4+2},{T,162*4+2} },0 },
 		{'fade', 0, { {T,194*4 },{T,194*4} },1},
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove)
 	}
 )
@@ -559,7 +569,7 @@ storyboard:newObject('sb/CrossB.png', 'Background', 'TopLeft', 550,357):add(
 		{'fade', 0, { {T,0},{T,2*1} }, 0,1 },
 		{'fade', 0, { {T,72*4+2},{T,72*4+2} },0 },
 		{'fade', 0, { {T,104*4 },{T,104*4} },1},
-		{'fade', 0, { {T,228*4} }, 0 },
+		{'fade', 0, { {T,229*4} }, 0 },
 		sb.concadd(CrossMove)
 	}
 )
@@ -592,7 +602,7 @@ storyboard:newObject('sb/FlashC.jpg', 'Foreground', 'TopLeft', 550,357):add(
 	{'origin_scale',
 		translate = {0,29},
 		{'protract', {'param', {{T,0}}, value='a'}},
-		Flash({T,1*4}, 450, 0.4, 0.25),
+		Flash({T,1*4}, 450, 0.2, 0.25),
 		Flash({T,34*4}, 600, 0.2, 0.4),
 		Flash({T,42*4}, 600, 0.2, 0.25),
 		Flash({T,50*4}, 600, 0.2, 0.25),
@@ -646,7 +656,7 @@ storyboard:newObject('sb/FlashC.jpg', 'Foreground', 'TopLeft', 550,357):add(
 		Flash({T,160*4}, 600, 0.3, 0.25),
 
 
-		Flash({T,226*4}, 1200, 0.5, 0.1),
+		Flash({T,226*4}, 1200, 0.3, 0.1),
 		Flash({T,72*4}, 600, 0.4, 0.25),
 		Flash({T,162*4}, 600, 0.4, 0.25),
 		sb.concadd(CrossMove)
@@ -677,5 +687,47 @@ storyboard:newObject('sb/FlashD.jpg', 'Foreground', 'TopLeft', 550,357):add(
 --	{'vector',0, { -500 }, {1,0.37} },
 --	{'fade', 0, { {T,228*4} }, 0 }
 --)
+--[[local rl1 = {T[1],T[2]+500}
+storyboard:newObject("sb/Blur.png", "Background", "Centre", 295, 380):add(
+	{'protract', {'param', {{rl1,3}}, value='a' }},
+	{'fade', 1, { {rl1,3}, {rl1,5} }, 0   ,1 },
+	{'scale',0, { {rl1,3}, {rl1,3} }, 0.5,0.5 },
+	{'fade', 0, { {rl1,32.45-0.6}, {rl1,34.45-0.6} }, 1,0 }
+)
+storyboard:newObject("sb/Title.png", "Foreground", "Centre", 242, 296):add(
+	{'moverel', 1, { {rl1,3}, {rl1,3.5} }, {0, 0}, {33,0}},
+	{'moverel', 0, { {rl1,3.5}, {rl1,4} }, {0, 0}, {17,0}},
+	{'moverel', 1, { {rl1,4}, {rl1,25+4} }, {0, 0}, {24,0}},
+	{'fade', 1, { {rl1,3}, {rl1,5} }, 0   ,1 },
+	{'scale',0, { {rl1,3}, {rl1,3} }, 0.5,0.5 },
+	{'fade', 0, { {rl1,32-0.5}, {rl1,34-0.5} }, 1,0 }
+)
+
+storyboard:newObject("sb/Artist.png", "Foreground", "Centre", 385, 350):add(
+	{'moverel', 1, { {rl1,2+8}, {rl1,3.5+8} }, {0, 0}, {-43,0}},
+	{'moverel', 0, { {rl1,3.5+8}, {rl1,5.2+8} }, {0, 0}, {-9,0}},
+	{'moverel', 1, { {rl1,5.2+8}, {rl1,26+8} }, {0, 0}, {-18,0}},
+	{'fade', 1, { {rl1,2+8}, {rl1,5+8} }, 0   ,1 },
+	{'scale',0, { {rl1,2+8}, {rl1,2+8} }, 0.5,0.5 },
+	{'fade', 0, { {rl1,32.15-0.6}, {rl1,34.15-0.6} }, 1,0 }
+)
+
+storyboard:newObject("sb/Original.png", "Foreground", "Centre", 253, 390):add(
+	{'moverel', 1, { {rl1,2+15}, {rl1,3.5+15} }, {0, 0}, {35,0}},
+	{'moverel', 0, { {rl1,3.5+15}, {rl1,5.2+15} }, {0, 0}, {7,0}},
+	{'moverel', 1, { {rl1,5.2+15}, {rl1,23+8} }, {0, 0}, {16,0}},
+	{'fade', 1, { {rl1,2+15}, {rl1,5+15} }, 0   ,1 },
+	{'scale',0, { {rl1,2+15}, {rl1,2+15} }, 0.35,0.35 },
+	{'fade', 0, { {rl1,32.3-0.6}, {rl1,34.3-0.6} }, 1,0 }
+)--]]
+
+--[[storyboard:newObject("sb/Source.png", "Foreground", "Centre", 395, 430):add(
+	{'moverel', 1, { {rl1,2+22-0.5}, {rl1,3.5+22-0.5} }, {0, 0}, {-59,0}},
+	{'moverel', 0, { {rl1,3.5+22-0.5}, {rl1,4.5+22-0.5} }, {0, 0}, {-07,0}},
+	{'moverel', 1, { {rl1,4.5+22-0.5}, {rl1,34-0.5} }, {0, 0}, {-09,0}},
+	{'fade', 1, { {rl1,2+22}, {rl1,5+22} }, 0   ,1 },
+	{'scale',0, { {rl1,2+22}, {rl1,2+22} }, 0.4,0.4 },
+	{'fade', 0, { {rl1,32.45-0.6}, {rl1,34.45-0.6} }, 1,0 }
+)--]]
 
 storyboard:writeToFile2()

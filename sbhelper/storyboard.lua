@@ -27,6 +27,7 @@ local storyboard = {
 	tri = require (modules..'tri'),
 	m3d = require (modules..'model'),
 	a3d = require (modules..'animate3d'),
+	cpml = require (modules..'cpml'),
 
 	unpack = table.unpack or unpack,
 

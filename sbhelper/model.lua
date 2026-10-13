@@ -101,7 +101,9 @@ function m3d:getNewVertexID()
 	return VERTEX_ID-1
 end
 
+local id = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}
 local __tempvec3_2 = cpml.vec3.new()
+local __vec3up = cpml.vec3.new(0,1,0)
 function m3d:rotateMatrix(mat, rot_type, rot)
 	local mat4 = cpml.mat4
 
@@ -115,12 +117,14 @@ function m3d:rotateMatrix(mat, rot_type, rot)
 		__tempvec3_2.x,__tempvec3_2.y,__tempvec3_2.z = rot[1],rot[2],rot[3]
 
 		local LA = mat4.new()
-		mat4.look_at(LA, __tempvec3_2, cpml.vec3.zero, __vec3up)
+		for i=1,16 do LA[i]=id[i] end
+		mat4.look_at(LA, cpml.vec3.zero, __tempvec3_2, __vec3up)
 		mat:mul(LA, mat)
 
 	elseif rot_type == "xyz" then
 
-		local R = mat4.identity()
+		local R = mat4.new()
+		for i=1,16 do R[i]=id[i] end
 		R:rotate(R,rot[1],cpml.vec3.unit_x)
 		R:rotate(R,rot[2],cpml.vec3.unit_y)
 		R:rotate(R,rot[3],cpml.vec3.unit_z)
@@ -133,7 +137,6 @@ function m3d:rotateMatrix(mat, rot_type, rot)
 	return mat
 end
 
-local id = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}
 local __tempvec3=cpml.vec3.new()
 local __vec3up = cpml.vec3.new(0,-1,0)
 function m3d:setCamera(pos, rot_type, rot)

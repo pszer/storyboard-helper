@@ -794,7 +794,9 @@ function tri:testTriangleOcclusion(triangle, set, epsilon)
 	local TriRoot = { triangle, coverage=false, children=nil }
 
 	local recur = nil
-	recur = function(root, top_tri)
+	recur = function(root, top_tri, level)
+		if level == 6 then return end
+
 		-- already occluded
 		if root.coverage == true then 
 			return
@@ -816,10 +818,10 @@ function tri:testTriangleOcclusion(triangle, set, epsilon)
 				root.children[4].coverage = false
 			end
 
-			recur(root.children[1], top_tri)
-			recur(root.children[2], top_tri)
-			recur(root.children[3], top_tri)
-			recur(root.children[4], top_tri)
+			recur(root.children[1], top_tri, level+1)
+			recur(root.children[2], top_tri, level+1)
+			recur(root.children[3], top_tri, level+1)
+			recur(root.children[4], top_tri, level+1)
 
 			if root.children[1].coverage and root.children[2].coverage
 				and root.children[3].coverage and root.children[4].coverage
@@ -846,7 +848,7 @@ function tri:testTriangleOcclusion(triangle, set, epsilon)
 	end
 
 	for i,v in ipairs(set) do
-		recur(TriRoot, v)
+		recur(TriRoot, v, 1)
 		if TriRoot.coverage then return true end
 	end
 

@@ -418,7 +418,7 @@ function command:toString(com, params)
 		end
 		result=result..","..vec2s.."}"
 	end
-	if args and (params.args == nil or param.args == true) then
+	if args and (params.args == nil or params.args == true) then
 		result=result.."{"
 
 		for i,v in pairs(args) do

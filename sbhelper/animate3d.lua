@@ -43,7 +43,7 @@ function anim3d:animate3D(params)
 	-- other params
 	local absolute_time = params.absolute_time or false
 	local dont_sort = params.dont_sort ~= nil
-
+	local layer = layer or 'Foreground'
 
 	--- actors
 	--[[
@@ -184,7 +184,7 @@ function anim3d:animate3D(params)
 		end
 	end
 
-	local objs = anim3d:outputActorTris(actor_tri_out, start_time, end_time, sample_step, frame)
+	local objs = anim3d:outputActorTris(actor_tri_out, start_time, end_time, sample_step, frame, layer)
 	if not dont_sort then
 		sb_object:sortByHeights(objs)
 	end
@@ -194,8 +194,9 @@ function anim3d:animate3D(params)
 	return objs
 end
 
-function anim3d:outputActorTris(actor_tris, start_time, end_time, time_step, frame_count)
+function anim3d:outputActorTris(actor_tris, start_time, end_time, time_step, frame_count, layer)
 	local objects = {}
+	layer=layer or 'Foreground'
 
 	for actor_i, Tris in ipairs(actor_tris) do
 
@@ -208,11 +209,11 @@ function anim3d:outputActorTris(actor_tris, start_time, end_time, time_step, fra
 
 				if T1.start_t < T2.start_t and not T1.final then
 					To1, To2 = sb_tri:getSpritesTwoFrames(T1, T1.cols, T2, T2.cols)
-					To1.height = T1.height
-					To2.height = T2.height
 
 					if To1 then
-						local O1,O2,O3 = sb_tri:convertTriDataToObjects(To1, To2, 'Foreground', T1.start_t, T2.start_t)
+						To1.height = T1.height
+						To2.height = T2.height
+						local O1,O2,O3 = sb_tri:convertTriDataToObjects(To1, To2, layer, T1.start_t, T2.start_t)
 
 						if O1 then
 							O1:setHeight(math.max(To1.height,To2.height))
