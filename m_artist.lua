@@ -5,8 +5,14 @@ table.unpack = unpack or table.unpack
 
 local x = os.clock()
 
+--storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
+storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/standard.osb")
 
-storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
+-- std mappers
+vyper = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/vyper_std.osb")
+doops = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/doops_std.osb")
+weeb = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/weeb_std.osb")
+
 sb.file:setProjectFolder("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/")
 
 --- 3d
@@ -19,19 +25,34 @@ interval_1_1 = sb.time:convert{redline, 1.0}
 sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
 sb.m3d:setPerspective()
 
-local derpy = sb.m3d:loadModelTable('derpyflat.txt')
+--local derpy = sb.m3d:loadModelTable('derpyflat.txt')
 
+__BOUND_X_LOW  = -107
+__BOUND_X_HIGH = 640
+__BOUND_Y_LOW  = 0
+__BOUND_Y_HIGH = 480
 local AnimPhases = require 'm_artist_anims'
 local MarioStars = require 'm_artist_stars'
 
-storyboard:addObjectTable(AnimPhases[1](derpy, 5.5, 3.2, 30))
-storyboard:addObjectTable(AnimPhases[2](derpy, 5.5, 3.2))
-storyboard:addObjectTable(AnimPhases[3](derpy, 5.5, 3.2))
-storyboard:addObjectTable(AnimPhases[4](derpy, 5.5, 3.2))
+--storyboard:addObjectTable(AnimPhases[1](derpy, 5.5, 3.2, 40))
+--storyboard:addObjectTable(AnimPhases[2](derpy, 5.5, 3.2))
+--storyboard:addObjectTable(AnimPhases[3](derpy, 5.5, 3.2))
+--storyboard:addObjectTable(AnimPhases[4](derpy, 5.5, 3.2))
+
+local function DoModel(filename, story_out, scale, y_off, sample_r)
+	local Model = sb.m3d:loadModelTable(filename)
+	story_out:addObjectTable(AnimPhases[1](Model, scale, y_off, sample_r))
+	story_out:addObjectTable(AnimPhases[2](Model, scale, y_off))
+	story_out:addObjectTable(AnimPhases[3](Model, scale, y_off))
+	story_out:addObjectTable(AnimPhases[4](Model, scale, y_off))
+end
+
+DoModel('derpyflat.txt', weeb, 5.5, 3.2, 40)
+
 storyboard:addObjectTable(MarioStars.stars)
 storyboard:addObjectTable(MarioStars.trails)
 
-storyboard:sortByHeight()
+--storyboard:sortByHeight()
 
 local tiles = {{1,3},{1,4},{2,3},{2,4},{3,1},{3,2},{3,3},{3,4},{4,0},{4,1},{4,2},{4,3},{4,4},{5,0},{5,1},{5,2},{5,3},{5,4},{6,0},{6,1},{6,2},{6,3},{6,4},{7,3},{7,4},{8,3},{8,4},
 }
@@ -44,7 +65,6 @@ local tiles_replace_with_square = {
 	{6,3},
 	{7,3},
 	{8,3},
-
 	{1,4},
 	{2,4},
 	{3,4},
@@ -428,6 +448,17 @@ storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
 
-storyboard:writeToFile2()
+local params = { pool_sprites = sb.tri.file_set }
+
+-- disable pooling 4 compile speeed
+params = nil
+storyboard:writeToFile2(nil, params)
+
+-- write mapper specific model events
+sb.config['silence-headers'] = true
+vyper:writeToFile2(nil, params)
+doops:writeToFile2(nil, params)
+weeb:writeToFile2(nil, params)
+
 --storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})
 print(string.format("elapsed time: %.2f\n", os.clock() - x))

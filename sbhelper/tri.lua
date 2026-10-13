@@ -661,6 +661,8 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 	if T2==nil then T2=T1 end
 	local L = sb_layer:out(layer)
 
+	local skip_v_shade = sb_config['3d-disable-vertex-shading']
+
 	if T1 and sb_config['3d-debug-depth-shader'] then
 		T1.col = {math.min(T1.height*50+50,255), math.min(T1.height*75+50,255), 50}
 		T2.col = T1.col
@@ -675,7 +677,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 			{'color' ,  0, {time1,time2}, T1.col, T2.col}
 		)
 
-		if T1.tri2 then
+		if T1.tri2 and not skip_v_shade then
 			obj2 = sb_object:new(T1.tri2.file, L, T1.anchor, 0,0):add(
 				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.tri2.pos, T2.tri2.pos},
@@ -683,7 +685,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'vector',  0, {time1,time2}, T1.tri2.vector, T2.tri2.vector},
 				{'color' ,  0, {time1,time2}, T1.tri2.col, T2.tri2.col}
 			)
-		elseif T2.tri2 then
+		elseif T2.tri2  and not skip_v_shade then
 			obj2 = sb_object:new(T1.file_v2, L, T1.anchor, 0,0):add(
 				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.pos, T2.tri2.pos},
@@ -693,7 +695,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 			)
 		end
 
-		if T1.tri3 then
+		if T1.tri3  and not skip_v_shade then
 			obj3 = sb_object:new(T1.tri3.file, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
 				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.tri3.pos, T2.tri3.pos},
@@ -701,7 +703,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'vector',  0, {time1,time2}, T1.tri3.vector, T2.tri3.vector},
 				{'color' ,  0, {time1,time2}, T1.tri3.col, T2.tri3.col}
 			)
-		elseif T2.tri3 then
+		elseif T2.tri3  and not skip_v_shade then
 			obj3 = sb_object:new(T1.file_v3, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
 				{'fade',    0, {time1,time1}, 1,1},
 				{'move',    0, {time1,time2}, T1.pos, T2.tri3.pos},

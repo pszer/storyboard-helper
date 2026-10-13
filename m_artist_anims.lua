@@ -16,19 +16,19 @@ local camera_func_1 = function(t)
 	pos[3] = rot_z
 	return pos, 'lookat', {pos[1],pos[2],pos[3]} end
 local camera_func_2 = function(t)
-	local pos = {0,0,-12}
+	local pos = {0,0.3,-12}
 	pos[3] = pos[3]
 	pos[2] = pos[2]
 	return pos, 'xyz', {0,0,0}
 end
 local camera_func_3 = function(t)
-	local pos = {0,0,-12}
+	local pos = {0,0.3,-12}
 	pos[3] = pos[3]
 	pos[2] = pos[2]
 	return pos, 'xyz', {0,0,0}
 end
 local camera_func_4 = function(t)
-	local pos = {0, 0.8, -9 + (-16)*(1 - t/500)}
+	local pos = {0, 1.8, -9 + (-16)*(1 - t/500)}
 	pos[3] = pos[3]
 	pos[2] = pos[2]
 	return pos, 'xyz', {0,0,0}
@@ -78,7 +78,7 @@ local function Phase2(m, scale, cam_y_off)
 				mat_func = function(t)
 					t=t/2000.0
 					return sb.m3d:modelMatrix(
-						{-15 * ((2000/433) * t) + 7.5, -cam_y_off,0}, 
+						{-19 * ((2000/433) * t) + 9.5, -cam_y_off,0}, 
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, -math.pi/2, 0})
 				end,
@@ -101,7 +101,7 @@ local function Phase3(m, scale, cam_y_off)
 				mat_func = function(t)
 					t=t/2000.0
 					return sb.m3d:modelMatrix(
-						{15 * ((2000/433) * t) - 7.5, -cam_y_off,0}, 
+						{19 * ((2000/433) * t) - 9.5, -cam_y_off,0}, 
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, math.pi/2, 0})
 				end,
@@ -114,7 +114,7 @@ end
 local function Phase4(m, scale, cam_y_off)
 	return sb.a3d:animate3D{
 		start_time = sb.time:convert{redline,15*4+2},
-		end_time = sb.time:convert{redline,15*4+3.3},
+		end_time = sb.time:convert{redline,15*4+3.2},
 		sample_step = 10,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 					{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,

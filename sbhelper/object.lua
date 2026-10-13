@@ -9,6 +9,7 @@ local sb_com    = require (modules..'commands')
 local sb_ir     = require (modules..'ir')
 local sb_eval   = require (modules..'eval')
 local sb_config = require (modules..'config')
+local sb_clone  = require (modules..'clone')
 local sb_verify = require (modules..'verify')
 
 local object = {}
@@ -173,6 +174,16 @@ function object:addTable(t)
 	end
 
 	return self
+end
+function object:wrap(w)
+	local c = self.commands
+	local wrap = sb_clone(w)
+	-- add commands to wrapper
+	for i,v in ipairs(c or {}) do
+		wrap[#wrap + 1]=v
+	end
+	self.commands = {wrap}
+	return wrap
 end
 
 -- creates a new object with the same object definition, but no commands.

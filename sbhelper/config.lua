@@ -33,6 +33,7 @@ local config = {
 	["3d-interp-1-weight"] = 0.6,
 	["3d-interp-2-weight"] = 0.42,
 	["3d-scale-padding"] = 3.2,
+	["3d-disable-vertex-shading"] = true,
 	["3d-larger-size-priority-scalar"] = 2.1,
 	["3d-debug-depth-shader"] = false,
 	["3d-default-occlusion-epsilon"] = 1.0,

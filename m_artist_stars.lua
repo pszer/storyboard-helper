@@ -9,6 +9,11 @@ local times2 = { sb.time:convert{redline,15*4  },sb.time:convert{redline,15*4+1}
 local times3 = { sb.time:convert{redline,15*4+1},sb.time:convert{redline,15*4+2} }
 local times4 = { sb.time:convert{redline,15*4+2},sb.time:convert{redline,15*4+3.2} }
 
+--__BOUND_X_LOW  = -107
+--__BOUND_X_HIGH = 640
+--__BOUND_Y_LOW  = 0
+--__BOUND_Y_HIGH = 480
+
 local __Format = 
 {
 	{
@@ -157,15 +162,19 @@ local function OutStars(stars, start_time, out, out_trails)
 		for i=1,#outframe-1 do
 			local o1, o2 = outframe[i],outframe[i+1]
 
+--__BOUND_X_LOW  = -107
+--__BOUND_X_HIGH = 640
+--__BOUND_Y_LOW  = 0
+--__BOUND_Y_HIGH = 480
 			-- ignore stars behind camera or outside screen, and append a fade to zero
 			if (o1.z < 3.5 or o2.z < 3.5 or o1.trail_z < 3.5 or o2.trail_z < 3.5) or
-				 ( ( o1[2]< -107 or o1[2]>640 or o1[3] < 0 or o1[3] > 480 )
+				 ( ( o1[2]< __BOUND_X_LOW or o1[2]>__BOUND_X_HIGH or o1[3] < __BOUND_Y_LOW or o1[3] > __BOUND_Y_HIGH )
 			 		  and
-				   ( o2[2]< -107 or o2[2]>640 or o2[3] < 0 or o2[3] > 480)
+				   ( o2[2]< __BOUND_X_LOW or o2[2]>__BOUND_X_HIGH or o2[3] < __BOUND_Y_LOW or o2[3] > __BOUND_Y_HIGH)
 					 and
-					 ( o1.trail_x< -107 or o1.trail_x>640 or o1.trail_y < 0 or o1.trail_y > 480 )
+					 ( o1.trail_x< __BOUND_X_LOW or o1.trail_x>__BOUND_X_HIGH or o1.trail_y < __BOUND_Y_LOW or o1.trail_y > __BOUND_Y_HIGH )
 			 		  and
-				   ( o2.trail_x< -107 or o2.trail_x>640 or o2.trail_y < 0 or o2.trail_y > 480)
+				   ( o2.trail_x< __BOUND_X_LOW or o2.trail_x>__BOUND_X_HIGH or o2.trail_y < __BOUND_Y_LOW or o2.trail_y > __BOUND_Y_HIGH)
 
 				 )
 			then
@@ -253,22 +262,26 @@ OutStars(Stars4, times4[1], stars_coms, trails_coms)
 
 local s_objs, t_objs = {},{}
 for _,Star_out in ipairs(stars_coms) do
-	table.insert(s_objs,
-		sb.object:new(
-			"sb/Star.png",
-			"Background",
-			"Centre",0,0
-		):add(sb.unpack(Star_out))
-	)
+	if #Star_out>0 then
+		table.insert(s_objs,
+			sb.object:new(
+				"sb/Star.png",
+				"Background",
+				"Centre",0,0
+			):add(sb.unpack(Star_out))
+		)
+	end
 end
 for _,Trail_out in ipairs(trails_coms) do
-	table.insert(t_objs,
-		sb.object:new(
-			"sb/StarTrail.png",
-			"Background",
-			"CentreLeft",0,0
-		):add(sb.unpack(Trail_out))
-	)
+	if #Trail_out>0 then
+		table.insert(t_objs,
+			sb.object:new(
+				"sb/StarTrail.png",
+				"Background",
+				"CentreLeft",0,0
+			):add(sb.unpack(Trail_out))
+		)
+	end
 end
 
 local view,proj = sb.m3d:getViewAndProjMats()
