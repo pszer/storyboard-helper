@@ -8,7 +8,7 @@ local x = os.clock()
 --storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
 storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/taiko.osb")
 
--- std mappers
+-- taiko mappers
 skey     = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/skey_taiko.osb")
 wth      = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/wth_taiko.osb")
 ectomic  = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/ectomic_taiko.osb")
@@ -458,30 +458,35 @@ for _,v in ipairs(fake_3d_square_edges_objects) do
 	storyboard:addObject(v)
 end
 
+local LogoPosX, LogoPosY = 319-16+2,420+14-6
+local LogoPosX2, LogoPosY2 = 535,426
+local LogoScale = taiko_rescale
 
 -- switch between badly cropped version to better
 storyboard:newObject("sb/LogoLQ.png","Background","Center", 320, 240):add(
-	{'move', 0, {logo_fade_in_time,logo_fade_in_time}, {64+263,243}},
+	{'move', 0, {logo_fade_in_time,logo_fade_in_time}, {LogoPosX,LogoPosY}},
 	{'fade',   0, {logo_fade_in_time, logo_fade_in_time + 500}, 0, 1},
-	{'vector', 0, {logo_fade_in_time, logo_fade_in_time}, {0.5,0.5}, {0.5,0.5}},
+	{'scale', 0, {logo_fade_in_time}, {0.5*LogoScale} },
 	--{'fade',   0, {logo_fade_in_time + 1500,30000}, 1, 1},
 
-	{'moverel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
-		{0,0}, {320*0.65,240*0.77}},
+	--{'moverel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+	--	{0,0}, {320*0.65,240*0.77}},
+	{'move', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		{LogoPosX,LogoPosY}, {LogoPosX2, LogoPosY2}},
 	{'vectorrel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
-		{1,1}, {0.32,0.56}},
+		{1,1}, {0.32/taiko_rescale,0.56/taiko_rescale}},
 	{'fade', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
 		1, 0}
 )
 
 storyboard:newObject("sb/Logo.png","Background","Center", 320, 240):add(
-	{'move', 0, {squares_fade_out_time_1 + interval_1_4,squares_fade_out_time_1 + interval_1_4}, {64+263,243}},
-	{'vector', 0, {squares_fade_out_time_1 + interval_1_4,squares_fade_out_time_1 + interval_1_4}, {0.5,0.5},{0.5,0.5}},
+	{'move', 0, {squares_fade_out_time_1 + interval_1_4,squares_fade_out_time_1 + interval_1_4}, {LogoPosX,LogoPosY}},
+	{'scale', 0, {squares_fade_out_time_1 + interval_1_4}, 0.5*LogoScale},
 
-	{'moverel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
-		{0,0}, {320*0.65,240*0.77}},
+	{'move', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
+		{LogoPosX,LogoPosY}, {LogoPosX2, LogoPosY2}},
 	{'vectorrel', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
-		{1,1}, {0.32,0.56}},
+		{1,1}, {0.32/taiko_rescale,0.56/taiko_rescale}},
 	{'fade', 0, {squares_fade_out_time_1 + interval_1_4, squares_fade_out_time_1 + interval_1_1*2},
 		0, 1},
 	{'fade',   0, {reset_time, reset_time + interval_1_1}, 1, 0}

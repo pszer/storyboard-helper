@@ -31,13 +31,13 @@ local config = {
 	["output-colour-decimal-points"] = 0,
 
 	["3d-interp-1-weight"] = 0.6,
-	["3d-interp-2-weight"] = 0.42,
-	["3d-scale-padding"] = 3.2,
+	["3d-interp-2-weight"] = 0.44,
+	["3d-scale-padding"] = 3.0,
 	["3d-disable-vertex-shading"] = true,
 	["3d-larger-size-priority-scalar"] = 2.1,
 	["3d-debug-depth-shader"] = false,
 	["3d-default-occlusion-epsilon"] = 1.0,
-	["3d-default-triangle-epsilon"] = 0.315,
+	["3d-default-triangle-epsilon"] = 0.14,
 
 	["disable-pooling"] = false,
 	["dont-trim-invisible"] = false,

@@ -25,8 +25,6 @@ interval_1_1 = sb.time:convert{redline, 1.0}
 sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
 sb.m3d:setPerspective()
 
---local derpy = sb.m3d:loadModelTable('derpyflat.txt')
-
 __BOUND_X_LOW  = -107
 __BOUND_X_HIGH = 640
 __BOUND_Y_LOW  = 0
@@ -39,15 +37,17 @@ local MarioStars = require 'm_artist_stars'
 --storyboard:addObjectTable(AnimPhases[3](derpy, 5.5, 3.2))
 --storyboard:addObjectTable(AnimPhases[4](derpy, 5.5, 3.2))
 
-local function DoModel(filename, story_out, scale, y_off, sample_r)
+local function DoModel(filename, story_out, scale, y_off, sample_r, anim, anim_s, anim_o, anim_l)
 	local Model = sb.m3d:loadModelTable(filename)
-	story_out:addObjectTable(AnimPhases[1](Model, scale, y_off, sample_r))
+	story_out:addObjectTable(AnimPhases[1](Model, scale, y_off, sample_r, anim,anim_s,anim_o, anim_l))
 	story_out:addObjectTable(AnimPhases[2](Model, scale, y_off))
 	story_out:addObjectTable(AnimPhases[3](Model, scale, y_off))
 	story_out:addObjectTable(AnimPhases[4](Model, scale, y_off))
+	story_out:sortByHeight()
 end
 
-DoModel('derpyflat.txt', weeb, 5.5, 3.2, 40)
+--DoModel('derpyflat.txt', weeb, 5.5, 3.2, 40)
+DoModel('cuddles.txt', vyper, 5.0, 3.0, 20, 'Actions', 0.7, 1.85, false)
 
 storyboard:addObjectTable(MarioStars.stars)
 storyboard:addObjectTable(MarioStars.trails)

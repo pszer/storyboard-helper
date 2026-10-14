@@ -2,13 +2,14 @@ package.path = "./?.lua;./?/init.lua;" .. package.path
 local sb = require('sbhelper')
 
 local view,proj = sb.m3d:getViewAndProjMats()
-local light_dir = {0,1/2^0.5,-1/2^0.5}
+local light_dir = {0,1/2^0.5,1/2^0.5}
+local light_dir2 = {0,1/2^0.5,-1/2^0.5}
 
 local camera_func_1 = function(t)
 	local pos = {0,15.5,-25}
 	pos[3] = pos[3] + 10* math.min(1, (1 - (2 - t/1000)/2)^3)
 	pos[2] = pos[2] - 13 * math.min(1, (1 - (2 - t/1000)/2)^3)
-									+ (t>2000 and -5.0 * math.sin((t-2000)/1150) or 0.0)
+									+ (t>2000 and -3.7 * math.sin((t-2000)/1150) or 0.0)
 	t = 1.9 * t / 2000
 	local rot_x = math.sin(t)*pos[3] - math.cos(t)*pos[1]
 	local rot_z = math.cos(t)*pos[3] + math.sin(t)*pos[1]
@@ -28,18 +29,23 @@ local camera_func_3 = function(t)
 	return pos, 'xyz', {0,0,0}
 end
 local camera_func_4 = function(t)
-	local pos = {0, 1.8, -9 + (-16)*(1 - t/500)}
+	local pos = {0, 1.8, -15 + (-17)*(1 - t/500)}
 	pos[3] = pos[3]
 	pos[2] = pos[2]
 	return pos, 'xyz', {0,0,0}
 end
 
-local function Phase1(m, scale, cam_y_off, resolution, anim, anim_s)
+local light_col = {120,120,120}
+local ambient_col = {220,220,220}
+
+local function Phase1(m, scale, cam_y_off, resolution, anim, anim_s, anim_o, anim_l, phase_mag)
 	local resolution = resolution or 40
 	local anim_s = anim_s or 1.0
+	local anim_o = anim_o or 0.0
+	local anim_l = anim_l or false
 	local anim_func
 	if anim then
-		anim_func = function(t) return anim, anim_s*(t/1000), true end
+		anim_func = function(t) return anim, anim_o + anim_s*(t/1000), anim_l end
 	end
 
 	return sb.a3d:animate3D{
@@ -47,7 +53,7 @@ local function Phase1(m, scale, cam_y_off, resolution, anim, anim_s)
 		end_time = sb.time:convert{redline,15*4},
 		sample_step = resolution,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-					{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
+					{dir = light_dir, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_1,
 		actors = {
 			{ model = m,
@@ -57,7 +63,7 @@ local function Phase1(m, scale, cam_y_off, resolution, anim, anim_s)
 					return sb.m3d:modelMatrix(
 						{0,-cam_y_off,0}, 
 						{scale,scale,scale}, 
-						'xyz', {-math.pi/2, -math.pi,0})
+						'xyz', {-math.pi/2, -math.pi + math.pi,0})
 				end,
 				anim_func = anim_func,
 				master_func = nil
@@ -71,14 +77,14 @@ local function Phase2(m, scale, cam_y_off)
 		end_time = sb.time:convert{redline,15*4+1},
 		sample_step = 10,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-					{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
+					{dir = light_dir, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_2,
 		actors = {
 			{ model = m,
 				mat_func = function(t)
 					t=t/2000.0
 					return sb.m3d:modelMatrix(
-						{-19 * ((2000/433) * t) + 9.5, -cam_y_off,0}, 
+						{-15 * ((2000/433) * t) + 7.5, -cam_y_off,0}, 
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, -math.pi/2, 0})
 				end,
@@ -94,14 +100,14 @@ local function Phase3(m, scale, cam_y_off)
 		end_time = sb.time:convert{redline,15*4+2},
 		sample_step = 10,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-					{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
+					{dir = light_dir, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_3,
 		actors = {
 			{ model = m,
 				mat_func = function(t)
 					t=t/2000.0
 					return sb.m3d:modelMatrix(
-						{19 * ((2000/433) * t) - 9.5, -cam_y_off,0}, 
+						{15 * ((2000/433) * t) - 7.5, -cam_y_off,0}, 
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, math.pi/2, 0})
 				end,
@@ -117,14 +123,14 @@ local function Phase4(m, scale, cam_y_off)
 		end_time = sb.time:convert{redline,15*4+3.2},
 		sample_step = 10,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
-					{dir = light_dir, col={180,180,180}, ambient={85,85,85}}) end,
+					{dir = light_dir2, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_4,
 		actors = {
 			{ model = m,
 				mat_func = function(t)
 					t=t/2000.0
 					return sb.m3d:modelMatrix(
-						{0, -cam_y_off,0}, 
+						{0, -cam_y_off+1.0,0}, 
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, math.pi, 0})
 				end,
