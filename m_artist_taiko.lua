@@ -6,13 +6,17 @@ table.unpack = unpack or table.unpack
 local x = os.clock()
 
 --storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
-storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/taiko.osb")
+storyboard_base = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/Kazumi Totaka - Title Theme (Nintendo 64).osb")
+storyboard      = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/taiko.osb")
 
 -- taiko mappers
 skey     = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/skey_taiko.osb")
 wth      = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/wth_taiko.osb")
 ectomic  = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/ectomic_taiko.osb")
 nintendo = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/nintendo_taiko.osb")
+
+-- tsarbomba
+bomba = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/bomba_horse.osb")
 
 sb.file:setProjectFolder("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/")
 
@@ -38,8 +42,9 @@ local viewport_y_s     = (480-245)/480
 local viewport_x_scale = 1 / viewport_y_s
 local viewport_x_add   = 854 * viewport_x_scale - 854
 
-__BOUND_X_LOW  = -107 - (viewport_x_add*0.5)
-__BOUND_X_HIGH = 640  + (viewport_x_add*0.5)
+STAR_EPSILON = 28.0
+__BOUND_X_LOW  = -107 - (viewport_x_add*0.4)
+__BOUND_X_HIGH = 640  + (viewport_x_add*0.4)
 __BOUND_Y_LOWEST  = 0
 __BOUND_Y_LOW  = 0
 __BOUND_Y_HIGH = 480
@@ -63,28 +68,47 @@ local function append_os(p)
 		v:wrap(OriginScale3D)
 	end
 end
-local function DoModel(filename, story_out, scale, y_off, sample_r)
+local function DoModel(filename, story_out, scale, y_off, sample_r, anim, anim_s, anim_o, anim_l, anim_234, anim_234_s, anim_234_o)
 	local Model = sb.m3d:loadModelTable(filename)
-	local p1 = AnimPhases[1](Model, scale, y_off, sample_r)
-	local p2 = AnimPhases[2](Model, scale, y_off)
-	local p3 = AnimPhases[3](Model, scale, y_off)
-	local p4 = AnimPhases[4](Model, scale, y_off)
+	local p1 = AnimPhases[1](Model, scale, y_off, sample_r, anim,anim_s,anim_o, anim_l)
+	local cache = sb.config["3d-time-padding"]
+	sb.config["3d-time-padding"] = 4
+	sb.config["3d-default-triangle-epsilon"] = 6.23
+	local p2 = AnimPhases[2](Model, scale, y_off, anim_234, anim_234_s)
+	local p3 = AnimPhases[3](Model, scale, y_off, anim_234, anim_234_s)
+	sb.config["3d-time-padding"] = cache
+	local p4 = AnimPhases[4](Model, scale, y_off, anim_234, anim_234_s, anim_234_o)
 	append_os(p1)
 	append_os(p2)
 	append_os(p3)
 	append_os(p4)
-	storyboard:addObjectTable(p1)
-	storyboard:addObjectTable(p2)
-	storyboard:addObjectTable(p3)
-	storyboard:addObjectTable(p4)
+	story_out:addObjectTable(p1)
+	story_out:addObjectTable(p2)
+	story_out:addObjectTable(p3)
+	story_out:addObjectTable(p4)
+	story_out:sortByHeight()
 end
 
-DoModel('derpyflat.txt', skey, 5.5, 3.2, 20)
+sb.a3d:setViewport(__BOUND_X_LOW, __BOUND_X_HIGH, __BOUND_Y_LOW, __BOUND_Y_HIGH)
+
+--DoModel('derpyflat.txt', skey, 5.5, 3.2, 20)
+sb.config["3d-default-triangle-epsilon"] = 5.73
+sb.config["3d-time-padding"] = 76
+sb.config["3d-scale-padding"] = 4.6
+DoModel('derpies.txt', bomba, 5.5, 3.2, 180, 'DerpyWalk', 1.0, 0.0, true)
+sb.config["3d-default-triangle-epsilon"] = 5.43-1.7
+sb.config["3d-time-padding"] = 46
+sb.config["3d-scale-padding"] = 4.0
+DoModel('mega.txt', skey, 6.3, 3.2, 180, 'MegaAction', 0.99, 0.25, false, 'MegaIdle', 2.7, 0.0)
+sb.config["3d-default-triangle-epsilon"] = 2.23
+sb.config["3d-time-padding"] = 15
+sb.config["3d-scale-padding"] = 3.5
+DoModel('rhombi.txt', ectomic, 5.5, 3.2, 120, 'RhombiAction', 0.95, -0.11, false)
 
 append_os(MarioStars.stars)
 append_os(MarioStars.trails)
-storyboard:addObjectTable(MarioStars.stars)
-storyboard:addObjectTable(MarioStars.trails)
+storyboard_base:addObjectTable(MarioStars.stars)
+storyboard_base:addObjectTable(MarioStars.trails)
 --
 storyboard:newObject("sb/ScreenGap.png","Background","TopRight", 640+107, 0):add(
 	{'fade',0,{{redline,1.9},{redline,2.5}},0,1},
@@ -349,9 +373,9 @@ for x = 0 - (taiko_width)*2, 640+taiko_width*2-1, taiko_width do
 		sfx_count = sfx_count+1
 
 		table.insert(Sq[5], {'vector', 'sineOut', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, vec1, vec2})
-		table.insert(Sq[5], {'color', 'sineOut' , {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {111,111,111},{255,255,255}})
+		table.insert(Sq[5], {'color', 'sineOut' , {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {99,99,99},{255,255,255}})
 		table.insert(Sq2[5], {'vector', 'sineOut', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, vec1, vec2})
-		table.insert(Sq2[5], {'color', 'sineOut' , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {111,111,111},{255,255,255}})
+		table.insert(Sq2[5], {'color', 'sineOut' , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {99,99,99},{255,255,255}})
 
 		-- fade out after 1st sequence
 
@@ -420,19 +444,19 @@ for x = 0 - (taiko_width)*2, 640+taiko_width*2-1, taiko_width do
 		end
 
 		table.insert(fake_3d_square_edges_objects,
-		storyboard:newObject("sb/Edge.png", "Background", "Center", 320, 240):add(
+		storyboard:newObject("sb/E.png", "Background", "Center", 320, 240):add(
 			{'fade',  1        , {Sq_time_in + DT*0.1, Sq_time_in + DT*0.2}, 0,1 },
 			{'scale',  1        , {Sq_time_in + DT*0.1}, taiko_rescale },
-			{'color', 'sineout', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.4}, {233,233,233},{50,50,50} },
+			--{'color', 'sineout', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.4}, {233,233,233},{50,50,50} },
 			{'fade',  1        , {Sq_time_in + DT*3.2, Sq_time_in + DT*3.4}, 1,0 },
 			{'move', 'sineOut', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {Sq[1]+X_OFF,Sq[2]}, {Sq[1]+edge_v[1]+X_OFF,Sq[2]+edge_v[2]}},
 			rot
 		))
 		table.insert(fake_3d_square_edges_objects,
-		storyboard:newObject("sb/Edge.png", "Background", "Center", 320, 240):add(
+		storyboard:newObject("sb/E.png", "Background", "Center", 320, 240):add(
 			{'fade',  1        , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*0.2}, 0,1 },
 			{'scale',  1        , {Sq_time_in_2 + DT*0.1}, taiko_rescale },
-			{'color', 'sineout', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.4}, {233,233,233},{50,50,50} },
+			--{'color', 'sineout', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.4}, {233,233,233},{50,50,50} },
 			{'fade',  1        , {Sq_time_in_2 + DT*3.2, Sq_time_in_2 + DT*3.4}, 1,0 },
 			{'move', 'sineOut', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {Sq2[1]+X_OFF,Sq2[2]}, {Sq2[1]+edge_v_2[1]+X_OFF,Sq2[2]+edge_v_2[2]}},
 			rot
@@ -457,6 +481,54 @@ end
 for _,v in ipairs(fake_3d_square_edges_objects) do
 	storyboard:addObject(v)
 end
+
+storyboard:newObject("sb/CC.jpg", "Background", "Center", 320, 47):add(
+	{'fade', 0, {{redline,3*4}}, 1},
+	{'scale', 0,{{redline,3*4}}, 0.5*taiko_rescale},
+	{'move', 0, {{redline,3*4}, {redline,3*4+3}}, {-300,47}, {320,47}},
+	{'fade', 0, {{redline,8*4+1}}, 0},
+	{'move', 0, {{redline,7*4+2}, {redline,7*4+5}}, {320,47}, {940,47}}
+)
+storyboard:newObject("sb/dot.png", "Background", "Center", 320, 90):add(
+	{'fade', 0, {{redline,3*4}}, 1},
+	{'scale', 0,{{redline,3*4}}, 0.5*taiko_rescale},
+	{'move', 0, {{redline,3*4}, {redline,3*4+3}}, {940,90}, {320,90}},
+	{'fade', 0, {{redline,8*4+1}}, 0},
+	{'move', 0, {{redline,7*4+2}, {redline,7*4+5}}, {320,90}, {-300,90}}
+)
+storyboard:newObject("sb/Pstart.png", "Background", "Center", 320, 90):add(
+	{'fade', 0, {{redline,5*4}, {redline,5*4+2}} ,0,1},
+	{'fade', 0, {{redline,5*4+2}, {redline,5*4+4}} ,1,0.7},
+	{'fade', 0, {{redline,5*4+4}, {redline,5*4+6}} ,0.7,1},
+	{'fade', 0, {{redline,5*4+6}, {redline,5*4+8}} ,1,0.7},
+	{'fade', 0, {{redline,5*4+8}, {redline,5*4+10}} ,0.7,1},
+	{'scale', 0, {{redline,3*4}}, 0.5*taiko_rescale},
+	{'move', 0, {{redline,3*4}, {redline,3*4+3}}, {-300,90}, {320,90}},
+	{'fade', 0, {{redline,8*4+1}}, 0},
+	{'move', 0, {{redline,7*4+2}, {redline,7*4+5}}, {320,90}, {-300,90}}
+)
+
+storyboard:newObject("sb/CC.jpg", "Background", "Center", 320, 47):add(
+	{'fade', 0, {{redline,3*4 + 16*4}}, 1},
+	{'scale', 0,{{redline,3*4 + 16*4}}, 0.5*taiko_rescale},
+	{'move', 0, {{redline,3*4 + 16*4}, {redline,3*4+3 + 16*4}}, {-300,47}, {320,47}},
+	{'color', 0, { squares_fade_out_time_2a, squares_fade_out_time_2b }, {255,255,255},{0,0,0}},
+	{'fade', 0, { squares_fade_out_time_2b, squares_fade_out_time_2b }, 0,0}
+)
+storyboard:newObject("sb/dot.png", "Background", "Center", 320, 90):add(
+	{'fade', 0, {{redline,3*4 + 16*4}}, 1},
+	{'scale', 0,{{redline,3*4 + 16*4}}, 0.5*taiko_rescale},
+	{'move', 0, {{redline,3*4 + 16*4}, {redline,3*4+3 + 16*4}}, {940,90}, {320,90}},
+	{'color', 0, {squares_fade_out_time_2a, squares_fade_out_time_2b}, {255,255,255},{0,0,0}},
+	{'fade', 0, {squares_fade_out_time_2b, squares_fade_out_time_2b}, 0,0}
+)
+storyboard:newObject("sb/Pstart.png", "Background", "Center", 320, 90):add(
+	{'fade', 0, {{redline,4*4 + 16*4-1}, {redline,4*4+1 + 16*4}} ,0,1},
+	{'scale', 0,{{redline,3*4 + 16*4}}, 0.5*taiko_rescale},
+	{'move', 0, {{redline,3*4 + 16*4}, {redline,3*4+3 + 16*4}}, {-300,90}, {320,90}},
+	{'color', 0, {squares_fade_out_time_2a, squares_fade_out_time_2b}, {255,255,255},{0,0,0}},
+	{'fade', 0, {squares_fade_out_time_2b, squares_fade_out_time_2b}, 0,0}
+)
 
 local LogoPosX, LogoPosY = 319-16+2,420+14-6
 local LogoPosX2, LogoPosY2 = 535,426
@@ -509,18 +581,23 @@ storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
 storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
+storyboard:newObject("bg.jpg", "Background", "Center", 320, 240):add(
+	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
+)
 
 local params = { pool_sprites = sb.tri.file_set }
+storyboard_base:writeToFile2(nil, params)
+sb.config['silence-headers'] = true
 
 -- disable pooling 4 compile speeed
 --params = nil
 storyboard:writeToFile2(nil, params)
 
 -- write mapper specific model events
-sb.config['silence-headers'] = true
 skey:writeToFile2(nil, params)
 wth:writeToFile2(nil, params)
 ectomic:writeToFile2(nil, params)
+bomba:writeToFile2(nil, params)
 
 --storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})
 print(string.format("elapsed time: %.2f\n", os.clock() - x))

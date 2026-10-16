@@ -25,6 +25,7 @@ interval_1_1 = sb.time:convert{redline, 1.0}
 sb.m3d:setCamera({0,0,-15}, 'xyz', {0,0,0})
 sb.m3d:setPerspective()
 
+STAR_EPSILON = 11.5
 __BOUND_X_LOW  = -107
 __BOUND_X_HIGH = 640
 __BOUND_Y_LOW  = 0
@@ -37,20 +38,53 @@ local MarioStars = require 'm_artist_stars'
 --storyboard:addObjectTable(AnimPhases[3](derpy, 5.5, 3.2))
 --storyboard:addObjectTable(AnimPhases[4](derpy, 5.5, 3.2))
 
-local function DoModel(filename, story_out, scale, y_off, sample_r, anim, anim_s, anim_o, anim_l)
-	local Model = sb.m3d:loadModelTable(filename)
-	story_out:addObjectTable(AnimPhases[1](Model, scale, y_off, sample_r, anim,anim_s,anim_o, anim_l))
-	story_out:addObjectTable(AnimPhases[2](Model, scale, y_off))
-	story_out:addObjectTable(AnimPhases[3](Model, scale, y_off))
-	story_out:addObjectTable(AnimPhases[4](Model, scale, y_off))
-	story_out:sortByHeight()
+-- Black box that hides the stars found in the .osb, as they are for the taiko diffs only.
+storyboard:newObject("Sq.png", "Foreground", "TopLeft", -107, 150):add(
+	{'fade', 0, {{redline, 8.5*4}}, 1},
+	{'vector', 0, {{redline, 8.5*4}}, {857/64, (480-150)/64}},
+	{'color', 0, {{redline, 8.5*4}}, {0,0,0}},
+	{'fade', 0, {{redline, 15*4+3.2}}, 0}
+):setHeight(-3)
+for i,v in ipairs(MarioStars.stars) do
+	v:setLayer('Foreground')
+	v:setHeight(-2)
 end
-
---DoModel('derpyflat.txt', weeb, 5.5, 3.2, 40)
-DoModel('cuddles.txt', vyper, 5.0, 3.0, 20, 'Actions', 0.7, 1.85, false)
-
+for i,v in ipairs(MarioStars.trails) do
+	v:setLayer('Foreground')
+	v:setHeight(-2)
+end
 storyboard:addObjectTable(MarioStars.stars)
 storyboard:addObjectTable(MarioStars.trails)
+
+local function DoModel(filename, story_out, scale, y_off, sample_r, anim, anim_s, anim_o, anim_l, anim_234, anim_234_s, anim_234_o)
+	local Model = sb.m3d:loadModelTable(filename)
+	story_out:addObjectTable(AnimPhases[1](Model, scale, y_off, sample_r, anim,anim_s,anim_o, anim_l))
+
+	sb.config["3d-default-triangle-epsilon"] = 1.63
+	local cache = sb.config["3d-time-padding"]
+	sb.config["3d-time-padding"] = 8
+	story_out:addObjectTable(AnimPhases[2](Model, scale, y_off, anim_234, anim_234_s))
+	story_out:addObjectTable(AnimPhases[3](Model, scale, y_off, anim_234, anim_234_s))
+	sb.config["3d-default-triangle-epsilon"] = 2.43
+	sb.config["3d-time-padding"] = cache
+	story_out:addObjectTable(AnimPhases[4](Model, scale, y_off, anim_234, anim_234_s, anim_234_o))
+	story_out:sortByHeight()
+end
+--DoModel('derpyflat.txt', weeb, 5.5, 3.2, 40)
+sb.config["3d-default-triangle-epsilon"] = 2.23-1.3
+sb.config["3d-time-padding"] = 16
+sb.config["3d-scale-padding"] = 3.8
+DoModel('cuddles.txt', vyper, 3.5, 2.1, 80, 'Actions', 0.8, 1.85, false, 'Actions', 2.9, 2.999)
+
+sb.config["3d-default-triangle-epsilon"] = 3.13
+sb.config["3d-time-padding"] = 24
+sb.config["3d-scale-padding"] = 3.2
+DoModel('spyro.txt', doops, 3.4, 2.6, 40, 'SpyroA', 0.85, 0, false, 'SpyroFly', 2.3, 0.0)
+
+sb.config["3d-default-triangle-epsilon"] = 0.63
+sb.config["3d-time-padding"] = 8
+sb.config["3d-scale-padding"] = 3.7
+DoModel('frog.txt', weeb, 3.7, 2.0, 60, 'FrogAction', 0.85, 0, false, 'FrogTongue', 2.7, 0.0)
 
 --storyboard:sortByHeight()
 
@@ -294,9 +328,9 @@ for x = 0 - (64)*2, 640+107, 64 do
 		sfx_count = sfx_count+1
 
 		table.insert(Sq[5], {'vector', 'sineOut', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, vec1, vec2})
-		table.insert(Sq[5], {'color', 'sineOut' , {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {111,111,111},{255,255,255}})
+		table.insert(Sq[5], {'color', 'sineOut' , {Sq_time_in + DT*0.1, Sq_time_in + DT*3.5}, {99,99,99},{255,255,255}})
 		table.insert(Sq2[5], {'vector', 'sineOut', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, vec1, vec2})
-		table.insert(Sq2[5], {'color', 'sineOut' , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {111,111,111},{255,255,255}})
+		table.insert(Sq2[5], {'color', 'sineOut' , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.5}, {99,99,99},{255,255,255}})
 
 		-- fade out after 1st sequence
 
@@ -346,8 +380,10 @@ for x = 0 - (64)*2, 640+107, 64 do
 			)
 		end
 
-		table.insert(Sq2[5], {'fade'  , 'linear',  {squares_fade_out_time_2a,
-																							 squares_fade_out_time_2b}, 1, 0})
+		table.insert(Sq2[5], {'color'  , 'linear',  {squares_fade_out_time_2a,
+																							 squares_fade_out_time_2b}, {255,255,255}, {0,0,0}})
+		table.insert(Sq2[5], {'fade'  , 'linear',  {squares_fade_out_time_2b,
+																							 squares_fade_out_time_2b}, 0, 0})
 		--table.insert(Sq2[5], {'vector', 'sineOut', {squares_fade_out_time_2a + DT*0.1+D_sq, squares_fade_out_time_2a + DT*6.5+D_sq}, vec1, vec2})
 
 		local rot = nil
@@ -365,7 +401,7 @@ for x = 0 - (64)*2, 640+107, 64 do
 		end
 
 		table.insert(fake_3d_square_edges_objects,
-		storyboard:newObject("sb/Edge.png", "Background", "Center", 320, 240):add(
+		storyboard:newObject("sb/E.png", "Background", "Center", 320, 240):add(
 			{'fade',  1        , {Sq_time_in + DT*0.1, Sq_time_in + DT*0.2}, 0,1 },
 			{'color', 'sineout', {Sq_time_in + DT*0.1, Sq_time_in + DT*3.4}, {233,233,233},{50,50,50} },
 			{'fade',  1        , {Sq_time_in + DT*3.2, Sq_time_in + DT*3.4}, 1,0 },
@@ -373,7 +409,7 @@ for x = 0 - (64)*2, 640+107, 64 do
 			rot
 		))
 		table.insert(fake_3d_square_edges_objects,
-		storyboard:newObject("sb/Edge.png", "Background", "Center", 320, 240):add(
+		storyboard:newObject("sb/E.png", "Background", "Center", 320, 240):add(
 			{'fade',  1        , {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*0.2}, 0,1 },
 			{'color', 'sineout', {Sq_time_in_2 + DT*0.1, Sq_time_in_2 + DT*3.4}, {233,233,233},{50,50,50} },
 			{'fade',  1        , {Sq_time_in_2 + DT*3.2, Sq_time_in_2 + DT*3.4}, 1,0 },
@@ -430,6 +466,54 @@ storyboard:newObject("sb/Logo.png","Background","Center", 320, 240):add(
 	{'fade',   0, {reset_time, reset_time + interval_1_1}, 1, 0}
 )
 
+storyboard:newObject("sb/CC.jpg", "Background", "Center", 320, 435):add(
+	{'fade', 0, {{redline,3*4}}, 1},
+	{'scale', 0,{{redline,3*4}}, 0.5},
+	{'move', 0, {{redline,3*4}, {redline,3*4+3}}, {-300,435}, {320,435}},
+	{'fade', 0, {{redline,8*4+1}}, 0},
+	{'move', 0, {{redline,7*4+2}, {redline,7*4+5}}, {320,435}, {940,435}}
+)
+storyboard:newObject("sb/dot.png", "Background", "Center", 320, 380):add(
+	{'fade', 0, {{redline,3*4}}, 1},
+	{'scale', 0,{{redline,3*4}}, 0.5},
+	{'move', 0, {{redline,3*4}, {redline,3*4+3}}, {940,380}, {320,380}},
+	{'fade', 0, {{redline,8*4+1}}, 0},
+	{'move', 0, {{redline,7*4+2}, {redline,7*4+5}}, {320,380}, {-300,380}}
+)
+storyboard:newObject("sb/Pstart.png", "Background", "Center", 320, 380):add(
+	{'fade', 0, {{redline,5*4}, {redline,5*4+2}} ,0,1},
+	{'fade', 0, {{redline,5*4+2}, {redline,5*4+4}} ,1,0.7},
+	{'fade', 0, {{redline,5*4+4}, {redline,5*4+6}} ,0.7,1},
+	{'fade', 0, {{redline,5*4+6}, {redline,5*4+8}} ,1,0.7},
+	{'fade', 0, {{redline,5*4+8}, {redline,5*4+10}} ,0.7,1},
+	{'scale', 0, {{redline,3*4}}, 0.5},
+	{'move', 0, {{redline,3*4}, {redline,3*4+3}}, {-300,380}, {320,380}},
+	{'fade', 0, {{redline,8*4+1}}, 0},
+	{'move', 0, {{redline,7*4+2}, {redline,7*4+5}}, {320,380}, {-300,380}}
+)
+
+storyboard:newObject("sb/CC.jpg", "Background", "Center", 320, 435):add(
+	{'fade', 0, {{redline,3*4 + 16*4}}, 1},
+	{'scale', 0,{{redline,3*4 + 16*4}}, 0.5},
+	{'move', 0, {{redline,3*4 + 16*4}, {redline,3*4+3 + 16*4}}, {-300,435}, {320,435}},
+	{'color', 0, { squares_fade_out_time_2a, squares_fade_out_time_2b }, {255,255,255},{0,0,0}},
+	{'fade', 0, { squares_fade_out_time_2b, squares_fade_out_time_2b }, 0,0}
+)
+storyboard:newObject("sb/dot.png", "Background", "Center", 320, 380):add(
+	{'fade', 0, {{redline,3*4 + 16*4}}, 1},
+	{'scale', 0,{{redline,3*4 + 16*4}}, 0.5},
+	{'move', 0, {{redline,3*4 + 16*4}, {redline,3*4+3 + 16*4}}, {940,380}, {320,380}},
+	{'color', 0, {squares_fade_out_time_2a, squares_fade_out_time_2b}, {255,255,255},{0,0,0}},
+	{'fade', 0, {squares_fade_out_time_2b, squares_fade_out_time_2b}, 0,0}
+)
+storyboard:newObject("sb/Pstart.png", "Background", "Center", 320, 380):add(
+	{'fade', 0, {{redline,4*4 + 16*4-1}, {redline,4*4+1 + 16*4}} ,0,1},
+	{'scale', 0,{{redline,3*4 + 16*4}}, 0.5},
+	{'move', 0, {{redline,3*4 + 16*4}, {redline,3*4+3 + 16*4}}, {-300,380}, {320,380}},
+	{'color', 0, {squares_fade_out_time_2a, squares_fade_out_time_2b}, {255,255,255},{0,0,0}},
+	{'fade', 0, {squares_fade_out_time_2b, squares_fade_out_time_2b}, 0,0}
+)
+
 interval_1_22 = sb.time:convert{redline, 0.55}
 storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
 	{'fade',  'out', {FF_time                 , FF_time + interval_1_22*1.1}, 0, 0.6},
@@ -447,15 +531,18 @@ storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
 storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
+storyboard:newObject("bg.jpg", "Background", "Center", 320, 240):add(
+	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
+)
 
 local params = { pool_sprites = sb.tri.file_set }
+sb.config['silence-headers'] = true
 
 -- disable pooling 4 compile speeed
 params = nil
 storyboard:writeToFile2(nil, params)
 
 -- write mapper specific model events
-sb.config['silence-headers'] = true
 vyper:writeToFile2(nil, params)
 doops:writeToFile2(nil, params)
 weeb:writeToFile2(nil, params)

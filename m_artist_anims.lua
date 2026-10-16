@@ -29,7 +29,7 @@ local camera_func_3 = function(t)
 	return pos, 'xyz', {0,0,0}
 end
 local camera_func_4 = function(t)
-	local pos = {0, 1.8, -15 + (-17)*(1 - t/500)}
+	local pos = {0, 1.8, -12.5 + (-17)*(1 - t/500)}
 	pos[3] = pos[3]
 	pos[2] = pos[2]
 	return pos, 'xyz', {0,0,0}
@@ -71,11 +71,16 @@ local function Phase1(m, scale, cam_y_off, resolution, anim, anim_s, anim_o, ani
 		}
 	}
 end
-local function Phase2(m, scale, cam_y_off)
+local function Phase2(m, scale, cam_y_off, anim, anim_s)
+	local anim_func
+	if anim then
+		anim_func = function(t) return anim, anim_s*(t/1000), true end
+	end
+
 	return sb.a3d:animate3D{
 		start_time = sb.time:convert{redline,15*4},
 		end_time = sb.time:convert{redline,15*4+1},
-		sample_step = 10,
+		sample_step = 80,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 					{dir = light_dir, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_2,
@@ -88,17 +93,22 @@ local function Phase2(m, scale, cam_y_off)
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, -math.pi/2, 0})
 				end,
+				anim_func = anim_func,
 
 				master_func = nil
 			}
 		}
 	}
 end
-local function Phase3(m, scale, cam_y_off)
+local function Phase3(m, scale, cam_y_off, anim, anim_s)
+	local anim_func
+	if anim then
+		anim_func = function(t) return anim, anim_s*(t/1000), true end
+	end
 	return sb.a3d:animate3D{
 		start_time = sb.time:convert{redline,15*4+1},
 		end_time = sb.time:convert{redline,15*4+2},
-		sample_step = 10,
+		sample_step = 80,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 					{dir = light_dir, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_3,
@@ -111,17 +121,22 @@ local function Phase3(m, scale, cam_y_off)
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, math.pi/2, 0})
 				end,
+				anim_func = anim_func,
 
 				master_func = nil
 			}
 		}
 	}
 end
-local function Phase4(m, scale, cam_y_off)
+local function Phase4(m, scale, cam_y_off, anim, anim_s, anim_o)
+	local anim_func
+	if anim then
+		anim_func = function(t) return anim, anim_o + anim_s*(t/1000), true end
+	end
 	return sb.a3d:animate3D{
 		start_time = sb.time:convert{redline,15*4+2},
 		end_time = sb.time:convert{redline,15*4+3.2},
-		sample_step = 10,
+		sample_step = 40,
 		shader = function(vert,norm,col) return sb.m3d:basicDiffuseColor(vert,norm,col,
 					{dir = light_dir2, col=light_col, ambient=ambient_col}) end,
 		camera_func = camera_func_4,
@@ -134,6 +149,7 @@ local function Phase4(m, scale, cam_y_off)
 						{scale,scale,scale}, 
 						'xyz', {-math.pi/2, math.pi, 0})
 				end,
+				anim_func = anim_func,
 
 				master_func = nil
 			}

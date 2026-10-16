@@ -369,6 +369,10 @@ function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
 
 	-- multiply normal by model matrix
 	cpml.mat4.mul_vec4(__norm_reg, model_m, __norm_reg)
+	-- multiply normal by skin
+	if bone_mats and deform_mat then
+		cpml.mat4.mul_vec4(__norm_reg, deform_mat, __norm_reg)
+	end
 
 	-- normalise
 	__norm_vec3.x = __norm_reg[1]
@@ -548,6 +552,9 @@ function m3d:getAnimationFrame(m_t, anim_name, time, force_loop)
 		if fi1==fi2 then fi2=fi1+1 end
 		if fi2 > end_i then fi2 = start_i end
 	end
+
+	if fi1 < start_i then fi1=start_i end
+	if fi2 > end_i then fi2=end_i end
 
 	local interp_i = frame_i - fi1
 	return m3d:interpolateTwoFrames(m_t, m_t.frames[fi1], m_t.frames[fi2], interp_i)

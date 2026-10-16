@@ -157,6 +157,12 @@ function object:getAnchorPosition(x,y)
 	return anc(x,y,w,h)
 end
 
+function object:setLayer(layer)
+	local layer_o = sb_layer:correctInput(layer)
+	sb_log:assert(layer_o, "object:setLayer(): unknown layer '%s'.", layer)
+	self.layer = layer_o
+end
+
 function object:add(...)
 	local commands = {...}
 

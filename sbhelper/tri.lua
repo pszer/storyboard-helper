@@ -663,6 +663,8 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 
 	local skip_v_shade = sb_config['3d-disable-vertex-shading']
 
+	local timepad = sb_config['3d-time-padding'] or 0
+
 	if T1 and sb_config['3d-debug-depth-shader'] then
 		T1.col = {math.min(T1.height*50+50,255), math.min(T1.height*75+50,255), 50}
 		T2.col = T1.col
@@ -674,7 +676,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 			{'move',    0, {time1,time2}, T1.pos, T2.pos},
 			{'rot',     0, {time1,time2}, T1.rot, T2.rot},
 			{'vector',  0, {time1,time2}, T1.vector, T2.vector},
-			{'color' ,  0, {time1,time2}, T1.col, T2.col}
+			{'color' ,  0, {time1,time2+timepad}, T1.col, T2.col}
 		)
 
 		if T1.tri2 and not skip_v_shade then
@@ -683,7 +685,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'move',    0, {time1,time2}, T1.tri2.pos, T2.tri2.pos},
 				{'rot',     0, {time1,time2}, T1.tri2.rot, T2.tri2.rot},
 				{'vector',  0, {time1,time2}, T1.tri2.vector, T2.tri2.vector},
-				{'color' ,  0, {time1,time2}, T1.tri2.col, T2.tri2.col}
+				{'color' ,  0, {time1,time2+timepad}, T1.tri2.col, T2.tri2.col}
 			)
 		elseif T2.tri2  and not skip_v_shade then
 			obj2 = sb_object:new(T1.file_v2, L, T1.anchor, 0,0):add(
@@ -691,7 +693,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'move',    0, {time1,time2}, T1.pos, T2.tri2.pos},
 				{'rot',     0, {time1,time2}, T1.rot, T2.tri2.rot},
 				{'vector',  0, {time1,time2}, T1.vector, T2.tri2.vector},
-				{'color' ,  0, {time1,time2}, T1.col, T2.tri2.col}
+				{'color' ,  0, {time1,time2+timepad}, T1.col, T2.tri2.col}
 			)
 		end
 
@@ -701,7 +703,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'move',    0, {time1,time2}, T1.tri3.pos, T2.tri3.pos},
 				{'rot',     0, {time1,time2}, T1.tri3.rot, T2.tri3.rot},
 				{'vector',  0, {time1,time2}, T1.tri3.vector, T2.tri3.vector},
-				{'color' ,  0, {time1,time2}, T1.tri3.col, T2.tri3.col}
+				{'color' ,  0, {time1,time2+timepad}, T1.tri3.col, T2.tri3.col}
 			)
 		elseif T2.tri3  and not skip_v_shade then
 			obj3 = sb_object:new(T1.file_v3, L, T1.anchor, T1.pos[1], T1.pos[2]):add(
@@ -709,7 +711,7 @@ function tri:convertTriDataToObjects(T1, T2, layer, time1, time2)
 				{'move',    0, {time1,time2}, T1.pos, T2.tri3.pos},
 				{'rot',     0, {time1,time2}, T1.rot, T2.tri3.rot},
 				{'vector',  0, {time1,time2}, T1.vector, T2.tri3.vector},
-				{'color' ,  0, {time1,time2}, T1.col, T2.tri3.col}
+				{'color' ,  0, {time1,time2+timepad}, T1.col, T2.tri3.col}
 			)
 		end
 	end
@@ -896,7 +898,7 @@ function tri:calculateDepthStack(triangles)
 			 t2.min_y > t1.max_y then
 			return false
 		end
-		return tri:triangleOverlap(t1,t2, 0.15)
+		return tri:triangleOverlap(t1,t2, 1.05)
 	end
 
 	-- store for each triangle, what triangles overlap on top of it

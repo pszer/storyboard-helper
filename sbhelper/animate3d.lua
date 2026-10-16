@@ -12,8 +12,20 @@ local anim3d = {
 	end,
 	default_perspective = function()
 		return 70, 'wide', 0.5, 5000
-	end
+	end,
+
+	low_x = -107,
+	high_x = 640+107,
+	low_y = 0,
+	high_y = 480,
 }
+
+function anim3d:setViewport(x1,x2,y1,y2)
+	self.low_x = x1
+	self.high_x = x2
+	self.low_y = y1
+	self.high_y = y2
+end
 
 local __id = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}
 local __last_fov = nil
@@ -198,6 +210,21 @@ function anim3d:outputActorTris(actor_tris, start_time, end_time, time_step, fra
 	local objects = {}
 	layer=layer or 'Foreground'
 
+	local function triInViewport(T)
+		local x1, y1 = T[1], T[2]
+		local x2, y3 = T[3], T[4]
+		local x3, y4 = T[5], T[6]
+
+		if x1 > anim3d.low_x and x1 < anim3d.high_x then return true end
+		if x2 > anim3d.low_x and x2 < anim3d.high_x then return true end
+		if x3 > anim3d.low_x and x3 < anim3d.high_x then return true end
+
+		if y1 > anim3d.low_y and y1 < anim3d.high_y then return true end
+		if y2 > anim3d.low_y and y2 < anim3d.high_y then return true end
+		if y3 > anim3d.low_y and y3 < anim3d.high_y then return true end
+		return false
+	end
+
 	for actor_i, Tris in ipairs(actor_tris) do
 
 		-- Do Triangles
@@ -208,22 +235,25 @@ function anim3d:outputActorTris(actor_tris, start_time, end_time, time_step, fra
 				local T2 = data[i+1]
 
 				if T1.start_t < T2.start_t and not T1.final then
-					To1, To2 = sb_tri:getSpritesTwoFrames(T1, T1.cols, T2, T2.cols)
 
-					if To1 then
-						To1.height = T1.height
-						To2.height = T2.height
-						local O1,O2,O3 = sb_tri:convertTriDataToObjects(To1, To2, layer, T1.start_t, T2.start_t)
+					if triInViewport(T1) then
+						To1, To2 = sb_tri:getSpritesTwoFrames(T1, T1.cols, T2, T2.cols)
 
-						if O1 then
-							O1:setHeight(math.max(To1.height,To2.height))
-							table.insert(objects, O1) end
-						if O2 then
-							O2:setHeight(math.max(To1.height,To2.height))
-							table.insert(objects, O2) end
-						if O3 then
-							O3:setHeight(math.max(To1.height,To2.height))
-							table.insert(objects, O3) end
+						if To1 then
+							To1.height = T1.height
+							To2.height = T2.height
+							local O1,O2,O3 = sb_tri:convertTriDataToObjects(To1, To2, layer, T1.start_t, T2.start_t)
+
+							if O1 then
+								O1:setHeight(math.max(To1.height,To2.height))
+								table.insert(objects, O1) end
+							if O2 then
+								O2:setHeight(math.max(To1.height,To2.height))
+								table.insert(objects, O2) end
+							if O3 then
+								O3:setHeight(math.max(To1.height,To2.height))
+								table.insert(objects, O3) end
+						end
 					end
 				elseif T1.start_t > T2.start_t then
 					sb_log:error("anim3d.outputActorTris(): malformed triangles at indices %s-%s, their timepoints go backwards (%s,%s).",
@@ -337,6 +367,15 @@ function anim3d:keyframeTriangles(out_frame)
 				table.insert(result,r_results2[i])
 			end
 		else
+
+			-- Set height of triangle to be the max of all the triangles that have just been culled.
+			--[[local max_height = -100
+			for H=I+1,J-1 do
+				local TriH = points[H]
+				max_height = math.max(max_height, TriH.height)
+			end
+			points[I].height = max_height--]]
+
 			result = {points[I],points[J]}
 		end
 
