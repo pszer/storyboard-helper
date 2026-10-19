@@ -53,7 +53,7 @@ local Trail = -0.40
 local Radius = 12
 
 math.randomseed(32318352800)
-for t=times1[1]-2200,times1[2],130 do
+for t=times1[1]-2200,times1[2],168 do
 	local Rand = math.random() * math.pi*16
 	local Rand2 = math.random() * Radius + 9
 	local end_time = (Far-Near)/Phase1Vel
@@ -63,19 +63,19 @@ end
 
 local Phase2X = 18
 local Phase2Vel = 19*2
-for t=times2[1]-3000,times2[2]+1500,240 do
+for t=times2[1]-3000,times2[2]+1500,440 do
 	local Rand = (math.random()*15-7.5)*1.3
 	local end_time = 3*(Phase2X-(-Phase2X))/Phase2Vel
 	table.insert(Stars2, CreateStarAt(t-times2[1], {3*-Phase2X,Rand,40}, {Phase2Vel,0,0}, t + end_time*1000 - times2[1]))
 end
 
-for t=times3[1]-3000,times3[2],240 do
+for t=times3[1]-3000,times3[2],440 do
 	local Rand = (math.random()*15-7.5)*1.3
 	local end_time = 3*(Phase2X-(-Phase2X))/Phase2Vel
 	table.insert(Stars3, CreateStarAt(t-times3[1], {3*Phase2X,Rand,40}, {-Phase2Vel,0,0}, t + end_time*1000-times3[1]))
 end
 
-for t=times4[1]-8000,times4[2]+1500,170 do
+for t=times4[1]-8000,times4[2]+1500,270 do
 	local Rand = math.random() * math.pi*16
 	local Rand2 = math.random() * Radius + 9
 	local end_time = (Far-Near)/Phase1Vel

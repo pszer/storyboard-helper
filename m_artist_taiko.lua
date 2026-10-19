@@ -14,7 +14,6 @@ skey     = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi T
 wth      = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/wth_taiko.osb")
 ectomic  = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/ectomic_taiko.osb")
 nintendo = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/nintendo_taiko.osb")
-
 -- tsarbomba
 bomba = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/bomba_horse.osb")
 
@@ -92,18 +91,28 @@ end
 sb.a3d:setViewport(__BOUND_X_LOW, __BOUND_X_HIGH, __BOUND_Y_LOW, __BOUND_Y_HIGH)
 
 --DoModel('derpyflat.txt', skey, 5.5, 3.2, 20)
-sb.config["3d-default-triangle-epsilon"] = 5.73
-sb.config["3d-time-padding"] = 76
-sb.config["3d-scale-padding"] = 4.6
+sb.config["3d-default-triangle-epsilon"] = 6.03
+sb.config["3d-time-padding"] = 86
+sb.config["3d-scale-padding"] = 5.2
 DoModel('derpies.txt', bomba, 5.5, 3.2, 180, 'DerpyWalk', 1.0, 0.0, true)
-sb.config["3d-default-triangle-epsilon"] = 5.43-1.7
-sb.config["3d-time-padding"] = 46
+
+sb.config["3d-default-triangle-epsilon"] = 3.03
+sb.config["3d-time-padding"] = 80
+sb.config["3d-scale-padding"] = 5.2
+DoModel('eevee.txt', wth, 7.1, 3.2, 120, 'EeveeAction', 0.75, -1.5, false, "EeveeFlap", 1.0, 0.0)
+
+sb.config["3d-default-triangle-epsilon"] = 5.43-0.9
+sb.config["3d-time-padding"] = 41
 sb.config["3d-scale-padding"] = 4.0
 DoModel('mega.txt', skey, 6.3, 3.2, 180, 'MegaAction', 0.99, 0.25, false, 'MegaIdle', 2.7, 0.0)
-sb.config["3d-default-triangle-epsilon"] = 2.23
+sb.config["3d-default-triangle-epsilon"] = 2.43
 sb.config["3d-time-padding"] = 15
 sb.config["3d-scale-padding"] = 3.5
 DoModel('rhombi.txt', ectomic, 5.5, 3.2, 120, 'RhombiAction', 0.95, -0.11, false)
+sb.config["3d-default-triangle-epsilon"] = 3.93
+sb.config["3d-time-padding"] = 76
+sb.config["3d-scale-padding"] = 5.2
+DoModel('kirby.txt', nintendo, 5.5, 3.2, 40, 'Kirbyction', 0.75, 0.0, false, 'KirbyAir', 0.8, 0.0)
 
 append_os(MarioStars.stars)
 append_os(MarioStars.trails)
@@ -148,10 +157,10 @@ function tileAfterLogo(X,Y)
 
 
 			if X==4 and Y==3+3 then
-				return "sb/t/43N.png"
+				return "sb/t/43N.jpg"
 			end
 			if X==5 and Y==3+3 then
-				return "sb/t/53N.png"
+				return "sb/t/53N.jpg"
 			end
 
 			return "Sq.png"
@@ -162,7 +171,7 @@ end
 
 function tileHasImg(X,Y)
 	for _,v in ipairs(tiles) do
-		if v[1]==X-AXX_M and v[2]==Y-3 then return "sb/t/"..(X-AXX_M)..(Y-3)..".png" end
+		if v[1]==X-AXX_M and v[2]==Y-3 then return "sb/t/"..(X-AXX_M)..(Y-3)..".jpg" end
 	end
 end
 
@@ -365,10 +374,10 @@ for x = 0 - (taiko_width)*2, 640+taiko_width*2-1, taiko_width do
 		end
 
 		if (Sq[3] >= 0) and (Sq[3] <= 9+AXX) and (Sq[3]+Sq[4])%1==0 then
-			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in+DT*0.3, 70)
+			storyboard_base:newObject('sb/s.mp3', 'Background', Sq_time_in+DT*0.3, 70)
 		end
 		if (Sq2[3] >= 0) and (Sq2[3] <= 9+AXX) and (Sq2[3]+Sq2[4])%1==0 then
-			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in_2+DT*0.3, 70)
+			storyboard_base:newObject('sb/s.mp3', 'Background', Sq_time_in_2+DT*0.3, 70)
 		end
 		sfx_count = sfx_count+1
 
@@ -578,9 +587,9 @@ storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
 )
 
 
-storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
-	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
-)
+--storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
+--	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
+--)
 storyboard:newObject("bg.jpg", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
@@ -597,6 +606,7 @@ storyboard:writeToFile2(nil, params)
 skey:writeToFile2(nil, params)
 wth:writeToFile2(nil, params)
 ectomic:writeToFile2(nil, params)
+nintendo:writeToFile2(nil, params)
 bomba:writeToFile2(nil, params)
 
 --storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})

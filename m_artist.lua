@@ -12,6 +12,7 @@ storyboard = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi
 vyper = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/vyper_std.osb")
 doops = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/doops_std.osb")
 weeb = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/weeb_std.osb")
+ness = sb:new("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/ness_std.osb")
 
 sb.file:setProjectFolder("/home/quake/.local/share/osu-wine/osu!/Songs/2585798 Kazumi Totaka - Title Theme/")
 
@@ -76,6 +77,11 @@ sb.config["3d-time-padding"] = 16
 sb.config["3d-scale-padding"] = 3.8
 DoModel('cuddles.txt', vyper, 3.5, 2.1, 80, 'Actions', 0.8, 1.85, false, 'Actions', 2.9, 2.999)
 
+sb.config["3d-default-triangle-epsilon"] = 1.30
+sb.config["3d-time-padding"] = 40
+sb.config["3d-scale-padding"] = 2.6
+DoModel('ness.txt', ness, 3.9, 2.2, 40, 'NessAction', 0.61, 0.0, false, 'NessKick', -1.7, 0.4, true)
+
 sb.config["3d-default-triangle-epsilon"] = 3.13
 sb.config["3d-time-padding"] = 24
 sb.config["3d-scale-padding"] = 3.2
@@ -115,10 +121,10 @@ function tileAfterLogo(X,Y)
 
 
 			if X==4 and Y==3 then
-				return "sb/t/43N.png"
+				return "sb/t/43N.jpg"
 			end
 			if X==5 and Y==3 then
-				return "sb/t/53N.png"
+				return "sb/t/53N.jpg"
 			end
 
 			return "Sq.png"
@@ -129,7 +135,7 @@ end
 
 function tileHasImg(X,Y)
 	for _,v in ipairs(tiles) do
-		if v[1]==X and v[2]==Y then return "sb/t/"..X..Y..".png" end
+		if v[1]==X and v[2]==Y then return "sb/t/"..X..Y..".jpg" end
 	end
 end
 
@@ -320,10 +326,10 @@ for x = 0 - (64)*2, 640+107, 64 do
 		end
 
 		if (Sq[3] >= 0) and (Sq[3] <= 9) and (Sq[3]+Sq[4])%1==0 then
-			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in+DT*0.3, 70)
+			--storyboard:newObject('sb/s.mp3', 'Background', Sq_time_in+DT*0.3, 70)
 		end
 		if (Sq2[3] >= 0) and (Sq2[3] <= 9) and (Sq2[3]+Sq2[4])%1==0 then
-			storyboard:newObject('sb/s.wav', 'Background', Sq_time_in_2+DT*0.3, 70)
+			--storyboard:newObject('sb/s.mp3', 'Background', Sq_time_in_2+DT*0.3, 70)
 		end
 		sfx_count = sfx_count+1
 
@@ -528,9 +534,9 @@ storyboard:newObject("sb/FF.png","Background","Center", 320, 240):add(
 )
 
 
-storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(
-	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
-)
+--storyboard:newObject("bg.png", "Background", "Center", 320, 240):add(	
+--	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
+--)
 storyboard:newObject("bg.jpg", "Background", "Center", 320, 240):add(
 	{'fade', 0, { {redline,0}, {redline,0} }, 0,0 }
 )
@@ -546,6 +552,7 @@ storyboard:writeToFile2(nil, params)
 vyper:writeToFile2(nil, params)
 doops:writeToFile2(nil, params)
 weeb:writeToFile2(nil, params)
+ness:writeToFile2(nil, params)
 
 --storyboard:writeToFile2(nil, {pool_sprites=sb.tri.file_set})
 print(string.format("elapsed time: %.2f\n", os.clock() - x))
