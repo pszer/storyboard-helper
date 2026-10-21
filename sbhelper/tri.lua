@@ -950,4 +950,79 @@ function tri:calculateDepthStack(triangles)
 	return sorted_by_centroid
 end
 
+-- clips triangle to be within depth >= z.
+--
+-- returns
+--
+-- nil                   - triangle fully behind plane
+-- {v1,v2,v3}            - triangle fully in front of plane, or two vertices clipped.
+-- {v1,v2,v3},{v1,v2,v3} - one vertex behind plane, triangle gets clipped to a quad.
+--
+function tri:clipTriangleZPlane(v1,v2,v3, z)
+	-- fully behind / in front
+	if v1.z <= z and v2.z <= z and v3.z <= z then
+		return nil end
+	if v1.z > z and v2.z > z and v3.z > z then
+		return {v1,v2,v3} end
+
+	-- clip A and B, C is in front of z-plane
+	local function ClipTwoVerts(a,b,c)
+		local b_c = c-b
+		local a_c = c-a
+
+		local new_a = a + a_c * ( (z - a.z) / (c.z - a.z) )
+		local new_b = b + b_c * ( (z - b.z) / (c.z - b.z) )
+
+		return new_a, new_b, c
+	end
+
+	-- clip A, B and C are in front of z-plane
+	local function ClipOneVert(a,b,c)
+		local a_c = c-a
+		local a_b = b-a
+
+		local d = a + a_b * ( (z - a.z) / (b.z - a.z) )
+		local e = a + a_c * ( (z - a.z) / (c.z - a.z) )
+
+		return d,b,c, e,b,c
+	end
+
+	-- two vertices clipped.
+	if v1.z <= z and v2.z <= z and v3.z > z then
+
+		local a,b,c = ClipTwoVerts(v1, v2, v3)
+		return {a,b,c}
+		--
+	elseif v1.z <= z and v2.z > z and v3.z <= z then
+		--
+		local a,b,c = ClipTwoVerts(v3, v1, v2)
+		return {b,c,a}
+		--
+	elseif v1.z > z and v2.z <= z and v3.z <= z then
+		local a,b,c = ClipTwoVerts(v2, v3, v1)
+		return {c,a,b}
+
+	end
+
+	-- one vertex to clip.
+	if v1.z <= z then
+
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v1, v2, v3)
+		return {a1,b1,c1},{a2,b2,c2}
+		--
+	elseif v2.z <= z then
+		--
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v2, v3, v1)
+		return {c1,a1,b1},{c2,a2,b2}
+		--
+	elseif v3.z <= z then
+		--
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v3, v1, v2)
+		return {b1,c1,a1},{b2,c2,a2}
+
+	end
+
+	return {v1,v2,v3}
+end
+
 return tri

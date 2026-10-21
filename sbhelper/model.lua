@@ -96,9 +96,26 @@ m3d.CubeVerts = {
 -- triangles which are culled are split into triangles with unique identifiers of their own
 --
 local VERTEX_ID = 0
+m3d.SPLIT_MAGIC_VALUE = 9999999
 function m3d:getNewVertexID()
 	VERTEX_ID = VERTEX_ID + 1
 	return VERTEX_ID-1
+end
+
+-- when a triangle gets clipped by a plane, it either gets two vertices clipped, resulting in a triangle,
+-- or it gets one vertex clipped resulting in a quadrilateral (two triangles).
+--
+-- when the latter happens, the resulting triangles are to be treated as entirely new triangles, with different IDs,
+-- so that inappropiate interpolation with the unclipped triangle from last frame doesn't happen, and the two clipped triangles
+-- can interpolate between themselves for as long as the source triangle stays clipped in the plane.
+--
+-- for any triangle with an ID X, the two triangles reserved for when it gets clipped to a quad is
+-- X + SPLIT_MAGIC_VALUE
+-- and X + SPLIT_MAGIC_VALUE*2
+-- the magic value offset is sufficiently large for no ID collisions to realistically happen.
+--
+function m3d:getSplitVertexIDs(id)
+	return id + m3d.SPLIT_MAGIC_VALUE, id + m3d.SPLIT_MAGIC_VALUE*2
 end
 
 local id = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}
@@ -398,6 +415,9 @@ function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
 	       cpml.vec3.new(__norm_vec3.x, __norm_vec3.y, __norm_vec3.z),
 				 {vertex[VCol_i], vertex[VCol_i+1], vertex[VCol_i+2]},
 				 x_screen, y_screen
+end
+
+function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats)
 end
 
 function m3d:basicDiffuseColor(vertex, normal, color, light)

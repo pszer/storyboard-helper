@@ -367,15 +367,6 @@ function anim3d:keyframeTriangles(out_frame)
 				table.insert(result,r_results2[i])
 			end
 		else
-
-			-- Set height of triangle to be the max of all the triangles that have just been culled.
-			--[[local max_height = -100
-			for H=I+1,J-1 do
-				local TriH = points[H]
-				max_height = math.max(max_height, TriH.height)
-			end
-			points[I].height = max_height--]]
-
 			result = {points[I],points[J]}
 		end
 
@@ -383,7 +374,6 @@ function anim3d:keyframeTriangles(out_frame)
 	end
 
 	local result = RDP(out_frame, 1, #out_frame)
-
 	--print()
 	--print('simplified to '..#result..' from '..#out_frame)
 
