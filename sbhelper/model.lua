@@ -1,6 +1,7 @@
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local cpml = require (modules..'cpml')
 local sb_log = require (modules..'log')
+local sb_clone = require (modules..'clone')
 require 'io'
 
 local m3d = {
@@ -331,6 +332,159 @@ function m3d:hasAttribute(format, attr)
 	return format[attr] ~= nil
 end
 
+
+-- clips triangle to be within depth >= z.
+--
+-- returns
+--
+-- nil                   - triangle fully behind plane
+-- {v1,v2,v3}            - triangle fully in front of plane, or two vertices clipped.
+-- {v1,v2,v3},{v1,v2,v3} - one vertex behind plane, triangle gets clipped to a quad.
+--
+function m3d:clipTriangleZPlane(v1,v2,v3, z)
+	-- fully behind / in front
+	if v1.z <= z and v2.z <= z and v3.z <= z then
+		return nil end
+	if v1.z > z and v2.z > z and v3.z > z then
+		return {v1,v2,v3} end
+
+	-- clip A and B, C is in front of z-plane
+	local function ClipTwoVerts(a,b,c)
+		local b_c = c-b
+		local a_c = c-a
+
+		local new_a = a + a_c * ( (z - a.z) / (c.z - a.z) )
+		local new_b = b + b_c * ( (z - b.z) / (c.z - b.z) )
+
+		return new_a, new_b, c
+	end
+
+	-- clip A, B and C are in front of z-plane
+	local function ClipOneVert(a,b,c)
+		local a_c = c-a
+		local a_b = b-a
+
+		local d = a + a_b * ( (z - a.z) / (b.z - a.z) )
+		local e = a + a_c * ( (z - a.z) / (c.z - a.z) )
+
+		return d,b,c, e,b,c
+	end
+
+	-- two vertices clipped.
+	if v1.z <= z and v2.z <= z and v3.z > z then
+
+		local a,b,c = ClipTwoVerts(v1, v2, v3)
+		return {a,b,c}
+		--
+	elseif v1.z <= z and v2.z > z and v3.z <= z then
+		--
+		local a,b,c = ClipTwoVerts(v3, v1, v2)
+		return {b,c,a}
+		--
+	elseif v1.z > z and v2.z <= z and v3.z <= z then
+		local a,b,c = ClipTwoVerts(v2, v3, v1)
+		return {c,a,b}
+
+	end
+
+	-- one vertex to clip.
+	if v1.z <= z then
+
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v1, v2, v3)
+		return {a1,b1,c1},{a2,b2,c2}
+		--
+	elseif v2.z <= z then
+		--
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v2, v3, v1)
+		return {c1,a1,b1},{c2,a2,b2}
+		--
+	elseif v3.z <= z then
+		--
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v3, v1, v2)
+		return {b1,c1,a1},{b2,c2,a2}
+
+	end
+
+	return {v1,v2,v3}
+end
+
+-- CLIP
+function m3d:clipTriangleZPlane2(t1,t2,t3, z)
+	local v1,v2,v3 = t1.pos, t2.pos, t3.pos
+
+	-- if fully behind / in front
+	if v1.z <= z and v2.z <= z and v3.z <= z then
+		return nil, nil, false end
+	if v1.z > z and v2.z > z and v3.z > z then
+		return {t1,t2,t3}, nil, true end
+
+	-- interps ['pos'],['norm'],['col']
+	local function interp(vA,vB, r)
+		local d_pos  = vB.pos - vA.pos
+		local d_norm = vB.norm - vA.norm
+		local d_R    = vB.col[1] - vA.col[1]
+		local d_G    = vB.col[2] - vA.col[2]
+		local d_B    = vB.col[3] - vA.col[3]
+
+		return {
+			pos = vA.pos + d_pos*r,
+			norm = vA.norm + d_norm*r,
+			col = {
+				vA.col[1] + d_R*r,
+				vA.col[2] + d_G*r,
+				vA.col[3] + d_B*r,
+			}
+		}
+	end
+
+	-- clip A and B. C is in front of z-plane
+	local function ClipTwoVerts(a,b,c)
+		return interp(a,c, (z-a.pos.z) / (c.pos.z - a.pos.z)),
+		       interp(b,c, (z-b.pos.z) / (c.pos.z - b.pos.z)),
+					 c
+	end
+	-- clip A. B and C are in front of z-plane
+	local function ClipOneVert(a,b,c)
+		return interp(a,b, (z-a.pos.z) / (b.pos.z - a.pos.z)),
+					 b,c,
+		       interp(b,c, (z-a.pos.z) / (c.pos.z - a.pos.z)),
+					 b,c
+	end
+	-- two vertices clipped.
+	if v1.z <= z and v2.z <= z and v3.z > z then
+		local a,b,c = ClipTwoVerts(t1, t2, t3)
+		return {a,b,c}, nil, true
+		--
+	elseif v1.z <= z and v2.z > z and v3.z <= z then
+		--
+		local a,b,c = ClipTwoVerts(t3, t1, t2)
+		return {b,c,a}, nil, true
+		--
+	elseif v1.z > z and v2.z <= z and v3.z <= z then
+		local a,b,c = ClipTwoVerts(t2, t3, t1)
+		return {c,a,b}, nil, true
+
+	end
+	-- one vertex to clip.
+	if v1.z <= z then
+
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(t1, t2, t3)
+		return {a1,b1,c1},{a2,b2,c2}, true
+		--
+	elseif v2.z <= z then
+		--
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(t2, t3, t1)
+		return {c1,a1,b1},{c2,a2,b2}, true
+		--
+	elseif v3.z <= z then
+		--
+		local a1,b1,c1, a2,b2,c2 = ClipOneVert(t3, t1, t2)
+		return {b1,c1,a1},{b2,c2,a2}, true
+
+	end
+	return {t1,t2,t3}, nil, false
+end
+
 local __pos_reg = {0,0,0,0}
 local __norm_reg = {0,0,0,0}
 local __screen_reg = {0,0,0,0}
@@ -417,7 +571,135 @@ function m3d:vertexOut(vertex, format, model_m, view_m, proj_m, bone_mats)
 				 x_screen, y_screen
 end
 
-function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats)
+function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats, clip_z)
+	local clip_z = clip_z or 0.1
+	local function getVertex(vertex)
+		local Pos_i,Pos_j = m3d:getVertexAttributeIndex(format, 'VertexPosition')
+		__pos_reg[1]=vertex[Pos_i]
+		__pos_reg[2]=vertex[Pos_i+1]
+		__pos_reg[3]=vertex[Pos_i+2]
+		__pos_reg[4]=1.0
+		if bone_mats then
+			local VertexBone_i, VertexBone_j = m3d:getVertexAttributeIndex(format, 'VertexBone')
+			local VertexWeight_i, VertexWeight_j = m3d:getVertexAttributeIndex(format, 'VertexWeight')
+			for i=1,16 do
+				deform_mat[i]=0 end
+			for i=0,3 do
+				local bm = bone_mats[ math.floor(vertex[VertexBone_i+i]*255.0)+1 ]
+				local scalar = vertex[VertexWeight_i+i]
+				for j=1,16 do
+					deform_mat[j] = deform_mat[j] + bm[j]*scalar
+				end
+			end
+			cpml.mat4.mul_vec4(__pos_reg, deform_mat, __pos_reg)
+		end
+		-- multiply by model matrix, then camera view+perspective matrix
+		cpml.mat4.mul_vec4(__pos_reg, model_m, __pos_reg)
+		cpml.mat4.mul_vec4(__pos_reg, view_m, __pos_reg)
+		local screen_space={0,0,0,0}
+		cpml.mat4.mul_vec4(screen_space, proj_m, __pos_reg)
+		local Norm_i,Norm_j = m3d:getVertexAttributeIndex(format, 'VertexNormal')
+		__norm_reg[1]=vertex[Norm_i]
+		__norm_reg[2]=vertex[Norm_i+1]
+		__norm_reg[3]=vertex[Norm_i+2]
+		__norm_reg[4]=0.0
+		-- multiply normal by model matrix
+		cpml.mat4.mul_vec4(__norm_reg, model_m, __norm_reg)
+		-- multiply normal by skin
+		if bone_mats and deform_mat then
+			cpml.mat4.mul_vec4(__norm_reg, deform_mat, __norm_reg)
+		end
+		-- normalise
+		__norm_vec3.x = __norm_reg[1]
+		__norm_vec3.y = __norm_reg[2]
+		__norm_vec3.z = __norm_reg[3]
+		local length = __norm_vec3:len()
+		__norm_vec3.x = __norm_vec3.x/length
+		__norm_vec3.y = __norm_vec3.y/length
+		__norm_vec3.z = __norm_vec3.z/length
+		local VCol_i, VCol_j = m3d:getVertexAttributeIndex(format, 'VertexColor')
+		return { pos  = cpml.vec3.new(__pos_reg[1], __pos_reg[2], __pos_reg[3]),
+					   norm = cpml.vec3.new(__norm_vec3.x, __norm_vec3.y, __norm_vec3.z),
+					 screen = screen_space,
+					    col = {vertex[VCol_i], vertex[VCol_i+1], vertex[VCol_i+2]} }
+	end
+
+	local function getXY(screen)
+		local v_x, v_y
+		local x_NDC = screen[1] / screen[4]
+		local y_NDC = screen[2] / screen[4]
+		v_x = (x_NDC + 0.5) * m3d.Screen_W + m3d.Screen_X_Off
+		v_y = (y_NDC + 0.5) * m3d.Screen_H + m3d.Screen_Y_Off
+		return v_x,v_y
+	end
+
+	local function toScreen(pos)
+		local sc_reg = {}
+		local reg = {}
+		reg[1] = pos.x
+		reg[2] = pos.y
+		reg[3] = pos.z
+		reg[4] = 1.0
+		cpml.mat4.mul_vec4(sc_reg, proj_m, reg)
+		return sc_reg
+	end
+
+	local function screenToXY(screen)
+	-- transform to final screen xy coordinates
+		local x_NDC = screen[1] / screen[4]
+		local y_NDC = screen[2] / screen[4]
+		--local z_NDC = __screen_reg[3] / __screen_reg[4]
+		local x_screen = (x_NDC + 0.5) * m3d.Screen_W + m3d.Screen_X_Off
+		local y_screen = (y_NDC + 0.5) * m3d.Screen_H + m3d.Screen_Y_Off
+		return x_screen, y_screen
+	end
+
+	local t1,t2,t3 = getVertex(v1),getVertex(v2),getVertex(v3)
+
+	local c_t1,c_t2,clipped = m3d:clipTriangleZPlane2(t1,t2,t3, clip_z)
+
+	-- clipped outside of view
+	if not c_t1 then return nil end
+
+	-- clipped to triangle
+	if not c_t2 then
+		if clipped then
+			t1.pos = c_t1[1]
+			t2.pos = c_t1[2]
+			t3.pos = c_t1[3]
+
+			t1.screen = toScreen(t1.pos)
+			t2.screen = toScreen(t2.pos)
+			t3.screen = toScreen(t3.pos)
+		end
+		t1.sx, t1.sy = screenToXY(t1.screen)
+		t2.sx, t2.sy = screenToXY(t2.screen)
+		t3.sx, t3.sy = screenToXY(t3.screen)
+		return t1,t2,t3
+	end
+
+	-- clipped to quad
+	local q1,q2,q3,q4,q5,q6
+	q1 = sb_clone(c_t1[1])
+	q2 = sb_clone(c_t1[2])
+	q3 = sb_clone(c_t1[3])
+	q4 = sb_clone(c_t1[4])
+	q5 = sb_clone(c_t1[5])
+	q6 = sb_clone(c_t1[6])
+	q1.screen = toScreen(q1.pos)
+	q2.screen = toScreen(q2.pos)
+	q3.screen = toScreen(q3.pos)
+	q4.screen = toScreen(q4.pos)
+	q5.screen = toScreen(q5.pos)
+	q6.screen = toScreen(q6.pos)
+	q1.sx,q1.sy = screenToXY(q1.screen)
+	q2.sx,q2.sy = screenToXY(q2.screen)
+	q3.sx,q3.sy = screenToXY(q3.screen)
+	q4.sx,q4.sy = screenToXY(q4.screen)
+	q5.sx,q5.sy = screenToXY(q5.screen)
+	q6.sx,q6.sy = screenToXY(q6.screen)
+
+	return q1,q2,q3,q4,q5,q6
 end
 
 function m3d:basicDiffuseColor(vertex, normal, color, light)
