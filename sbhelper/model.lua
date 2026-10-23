@@ -337,86 +337,21 @@ end
 --
 -- returns
 --
--- nil                   - triangle fully behind plane
--- {v1,v2,v3}            - triangle fully in front of plane, or two vertices clipped.
--- {v1,v2,v3},{v1,v2,v3} - one vertex behind plane, triangle gets clipped to a quad.
+-- nil,nil,true               - triangle fully behind plane
+-- {v1,v2,v3},nil,false       - triangle fully in front of plane
+-- {v1,v2,v3},nil,true        - two vertices clipped.
+-- {v1,v2,v3},{v1,v2,v3},true - one vertex behind plane, triangle gets clipped to a quad.
 --
-function m3d:clipTriangleZPlane(v1,v2,v3, z)
-	-- fully behind / in front
-	if v1.z <= z and v2.z <= z and v3.z <= z then
-		return nil end
-	if v1.z > z and v2.z > z and v3.z > z then
-		return {v1,v2,v3} end
-
-	-- clip A and B, C is in front of z-plane
-	local function ClipTwoVerts(a,b,c)
-		local b_c = c-b
-		local a_c = c-a
-
-		local new_a = a + a_c * ( (z - a.z) / (c.z - a.z) )
-		local new_b = b + b_c * ( (z - b.z) / (c.z - b.z) )
-
-		return new_a, new_b, c
-	end
-
-	-- clip A, B and C are in front of z-plane
-	local function ClipOneVert(a,b,c)
-		local a_c = c-a
-		local a_b = b-a
-
-		local d = a + a_b * ( (z - a.z) / (b.z - a.z) )
-		local e = a + a_c * ( (z - a.z) / (c.z - a.z) )
-
-		return d,b,c, e,b,c
-	end
-
-	-- two vertices clipped.
-	if v1.z <= z and v2.z <= z and v3.z > z then
-
-		local a,b,c = ClipTwoVerts(v1, v2, v3)
-		return {a,b,c}
-		--
-	elseif v1.z <= z and v2.z > z and v3.z <= z then
-		--
-		local a,b,c = ClipTwoVerts(v3, v1, v2)
-		return {b,c,a}
-		--
-	elseif v1.z > z and v2.z <= z and v3.z <= z then
-		local a,b,c = ClipTwoVerts(v2, v3, v1)
-		return {c,a,b}
-
-	end
-
-	-- one vertex to clip.
-	if v1.z <= z then
-
-		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v1, v2, v3)
-		return {a1,b1,c1},{a2,b2,c2}
-		--
-	elseif v2.z <= z then
-		--
-		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v2, v3, v1)
-		return {c1,a1,b1},{c2,a2,b2}
-		--
-	elseif v3.z <= z then
-		--
-		local a1,b1,c1, a2,b2,c2 = ClipOneVert(v3, v1, v2)
-		return {b1,c1,a1},{b2,c2,a2}
-
-	end
-
-	return {v1,v2,v3}
-end
 
 -- CLIP
-function m3d:clipTriangleZPlane2(t1,t2,t3, z)
+function m3d:clipTriangleZPlane(t1,t2,t3, z)
 	local v1,v2,v3 = t1.pos, t2.pos, t3.pos
 
 	-- if fully behind / in front
 	if v1.z <= z and v2.z <= z and v3.z <= z then
-		return nil, nil, false end
+		return nil, nil, true end
 	if v1.z > z and v2.z > z and v3.z > z then
-		return {t1,t2,t3}, nil, true end
+		return {t1,t2,t3}, nil, false end
 
 	-- interps ['pos'],['norm'],['col']
 	local function interp(vA,vB, r)
@@ -446,8 +381,9 @@ function m3d:clipTriangleZPlane2(t1,t2,t3, z)
 	-- clip A. B and C are in front of z-plane
 	local function ClipOneVert(a,b,c)
 		return interp(a,b, (z-a.pos.z) / (b.pos.z - a.pos.z)),
-					 b,c,
-		       interp(b,c, (z-a.pos.z) / (c.pos.z - a.pos.z)),
+					 b,
+		       interp(a,c, (z-a.pos.z) / (c.pos.z - a.pos.z)),
+		       interp(a,c, (z-a.pos.z) / (c.pos.z - a.pos.z)),
 					 b,c
 	end
 	-- two vertices clipped.
@@ -623,16 +559,6 @@ function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats, c
 					 screen = screen_space,
 					    col = {vertex[VCol_i], vertex[VCol_i+1], vertex[VCol_i+2]} }
 	end
-
-	local function getXY(screen)
-		local v_x, v_y
-		local x_NDC = screen[1] / screen[4]
-		local y_NDC = screen[2] / screen[4]
-		v_x = (x_NDC + 0.5) * m3d.Screen_W + m3d.Screen_X_Off
-		v_y = (y_NDC + 0.5) * m3d.Screen_H + m3d.Screen_Y_Off
-		return v_x,v_y
-	end
-
 	local function toScreen(pos)
 		local sc_reg = {}
 		local reg = {}
@@ -642,6 +568,14 @@ function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats, c
 		reg[4] = 1.0
 		cpml.mat4.mul_vec4(sc_reg, proj_m, reg)
 		return sc_reg
+	end
+	local function getXY(screen)
+		local v_x, v_y
+		local x_NDC = screen[1] / screen[4]
+		local y_NDC = screen[2] / screen[4]
+		v_x = (x_NDC + 0.5) * m3d.Screen_W + m3d.Screen_X_Off
+		v_y = (y_NDC + 0.5) * m3d.Screen_H + m3d.Screen_Y_Off
+		return v_x,v_y
 	end
 
 	local function screenToXY(screen)
@@ -655,19 +589,19 @@ function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats, c
 	end
 
 	local t1,t2,t3 = getVertex(v1),getVertex(v2),getVertex(v3)
-
-	local c_t1,c_t2,clipped = m3d:clipTriangleZPlane2(t1,t2,t3, clip_z)
+	local c_t1,c_t2,clipped = m3d:clipTriangleZPlane(t1,t2,t3, clip_z)
 
 	-- clipped outside of view
 	if not c_t1 then return nil end
 
-	-- clipped to triangle
+	-- triangle/clipped to triangle
 	if not c_t2 then
+		-- if clipping has occured, the screen co-ordinates have to be recalculated,
+		-- and position updated.
 		if clipped then
 			t1.pos = c_t1[1]
 			t2.pos = c_t1[2]
 			t3.pos = c_t1[3]
-
 			t1.screen = toScreen(t1.pos)
 			t2.screen = toScreen(t2.pos)
 			t3.screen = toScreen(t3.pos)
@@ -678,7 +612,7 @@ function m3d:triangleOut(v1,v2,v3, format, model_m, view_m, proj_m, bone_mats, c
 		return t1,t2,t3
 	end
 
-	-- clipped to quad
+	-- clipped to quad (two triangles, six vertices)
 	local q1,q2,q3,q4,q5,q6
 	q1 = sb_clone(c_t1[1])
 	q2 = sb_clone(c_t1[2])

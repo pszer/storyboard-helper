@@ -760,6 +760,55 @@ function tri:get3DTrianglesOut(verts, format, model_m, view_m, proj_m, bone_mats
 	return Triangles, Colors
 end
 
+--
+-- triangle clipped.
+--
+function tri:get3DTrianglesOut_Clipped(verts, format, model_m, view_m, proj_m, bone_mats, frag_shader, clip_z)
+	local clip_z = clip_z or 0.1
+	local Triangles = {}
+
+	local Pos_i, Pos_j = sb_m3d:getVertexAttributeIndex(format, 'VertexPosition')
+
+	local m3d = sb_m3d
+
+	for i=1, #verts, 3 do
+		local ID = verts[i+0].id
+
+		--[[local v1_pos, v1_norm, v1_c, v1_x, v1_y = m3d:vertexOut(verts[i+0], format, model_m, view_m, proj_m, bone_mats)
+		local v2_pos, v2_norm, v2_c, v2_x, v2_y = m3d:vertexOut(verts[i+1], format, model_m, view_m, proj_m, bone_mats)
+		local v3_pos, v3_norm, v3_c, v3_x, v3_y = m3d:vertexOut(verts[i+2], format, model_m, view_m, proj_m, bone_mats)
+
+		local v1_col = frag_shader(v1_pos, v1_norm, v1_c)
+		local v2_col = frag_shader(v2_pos, v2_norm, v2_c)
+		local v3_col = frag_shader(v3_pos, v3_norm, v3_c)--]]
+
+		local v1,v2,v3,v4,v5,v6 = m3d:triangleOut(verts[i+0],verts[i+1],verts[i+2], format, model_m, view_m, proj_m, bone_mats, clip_z)
+
+		-- if not clipped outside view.
+		if v1 then
+			-- one triangle
+			if not v4 then
+				local centroid_z = tri:centroidZ(v1.pos, v2.pos, v3.pos)
+				table.insert(Triangles, {v1.sx,v1.sy, v2.sx,v2.sy, v3.sx,v3.sy, ["centroid_z"] = centroid_z, height=0, cols =
+					{v1.col,v2.col,v3.col}, id=ID})
+
+			-- if clipped to quad, it's two triangles with their own different IDs
+			else
+				local id1,id2 = sb_m3d:getSplitVertexIDs(ID)  
+
+				local centroid_z1 = tri:centroidZ(v1.pos, v2.pos, v3.pos)
+				table.insert(Triangles, {v1.sx,v1.sy, v2.sx,v2.sy, v3.sx,v3.sy, ["centroid_z"] = centroid_z1, height=0, cols =
+					{v1.col,v2.col,v3.col}, id=id1})
+				local centroid_z2 = tri:centroidZ(v4.pos, v5.pos, v6.pos)
+				table.insert(Triangles, {v4.sx,v4.sy, v5.sx,v5.sy, v6.sx,v6.sy, ["centroid_z"] = centroid_z2, height=0, cols =
+					{v4.col,v5.col,v6.col}, id=id2})
+			end
+		end
+	end
+
+	return Triangles
+end
+
 -- subdivides triangle once
 --     /\         /\
 --    /  \       /  \
