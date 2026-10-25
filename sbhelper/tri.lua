@@ -789,12 +789,26 @@ function tri:get3DTrianglesOut_Clipped(verts, format, model_m, view_m, proj_m, b
 			-- one triangle
 			if not v4 then
 				local centroid_z = tri:centroidZ(v1.pos, v2.pos, v3.pos)
+				if frag_shader then
+					v1.col = frag_shader(v1.pos, v1.norm, v1.col)
+					v2.col = frag_shader(v2.pos, v2.norm, v2.col)
+					v3.col = frag_shader(v3.pos, v3.norm, v3.col)
+				end
+
 				table.insert(Triangles, {v1.sx,v1.sy, v2.sx,v2.sy, v3.sx,v3.sy, ["centroid_z"] = centroid_z, height=0, cols =
 					{v1.col,v2.col,v3.col}, id=ID})
 
 			-- if clipped to quad, it's two triangles with their own different IDs
 			else
 				local id1,id2 = sb_m3d:getSplitVertexIDs(ID)  
+				if frag_shader then
+					v1.col = frag_shader(v1.pos, v1.norm, v1.col)
+					v2.col = frag_shader(v2.pos, v2.norm, v2.col)
+					v3.col = frag_shader(v3.pos, v3.norm, v3.col)
+					v4.col = frag_shader(v4.pos, v4.norm, v4.col)
+					v5.col = frag_shader(v5.pos, v5.norm, v5.col)
+					v6.col = frag_shader(v6.pos, v6.norm, v6.col)
+				end
 
 				local centroid_z1 = tri:centroidZ(v1.pos, v2.pos, v3.pos)
 				table.insert(Triangles, {v1.sx,v1.sy, v2.sx,v2.sy, v3.sx,v3.sy, ["centroid_z"] = centroid_z1, height=0, cols =

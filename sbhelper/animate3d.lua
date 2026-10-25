@@ -134,7 +134,9 @@ function anim3d:animate3D(params)
 			-- the actor is disabled for the frame.
 			--
 			if m_mat then
-				local Tris = sb_tri:get3DTrianglesOut(Model.vertices, Model.format, m_mat,
+				--local Tris = sb_tri:get3DTrianglesOut(Model.vertices, Model.format, m_mat,
+				--	view, proj, bone_mats, local_shader)
+				local Tris = sb_tri:get3DTrianglesOut_Clipped(Model.vertices, Model.format, m_mat,
 					view, proj, bone_mats, local_shader)
 
 				local depthStack = sb_tri:calculateDepthStack(Tris)
