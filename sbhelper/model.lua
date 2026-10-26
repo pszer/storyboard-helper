@@ -180,7 +180,7 @@ local __4_3 = 4/3
 function m3d:setPerspective(fov, widescreen, near, far)
 	local fov = fov or 70
 	local widescreen = widescreen or 'wide'
-	local near = near or 0.5
+	local near = near or 0.1
 	local far = far or 5000
 	local aspect = __16_9
 	if widescreen:lower()=='standard' then

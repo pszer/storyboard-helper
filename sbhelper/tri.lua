@@ -33,7 +33,33 @@ local function radToDeg(x)
 	return 180.0*x/math.pi
 end
 
--- fill out sample set
+function tri:initTriSet(dim, size, folder)
+	tri.DIM=dim
+	tri.size=size
+
+	folder = folder or 'T/'
+	tri.file_str_format    = folder..'%d.png'
+	tri.file_str_format_v2 = folder..'%dA.png'
+	tri.file_str_format_v3 = folder..'%dB.png'
+
+	tri.sample_set = {}
+	tri.file_set = {}
+
+	-- fill out sample set
+	local count = 1
+	for i=0,0.5, 0.5/tri.set_size do
+		tri.sample_set[count] = { i,1 , file = string.format(tri.file_str_format, count),
+																		file_v2 = string.format(tri.file_str_format_v2, count),
+																		file_v3 = string.format(tri.file_str_format_v3, count),
+																	}
+		table.insert(tri.file_set, string.format(tri.file_str_format, count))
+		table.insert(tri.file_set, string.format(tri.file_str_format_v2, count))
+		table.insert(tri.file_set, string.format(tri.file_str_format_v3, count))
+		count=count+1
+	end
+end
+
+-- fill out sample set with default values
 local count = 1
 for i=0,0.5, 0.5/tri.set_size do
 	tri.sample_set[count] = { i,1 , file = string.format(tri.file_str_format, count),
